@@ -51,17 +51,7 @@ export class CalendarScale {
 
   }
 
-  get timeInterval(): number {
-    let r: number = 0;
-    switch (this.interval) {
-      case TimeRangeType.day: r = 'days'; break;
-      case TimeRangeType.week: r = 'weeks'; break;
-      case TimeRangeType.month: r = 'months'; break;
-      case TimeRangeType.year: r = 'years'; break;
-    }
-    return r;
-  }
-
+ 
   Labels() {
 
     let m1 = moment(this.firstDate);
