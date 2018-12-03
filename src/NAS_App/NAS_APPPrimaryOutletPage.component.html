@@ -1,0 +1,76 @@
+<mat-grid-list cols="4" rowHeight="60px">
+  <mat-grid-tile colspan="4">
+      <span>
+        <div class="button-row">
+          <button mat-icon-button [matMenuTriggerFor]="mes">
+            MES
+          </button>
+          <button mat-icon-button [matMenuTriggerFor]="hr">
+            HR
+          </button>
+        </div>
+      </span>
+      <span class="toolbar-spacer"></span>
+      <span></span>
+    <mat-menu #mes="matMenu">
+      <button mat-menu-item [matMenuTriggerFor]="hotmill">Hot Mill</button>
+      <button mat-menu-item [matMenuTriggerFor]="tools">Tools</button>
+    </mat-menu>
+
+    <mat-menu #hotmill="matMenu">
+      <button mat-menu-item [matMenuTriggerFor]="productionreports">Production Reports</button>
+    </mat-menu>
+
+    <mat-menu #productionreports="matMenu">
+      <button mat-menu-item routerLink="/hrmproductionhistory">HRM Production History</button>
+    </mat-menu>
+
+    <mat-menu #tools="matMenu">
+      <button mat-menu-item routerLink="/systeminventory">System Inventory</button>
+    </mat-menu>
+
+    <mat-menu #hr="matMenu">
+      <button mat-menu-item>Employee Swipes Report</button>
+    </mat-menu>
+
+  </mat-grid-tile>
+  <mat-grid-tile colspan="4">
+    <mat-toolbar color="primary">
+      <span>{{pageTitle}}</span>
+
+      <!-- This fills the remaining space of the current row -->
+      <span class="toolbar-spacer"></span>
+
+      <span>
+        <div class="button-row">
+          <button mat-icon-button>
+            <fa-icon aria-label="Filter Page" icon="filter"></fa-icon>
+          </button>
+          <button mat-icon-button color="error">
+            <mat-icon aria-label="PDF">insert_photo</mat-icon>
+          </button>
+          <button mat-icon-button color="accent">
+            <mat-icon aria-label="Text">publish</mat-icon>
+          </button>
+          <button mat-icon-button color="default">
+            <mat-icon aria-label="Send as Email">email</mat-icon>
+          </button>
+        </div>
+      </span>
+    </mat-toolbar>
+  </mat-grid-tile>
+  <mat-grid-tile colspan="4">
+    <span class="toolbar-spacer"></span>
+    <span>
+      <div class="button-row">
+        <button mat-raised-button color="primary" (click)="filterService.ApplyFilter()">Go</button>
+        <button mat-raised-button color="primary" (click)="filterService.ResetFilter()">Reset</button>
+      </div>
+    </span>
+  </mat-grid-tile>
+  <!--<mat-grid-tile colspan="4" rowspan="10" [style.background]="red">
+  </mat-grid-tile>-->
+</mat-grid-list>
+<router-outlet></router-outlet>
+
+

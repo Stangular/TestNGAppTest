@@ -1,0 +1,9 @@
+﻿<div [formGroup]="form" class="form-group" [class.has-error]="!isValid">
+    <mat-form-field>
+        <mat-select [placeholder]="element.Label()" (selectionChange)="SelectItem($event)" [value]="currentItem">
+            <mat-option *ngFor="let item of List" [value]="item.value">
+                {{ item.label }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

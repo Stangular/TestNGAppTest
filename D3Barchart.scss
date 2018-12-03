@@ -1,0 +1,89 @@
+
+
+path {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2;
+}
+
+.linesss {
+  fill: none;
+  shape-rendering: crispEdges;
+  stroke: red;
+  stroke-width: 1;
+}
+
+.axis path, .axis line {
+  fill: none;
+  shape-rendering: crispEdges;
+  stroke: red;
+  stroke-width: 1;
+}
+
+.axis text {
+  fill: #766;
+  font-family: 'PT Sans Narrow', sans-serif;
+  font-size: 12px;
+}
+
+
+div#layout {
+  text-align: center;
+}
+
+div#container {
+  width: 1000px;
+  height: 600px;
+  margin: auto;
+  background-color: #2F4A6D;
+}
+
+text {
+  font-size: 12px;
+  fill: #fff;
+}
+
+line {
+  stroke: gray;
+}
+
+line#limit {
+  stroke: #FED966;
+  stroke-width: 3;
+  stroke-dasharray: 3 6;
+}
+
+.grid path {
+  stroke-width: 1;
+}
+
+.grid .tick line {
+  stroke: #FED966;
+  stroke-opacity: 0.1;
+}
+
+text.divergence {
+  font-size: 14px;
+  fill: #2F4A6D;
+}
+
+text.value {
+  font-size: 14px;
+}
+
+text.charttitle {
+  font-size: 22px;
+  font-weight: 600;
+  fill: red;
+}
+
+text.label {
+  font-size: 14px;
+  font-weight: 400;
+  color: yellow;
+}
+
+text.source {
+  font-size: 10px;
+  color: black;
+}

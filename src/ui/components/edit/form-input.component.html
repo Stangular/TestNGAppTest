@@ -1,0 +1,10 @@
+﻿<div [formGroup]="form" class="form-group" [class.has-error]="!isValid">
+    <mat-form-field>
+        <input matInput
+               [formControlName]="element.FieldID()"
+               [id]="element.FieldID()"
+               [placeholder]="element.Label()"
+               [type]="element.Type()"
+               [value]="element.CurrentValue()" />
+    </mat-form-field>
+</div>

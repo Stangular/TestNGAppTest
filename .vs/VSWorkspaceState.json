@@ -1,0 +1,23 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\d3",
+    "\\src\\d3\\axis",
+    "\\src\\d3\\barchart",
+    "\\src\\d3\\dataviewModel",
+    "\\src\\d3\\dataviewModel\\examples",
+    "\\src\\d3\\dataviewModel\\examples\\maps",
+    "\\src\\d3\\linechart",
+    "\\src\\d3\\SVGElement",
+    "\\src\\dataManagement",
+    "\\src\\dataManagement\\model",
+    "\\src\\dataManagement\\model\\data",
+    "\\src\\dataManagement\\model\\definitions",
+    "\\src\\dataManagement\\model\\form",
+    "\\src\\NAS_App",
+    "\\src\\NAS_App\\Charts"
+  ],
+  "SelectedNode": "\\src\\dataManagement\\model\\data\\dataitem.ts",
+  "PreviewInSolutionExplorer": false
+}

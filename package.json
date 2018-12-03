@@ -12,15 +12,25 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^6.1.0",
+    "@angular/cdk": "^6.4.0",
     "@angular/common": "^6.1.0",
     "@angular/compiler": "^6.1.0",
     "@angular/core": "^6.1.0",
     "@angular/forms": "^6.1.0",
     "@angular/http": "^6.1.0",
+    "@angular/material": "^6.4.0",
     "@angular/platform-browser": "^6.1.0",
     "@angular/platform-browser-dynamic": "^6.1.0",
     "@angular/router": "^6.1.0",
+    "@fortawesome/angular-fontawesome": "^0.1.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.2",
+    "@fortawesome/free-solid-svg-icons": "^5.2.0",
     "core-js": "^2.5.4",
+    "d3": "^5.5.0",
+    "font-awesome": "^4.7.0",
+    "fontawesome": "^4.7.2",
+    "moment": "^2.22.2",
+    "ol": "^5.1.3",
     "rxjs": "^6.0.0",
     "zone.js": "~0.8.26"
   },
@@ -43,6 +53,7 @@
     "protractor": "~5.4.0",
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
+    "material-icons": "^0.2.3",
     "typescript": "~2.7.2"
   }
 }

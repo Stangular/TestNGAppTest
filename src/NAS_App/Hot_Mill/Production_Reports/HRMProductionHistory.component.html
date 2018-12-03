@@ -1,0 +1,123 @@
+
+<mat-accordion [multi]="true">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Inventory Summary by Area
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-card>
+      <d3linechart [chartID]="'inventorysummanrbyarea'"
+                   [chartWidth]="600"
+                   [chartHeight]="400">
+      </d3linechart>
+    </mat-card>
+
+  </mat-expansion-panel>
+  <mat-expansion-panel (opened)="panelOpenState = true"
+                       (closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Inventory By something else
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-card>
+      <d3barchart [chartID]="'inventorybyarea2'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="0"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea3'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="5"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea4'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="40"
+                  [offsetY]="20">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea5'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="80"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea2'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="0"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea3'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="5"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea4'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="40"
+                  [offsetY]="20">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea5'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="80"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea2'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="0"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea3'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="5"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea42'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="40"
+                  [offsetY]="20">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea52'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="80"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea21'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="0"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea31'"
+                  [chartWidth]="100"
+                  [chartHeight]="80"
+                  [offsetX]="5"
+                  [offsetY]="0">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea41'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="40"
+                  [offsetY]="20">
+      </d3barchart>
+      <d3barchart [chartID]="'inventorybyarea51'"
+                  [chartWidth]="20"
+                  [chartHeight]="80"
+                  [offsetX]="80"
+                  [offsetY]="0">
+      </d3barchart>
+    </mat-card>
+  </mat-expansion-panel>
+</mat-accordion>
