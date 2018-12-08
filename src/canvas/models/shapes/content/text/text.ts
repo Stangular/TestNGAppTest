@@ -35,7 +35,7 @@ export class Text extends Shape implements IContextItem {
     context.rect(0, 0, this.Width, this.Height);
     context.fillStyle = DisplayValues.GetColor(this.state.Index[UIStates.background]);
     context.fill();
-    context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
+  //  context.lineWidth = 5; //DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
     context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
 
     context.font = this.Height + "px " + DisplayValues.GetFont(this.state.Index[UIStates.fontFace]);
@@ -43,9 +43,11 @@ export class Text extends Shape implements IContextItem {
     context.textAlign = 'left';
     context.fillStyle = DisplayValues.GetColor(this.state.Index[UIStates.color]);
     this.align(context);
-    context.restore();
-    context.lineWidth = 0
+    context.strokeStyle = 'transparent';
+    context.lineWidth = 1;
     context.stroke();
+    context.restore();
+
   }
 
   Draw(context: any): void {

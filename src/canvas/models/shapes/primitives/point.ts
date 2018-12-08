@@ -1,4 +1,4 @@
-import { IShape } from './IShape';
+import { Size } from './size';
 
 export class Point {
 
@@ -12,10 +12,10 @@ export class Point {
     this.y = point.Y;
   }
 
-  SetToCenter(shape: IShape, offsetX: number = 0, offsetY: number = 0) {
+  SetToCenter(size: Size, offsetX: number = 0, offsetY: number = 0) {
 
-    this.x = shape.Width / 2 + shape.Left;
-    this.y = shape.Height / 2 + shape.Top;
+    this.x = size.Width / 2 + shape.Left;
+    this.y = size.Height / 2 + shape.Top;
     this.x += offsetX;
     this.y += offsetY;
 

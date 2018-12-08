@@ -1,9 +1,9 @@
 import { Component, ElementRef, OnInit, Input, AfterViewInit, ViewChild } from '@angular/core';
 import { ContextSystem, ContextLayer } from '../models/IContextItem';
 import { ExperimentalLayer } from '../models/custom/layers/experimentalLayer';
-import { BarLayer } from '../models/custom/layers/charts/content/bars/verticalbars';
+//import { BarLayer } from '../models/custom/layers/charts/content/bars/verticalbars';
 import { DisplayValues } from '../models/DisplayValues';
-
+import { ChartLayer } from '../models/custom/layers/charts/chart.layer';
 
 @Component({
   selector: 'app-canvas',
@@ -34,7 +34,7 @@ export class CanvasComponent implements OnInit {
   ngAfterViewInit(): void {
 
     switch (this.layerName) {
-      case 'chart': this.layers.push(new BarLayer(this.width,this.height)); break;
+      case 'chart': this.layers.push(new ChartLayer(this.width,this.height,'myChart')); break;
       default: this.layers.push(new ExperimentalLayer()); break;
     }
 

@@ -1,7 +1,9 @@
-import { ContextLayer } from '../../../IContextItem';
-import { Rectangle } from '../../../shapes/rectangle';
-import { AxisLayer } from './axis/axis.layer';
-import { StateIndex, UIStates } from '../../../DisplayValues'
+import { ContextLayer } from '../../../../IContextItem';
+import { Rectangle } from '../../../../shapes/rectangle';
+import { AxisLayer } from '../axis/axis.layer';
+import { StateIndex, UIStates } from '../../../../DisplayValues'
+import { Area } from '../../../../shapes/primitives/area';
+import { Size } from '../../../../shapes/primitives/size';
 
 
 // DataContent{
@@ -12,7 +14,7 @@ import { StateIndex, UIStates } from '../../../DisplayValues'
 
 export abstract class ContentLayer extends ContextLayer {
 
-  constructor(width: number, height: number,layerId:string) {
+  constructor(margins: Area, size: Size,layerId:string) {
     super(layerId, 'default');
 
 

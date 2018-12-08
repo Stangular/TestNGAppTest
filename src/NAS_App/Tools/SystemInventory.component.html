@@ -12,12 +12,24 @@
                [marginRight]="60"
                [marginBottom]="50"></d3svgItem>
   </mat-card>
-  <mat-card>
+  <!--<mat-card>-->
     <mat-card>
       <app-canvas [canvasID]="ex1" [width]="300" [height]="600" [layerName]="'exp'"></app-canvas>
     </mat-card>
-    <!--<mat-card>
-    <app-canvas [canvasID]="ex2" [width]="700" [height]="400" [layerName]="'chart'"></app-canvas>-->
+    <mat-card>
+      <app-canvas [canvasID]="ex1" [width]="300" [height]="600" [layerName]="'exp'"></app-canvas>
+    </mat-card>
+    <mat-card>
+      <app-canvas [canvasID]="ex2" [width]="700" [height]="400" [layerName]="'chart'"></app-canvas>
+    </mat-card>
+    <!--<d3svgItem [chartID]="'multiSeriesLineChartExample'"
+       [chartWidth]="1500"
+       [chartHeight]="600"
+       [marginTop]="20"
+       [marginLeft]="50"
+       [marginRight]="80"
+       [marginBottom]="30"></d3svgItem>-->
+    <!--   </mat-card>-->
     <!--<d3svgItem [chartID]="'multiSeriesLineChartExample'"
          [chartWidth]="1500"
          [chartHeight]="600"
@@ -25,15 +37,7 @@
          [marginLeft]="50"
          [marginRight]="80"
          [marginBottom]="30"></d3svgItem>-->
-    <!--   </mat-card>-->
-    <!--<d3svgItem [chartID]="'multiSeriesLineChartExample'"
-           [chartWidth]="1500"
-           [chartHeight]="600"
-           [marginTop]="20"
-           [marginLeft]="50"
-           [marginRight]="80"
-           [marginBottom]="30"></d3svgItem>-->
-  </mat-card>
+    <!--</mat-card>
    <mat-card>
     <d3svgItem [chartID]="'inventorybyarea200'"
                [chartWidth]="1000"
@@ -42,5 +46,5 @@
                [marginLeft]="120"
                [marginRight]="70"
                [marginBottom]="40"></d3svgItem>
-  </mat-card>
+  </mat-card>-->
 </form>

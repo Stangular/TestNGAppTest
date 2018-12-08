@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://localhost:4225/",
+            "url": "http://localhost:4220/",
             "runtimeArgs": [
               "--disable-web-security",
               "--user-data-dir",
