@@ -108,6 +108,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   abstract UpdateDependentUI(): void;
   abstract GetUIValue(fieldID: string): any;
   abstract get testData(): Field<any>[];
+  abstract ChartData(chartID: string): { xparam: number, yparam: number } [];
 
   private createFormGroup() {
     let group: any = {};

@@ -1,5 +1,5 @@
 import { IShape } from './IShape';
-import { Point, TrackingPoint } from './point';
+import { Point, TrackingPoint } from './primitives/point';
 import { Shape } from './shape';
 import { extend } from 'webdriver-js-extender';
 

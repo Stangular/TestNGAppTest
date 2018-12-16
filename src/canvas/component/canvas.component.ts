@@ -4,6 +4,11 @@ import { ExperimentalLayer } from '../models/custom/layers/experimentalLayer';
 //import { BarLayer } from '../models/custom/layers/charts/content/bars/verticalbars';
 import { DisplayValues } from '../models/DisplayValues';
 import { ChartLayer } from '../models/custom/layers/charts/chart.layer';
+import { Area } from '../models/shapes/primitives/area';
+import { Margin } from '../models/shapes/primitives/margin';
+import { Size } from '../models/shapes/primitives/size';
+import { Point } from '../models/shapes/primitives/point';
+
 
 @Component({
   selector: 'app-canvas',
@@ -16,31 +21,27 @@ export class CanvasComponent implements OnInit {
   @Input() canvasID: string = 'testCanvas';
   @Input() width: number = 200;
   @Input() height: number = 200;
-  @Input() layerName: string = '';
-  layers: ContextLayer[] = [];
-  private _system: ContextSystem;
+  @Input() margin: Margin;
+  @Input() system: ContextSystem; 
+ // layers: ContextLayer[] = [];
+ // private _system: ContextSystem;
 
-  constructor() {
-    //DisplayValues.SetValue('default_bg', 'red');
-    //DisplayValues.SetValue('default_borderwidth', '1');
-    //DisplayValues.SetValue('default_bordercolor', '1');
-   // this.layers.push(new ExperimentalLayer());
-  }
+  constructor() {}
 
   ngOnInit() {
 
   }
 
+  get Context2D() {
+    return (
+      <HTMLCanvasElement>this.CanvasComponent.nativeElement)
+      .getContext('2d');
+  }
   ngAfterViewInit(): void {
-
-    switch (this.layerName) {
-      case 'chart': this.layers.push(new ChartLayer(this.width,this.height,'myChart')); break;
-      default: this.layers.push(new ExperimentalLayer()); break;
+    
+    if ( !this.system ) {
+      this.system = new ContextSystem();  // TODO: have default layer for this state.
     }
-
-    const context = (<HTMLCanvasElement>this.CanvasComponent.nativeElement).getContext('2d');
-
-    this._system = new ContextSystem(context, this.layers);
-    this._system.Draw();
+    this.system.Draw(this.Context2D);
   }
 }

@@ -1,11 +1,13 @@
-import { IShape} from './IShape';
-import { Point, TrackingPoint } from './point';
+import { IShape } from './IShape';
+import { Point, TrackingPoint } from './primitives/point';
+import { Size } from './primitives/size';
 import {  StateIndex } from '../DisplayValues'
 import { Port } from './port';
 
 export abstract class Shape implements IShape {
 
   _center: Point = new Point();
+
   protected _shapes: Shape[] = [];
   protected _ports: Port[] = [];
 
@@ -17,8 +19,8 @@ export abstract class Shape implements IShape {
     private height: number,
     protected state: StateIndex ) {
 
-    this._center.SetToCenter(this);
-
+    this._center.SetToPosition(this.left, this.top);
+    this._center.Offset(this.width / 2, this.height/2);
   }
 
   get Id(): string { return this.id; }

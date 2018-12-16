@@ -2,8 +2,13 @@ import { Records } from '../../../dataManagement/model/records';
 import { Field, BaseField } from '../../../dataManagement/model/field';
 import { ElementModel,EditElementDefinition, IElementDefinition } from '../../../dataManagement/model/definitions/elementDefinition';
 import { D3AxisModel } from '../../../d3/axis/d3.axis.model';
-import { D3Service } from '../../../d3/services/d3.service';
-
+//import { D3Service } from '../../../d3/services/d3.service';
+import { Tick, IScale, Scale, NumericScale } from '../../../canvas/models/custom/layers/charts/axis/axis.layer';
+import { StateIndex, UIStates } from '../../../canvas/models/DisplayValues';
+import { ChartLayer } from '../../../canvas/models/custom/layers/charts/chart.layer';
+import { BarLayer } from '../../../canvas/models/custom/layers/charts/content/bars/bar.layer';
+import { Margin } from '../../../canvas/models/shapes/primitives/margin';
+import { Size } from '../../../canvas/models/shapes/primitives/size';
 export class FilterSystemInventoryModel extends Records<string> {
 
   axisModel: D3AxisModel;// = new D3AxisModel();
@@ -53,6 +58,21 @@ export class FilterSystemInventoryModel extends Records<string> {
     let fields: Field<string>[] = [];
     return fields;
   }
+
+  ChartData(chartID: string): { xparam: number, yparam: number }[] {
+    let data: { xparam: number, yparam: number }[];
+    if (chartID == 'bar') {
+      let fx = this.Fields.find(f => f.FieldId == 'date');
+      let fy = this.Fields.find(f => f.FieldId == 'income');
+      for (let i = 0; i < fx.Data.length; i++) {
+        data.push({
+          xparam: fx[0].Value(i),
+          yparam: parseInt(fy[1].Value(i)),
+        });
+      }
+    }
+    return data;
+  }
 }
 
 
@@ -80,6 +100,21 @@ export class FilterCityTemperatureModel extends Records<string> {
       //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'austin', true, 1, 1, 1, '', 'float'));
     }
     return this._UIElements;
+  }
+
+  ChartData(chartID: string): { xparam: number, yparam: number }[] {
+    let data: { xparam: number, yparam: number }[];
+    if (chartID == 'bar') {
+      let fx = this.Fields.find(f => f.FieldId == 'date');
+      let fy = this.Fields.find(f => f.FieldId == 'income');
+      for (let i = 0; i < fx.Data.length; i++) {
+        data.push({
+          xparam: fx[0].Value(i),
+          yparam: parseInt(fy[1].Value(i)),
+        });
+      }
+    }
+    return data;
   }
 
   UpdateDependentUI(): void {
@@ -170,6 +205,21 @@ export class FilterBarCharModel extends Records<string> {
   SetDataView() {
 
 //    this.axisModel = new D3AxisModel(this._fields);
+  }
+
+  ChartData(chartID: string): { xparam: number, yparam: number }[] {
+    let data: { xparam: number, yparam: number }[];
+    if (chartID == 'bar') {
+      let fx = this.Fields.find(f => f.FieldId == 'date');
+      let fy = this.Fields.find(f => f.FieldId == 'income');
+      for (let i = 0; i < fx.Data.length; i++) {
+        data.push({
+          xparam: fx[0].Value(i),
+          yparam: parseInt(fy[1].Value(i)),
+        });
+      }
+    }
+    return data;
   }
 
   get testData() {
@@ -320,6 +370,18 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
     return this._form.controls[fieldID].value;
   }
 
+  ChartData(chartID: string): { xparam: number, yparam: number }[] {
+    let data: { xparam: number, yparam: number }[] = [];;
+    let fx = this.Fields.find(f => f.FieldId == 'date');
+    let fy = this.Fields.find(f => f.FieldId == 'income');
+    for (let i = 0; i < fx.Data.length; i++) {
+      data.push({
+        xparam: fx[0].Value(i),
+        yparam: parseInt(fy[1].Value(i)),
+      });
+    }
+    return data;
+  }
 
   New(data: any): Field<any> {
     return new BaseField(data);
@@ -423,13 +485,11 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
   }
 }
 
-
 export class FilterBasicBarChartModel extends Records<string> {
 
   axisModel: D3AxisModel;// = new D3AxisModel();
 
   constructor(
-    private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
     super(formName, fields);
@@ -461,10 +521,79 @@ export class FilterBasicBarChartModel extends Records<string> {
     return this._form.controls[fieldID].value;
   }
 
-
   New(data: any): Field<any> {
     return new BaseField(data);
   }
+
+  ChartData(chartID: string): { xparam: number, yparam: number }[] {
+    let data: { xparam: number, yparam: number }[];
+    if (chartID == 'bar') {
+      let fx = this.Fields.find(f => f.FieldId == 'date');
+      let fy = this.Fields.find(f => f.FieldId == 'income');
+      for (let i = 0; i < fx.Data.length; i++) {
+        data.push({
+          xparam: fx[0].Value(i),
+          yparam: parseInt(fy[1].Value(i)),
+        });
+      }   
+    }
+    return data;
+  }
+
+  
+  ChartGraphic(width: number, height: number, chartName:string = ''): ChartLayer {
+
+    let fx = this.Fields.find(f => f.FieldId == 'date');
+    let fy = this.Fields.find(f => f.FieldId == 'income');
+
+    if (!fx || !fy) {
+      return null;
+    }
+    let d: string = '';
+    let r: string[] = [];
+    let years: string [] = [];
+    let months: string[] = [];
+    
+
+    for (let i = 0; i < fx.Data.length; i++) {
+      d = fx.Value(i);
+      // calculate percentage of total height -  x/H = (d/500)* H 
+    }
+
+    for (let i = 0; i < fx.Data.length; i++) {
+      d = fx.Value(i);
+      r = d.split('-')
+      years.push(years.findIndex(y => y == r[0]) >= 0 ? '' : r[0]);
+      months.push(r[1]);
+    }
+    let dateScale: any[] = [];
+    dateScale.push({ scale: new Scale(months), width: 20, height: 16, angle: 0 });
+    dateScale.push({ scale: new Scale(years), width: 20, height: 16, angle: 0 });
+    let xTick = new Tick(dateScale, 5, 0, 50);
+
+    let xScale = new NumericScale(0, 500, 50, 5);
+    let scale1 = { scale: xScale, width: 20, height: 16, angle: 0 };
+
+    let yTick = new Tick([scale1], 5, 0, 50);
+    let chartstate: StateIndex;
+
+    chartstate = new StateIndex('barchart');
+    chartstate.setState(UIStates.background, 5);
+    chartstate.setState(UIStates.foreground, 3);
+    chartstate.setState(UIStates.color, 3);
+    chartstate.setState(UIStates.weight, 0);
+    chartstate.setState(UIStates.fontFace, 0);
+    let margins = new Margin(10, 50, 10, 60);
+    let chart: ChartLayer;
+
+    let bar = new BarLayer(0, 500, fy.Data, margins, new Size(width,height));
+    chart = new ChartLayer(
+      width, height,
+      margins, xTick, yTick, 'barchart', 'bc1',
+      chartstate, bar);
+    return chart;
+  }
+
 
   SetDataView() {
 
@@ -513,8 +642,8 @@ export class FilterBasicBarChartModel extends Records<string> {
 
   
 
-    fields.push(new BaseField({ fieldID: 'xaxis', values: data }));
-    fields.push(new BaseField({ fieldID: 'yaxis', values: ydata }));
+    fields.push(new BaseField({ fieldID: 'date', values: data }));
+    fields.push(new BaseField({ fieldID: 'income', values: ydata }));
 
    
 

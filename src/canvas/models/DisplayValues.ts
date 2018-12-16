@@ -1,6 +1,6 @@
 import { IShape } from './shapes/IShape';
 import { ILine } from './lines/ILine';
-import { Point } from '../models/shapes/point';
+import { Point } from '../models/shapes/primitives/point';
 export class NamedValue<T> {
 
   constructor(private valueName: string = '',

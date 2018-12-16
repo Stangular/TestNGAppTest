@@ -1,12 +1,14 @@
 import { ContextLayer } from '../../../../../IContextItem';
 import { IContextItem } from '../../../../../IContextItem';
 import { Rectangle } from '../../../../../shapes/rectangle';
-import { Area } from '../../../../../shapes/primitives/area';
+import { Margin } from '../../../../../shapes/primitives/margin';
 import { Size } from '../../../../../shapes/primitives/size';
-
-import { AxisLayer } from '../../axis/axis.layer';
+import { Point } from '../../../../../shapes/primitives/point';
+import { AxisLayer, IScale, NumericScale, TimeScale } from '../../axis/axis.layer';
 import { StateIndex, UIStates } from '../../../../../DisplayValues'
 import { ContentLayer } from '../content.layer';
+//import { Records } from '../../../../../../../dataManagement/model/records';
+import { AppDataService } from '../../../../../../../dataManagement/service/appData.service';
 
 
 // DataContent{
@@ -17,13 +19,19 @@ import { ContentLayer } from '../content.layer';
 
 export class Bar implements IContextItem{
   bar: Rectangle;
-  constructor(id: string, value: number, margins: Area, size: Size, offset: number,
-    width:number,
+  constructor(id: string,
+    minValue: number,
+    maxValue: number,
+    value: number,
+    size: Size,
+    offset: number,
+    width: number,
     state: StateIndex) {
 
-    let h = (value / size.Height) * 100;
-    let t = margins.Bottom - h;
-    let l = margins.Left + offset;
+    let h = ((value / maxValue) * size.Height);
+    let t = size.Height - h;
+    h -= 2;
+    let l = offset + 5 ;
     this.bar = new Rectangle(id, t, l, width, h,state );
   }
 
@@ -36,24 +44,31 @@ export class Bar implements IContextItem{
 
 export class BarLayer extends ContentLayer {
 
-  barState: StateIndex;
   bars: Bar[] = [];
   //labeledData {label:string,param: string}
-  constructor(margins: Area, size: Size,
-    private labels: { label: string, width: number, height: number, angle: number }[],
-    private data: { xparam: number, yparam: number }[] = []) {
-    super( margins,size, 'barchart');
+  constructor(
+    minValue: number,
+    maxValue: number,
+    data: number[],
+    margins: Margin,
+    size: Size ) {
+    super(margins,size, 'barchart');
  
-    this.barState = new StateIndex('barsss');
-    this.barState.setState(UIStates.background, 2);
-    this.barState.setState(UIStates.foreground, 1);
-    this.barState.setState(UIStates.color, 4);
-    this.barState.setState(UIStates.weight, 0);
-    let barwidth = size.Width / this.data.length;
+    let barState = new StateIndex('barsss');
+    barState.setState(UIStates.background, 2);
+    barState.setState(UIStates.foreground, 1);
+    barState.setState(UIStates.color, 4);
+    barState.setState(UIStates.weight, 0);
+    let barwidth = (size.Width / data.length) - 10;
     let offset = 0;
-    this.data.forEach(function (d, i) {
-      let bar = new Bar('sss' + i, d.xparam, margins, size, offset, barwidth, this.barState);
-      this.AddContent(bar);
+    let self = this;
+    let chartSize = new Size(size.Width - margins.Right, size.Height - margins.Bottom);
+    const origin: Point = new Point(margins.Left, size.Height);
+    offset = margins.Left;
+    data.forEach(function (d, i) {
+      let bar = new Bar('barchart' + i, minValue, maxValue, d, chartSize, offset, barwidth, barState);
+      offset += ( barwidth + 10 );
+      self.AddContent(bar);
     });
     // height of chart area, xaxis base line, yaxis base line
     //  xparam as % of height = top;
@@ -63,5 +78,15 @@ export class BarLayer extends ContentLayer {
 
     // max value, min value  ( max - min )/hgt = count
     // 
+  }
+
+  XScale(): IScale {
+    let xScale = new NumericScale(0, 100, 20, 5);
+    return new NumericScale(0, 100, 20, 5);
+  }
+
+  YScale(): IScale {
+    let xScale = new NumericScale(0, 100, 20, 5);
+    return new NumericScale(0, 100, 20, 5);
   }
 }

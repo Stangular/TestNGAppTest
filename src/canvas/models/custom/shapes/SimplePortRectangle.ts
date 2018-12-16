@@ -4,7 +4,7 @@ import { DisplayValues, StateIndex, UIStates } from '../../DisplayValues'
 import { Rectangle } from '../../shapes/rectangle';
 import { Ellipse } from '../../shapes/ellipse';
 import { Port } from '../../shapes/port';
-import { Point } from '../../shapes/point';
+import { Point } from '../../shapes/primitives/point';
 
 export class SimplePort extends Port {
   constructor(id: string, top: number, left: number, state: StateIndex, offset: Point) {

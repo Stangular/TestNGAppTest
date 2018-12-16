@@ -12,10 +12,14 @@ export class Point {
     this.y = point.Y;
   }
 
-  SetToCenter(size: Size, offsetX: number = 0, offsetY: number = 0) {
+  SetToPosition(x:number,y:number) {
 
-    this.x = size.Width / 2 + shape.Left;
-    this.y = size.Height / 2 + shape.Top;
+    this.x = x;
+    this.y = y;
+
+  }
+  Offset( offsetX: number, offsetY: number) {
+
     this.x += offsetX;
     this.y += offsetY;
 

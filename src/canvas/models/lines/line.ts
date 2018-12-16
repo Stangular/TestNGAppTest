@@ -1,7 +1,7 @@
 //import { IShape } from '../shapes/Ishape';
 //import { Shape } from '../shapes/shape';
 import { Port } from '../shapes/port';
-import { Point } from '../shapes/point';
+import { Point } from '../shapes/primitives/point';
 import { IContextItem, ContextSystem } from '../IContextItem';
 import { ILine } from './Iline'
 import { DisplayValues, StateIndex, UIStates} from '../DisplayValues'

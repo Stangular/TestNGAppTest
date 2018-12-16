@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
 
 import { IRecordService } from '../../../dataManagement/model/records';
 import { DataHTTPService } from '../../../dataManagement/service/dataHTTP.service';
@@ -61,10 +62,22 @@ export class FilterService implements IRecordService {
     this._filterA = new FilterSystemInventoryModel(this.d3Service.D3, 'testtable1');
     this._filterB = new FilterCityTemperatureModel(this.d3Service.D3, 'TestMultSeriesLineChart');
     this._filterC = new FilterNormalizedStackedBarChartModel(this.d3Service.D3, 'VBarChart');
-    this._filterD = new FilterBasicBarChartModel(this.d3Service.D3, 'VBarChart');
+    this._filterD = new FilterBasicBarChartModel('VBarChart');
 
 
   }
+
+  ChartGraphic(width:number,height:number,chartName: string): ChartLayer {
+
+    let layer: ChartLayer;
+
+    switch (chartName) {
+      case 'bar': layer = this._filterD.ChartGraphic(width, height); break;
+    }
+
+    return layer;
+  }
+
 
   ApplyFilter() {
     this.toggle = !this.toggle;

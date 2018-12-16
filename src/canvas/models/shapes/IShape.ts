@@ -1,4 +1,4 @@
-import { Point, TrackingPoint } from './point';
+import { Point, TrackingPoint } from './primitives/point';
 
 export interface IShape {
 

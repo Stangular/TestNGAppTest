@@ -3,6 +3,7 @@ import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from '../Services/filter/filter.service';
 import { IElementDefinition } from '../../dataManagement/model/definitions/elementDefinition';
 import { TheCanvasState } from '../../canvas/models/DisplayValues';
+import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
 
 @Component({
   templateUrl: './SystemInventory.component.html',
@@ -10,17 +11,17 @@ import { TheCanvasState } from '../../canvas/models/DisplayValues';
 })
 export class SystemInventoryComponent implements OnInit {
 
+  barSystem: ChartLayer;
   elements: IElementDefinition<any>[] = [];
   form: FormGroup;
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   _theCanvas: TheCanvasState = new TheCanvasState();
-  constructor(private filterService: FilterService) {
-
-  }
+  constructor(private filterService: FilterService) {}
 
   ngOnInit() {
 
     this.InitForm();
+    this.barSystem = this.filterService.ChartGraphic(800,600,'bar');
     // register D3 view...
   }
 

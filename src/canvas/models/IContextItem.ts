@@ -61,12 +61,12 @@ export class ContextLayer implements IContextSystem {
 export class ContextSystem implements IContextSystem{
 
 
-  constructor(private context: any, private layers: ContextLayer []) { }
+  constructor( private layers: ContextLayer [] = []) { }
 
   get Id() { return this.layers[0].Id; }
 
-  Draw(context: any = null) {
-    this.layers.reverse().forEach(l => l.Draw(context || this.context));
+  Draw(context: any ) {
+    this.layers.reverse().forEach(l => l.Draw(context));
   }
 
   get Content(): IContextItem[] { return this.layers[0].Content; }
@@ -79,7 +79,7 @@ export class ContextSystem implements IContextSystem{
 
   AddLayer(id: string, displayState: string, content: IContextItem[] = []) {
     this.layers.unshift(new ContextLayer(id, displayState, content));
-    this.Draw();
+ //   this.Draw();
   }
 
   SelectLayer(index: number) {

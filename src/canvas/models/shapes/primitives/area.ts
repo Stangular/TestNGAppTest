@@ -14,7 +14,8 @@ export class Area {
   get Height(): number { return this.size.Height; }
   get Bottom(): number { return this.size.Height - this.point.Y; }
   get Right(): number { return this.size.Width - this.point.X; }
- Set(area: Area) {
+  Set(area: Area) {
     this.point.Set(area.Point);
     this.size.Set(area.Size);
   }
+}

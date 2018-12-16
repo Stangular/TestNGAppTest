@@ -1,6 +1,6 @@
 import { IShape } from '../shapes/Ishape';
 import { Port } from '../shapes/port';
-import { Point } from '../shapes/point';
+import { Point } from '../shapes/primitives/point';
 import { IContextItem, ContextSystem } from '../IContextItem';
 import { ILine } from './Iline';
 import { Line } from './line';

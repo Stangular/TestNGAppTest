@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\TestNGApp"
+    "\\src",
+    "\\src\\canvas"
   ],
+  "SelectedNode": "\\src",
   "PreviewInSolutionExplorer": false
 }

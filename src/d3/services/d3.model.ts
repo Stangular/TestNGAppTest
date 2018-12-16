@@ -22,6 +22,20 @@ export class D3ModelContainer extends Records<string> {
 
   }
 
+  ChartData(chartID: string): { xparam: number, yparam: number }[] {
+    let data: { xparam: number, yparam: number }[];
+    if (chartID == 'bar') {
+      let fx = this.Fields.find(f => f.FieldId == 'date');
+      let fy = this.Fields.find(f => f.FieldId == 'income');
+      for (let i = 0; i < fx.Data.length; i++) {
+        data.push({
+          xparam: fx[0].Value(i),
+          yparam: parseInt(fy[1].Value(i)),
+        });
+      }
+    }
+    return data;
+  }
 
   Draw(d3: any, idsss: string, chartType: string, width: number, height: number, offsetX: number = 0, offsetY: number = 0) {
 
