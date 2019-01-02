@@ -1,31 +1,44 @@
-import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter, ElementRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { IElementDefinition} from '../../../dataManagement/model/definitions/elementDefinition';
+import { IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
 
 @Component({
-    selector: 'input-edit',
-    templateUrl: 'form-input.component.html'
+  selector: 'input-edit',
+  templateUrl: 'form-input.component.html'
 })
 
 export class FormInputElementComponent implements OnInit {
-    @Input() element: IElementDefinition<string>;
- //   @Input() form: FormGroup;
-    @Input() actionClass = '';
-    @Output() action: EventEmitter<string> = new EventEmitter<string>();
-    constructor() {}
+  value: string = '';
+  @Input() element: IElementDefinition<string>;
+  @Input() form: FormGroup;
+  @Input() actionClass = '';
+  @Output() action: EventEmitter<string> = new EventEmitter<string>();
+  @Output() blur: EventEmitter<{ id: string, value: string }> = new EventEmitter<{ id: string, value: string }>();
+  
+  constructor() {}
 
-    onAction(value: HTMLElement) {
-        this.action.emit(this.actionClass);
-    }
+  onAction(value: HTMLElement) {
+    this.action.emit(this.actionClass);
+  }
 
-    ngOnInit(){}
+  get editMode() {
+    return true;
+  }
+  onblur() {
+    this.blur.emit({ id: this.element.FieldID(), value: this.value });
+    this.value = this.element.CurrentValue();
+  }
 
-    Init() {}
-    //   mask = [/\d/, /\d/, /\d/, /\d/]; // ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-    get isValid() {
-        let v = this.form.controls[this.element.FieldID()].value;
-        let valid = this.element.validateValue(v);
+  ngOnInit() {
+    this.value = this.element.CurrentValue();
+  }
 
-        return valid;
-    }
+  Init() { }
+  //   mask = [/\d/, /\d/, /\d/, /\d/]; // ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  get isValid() {
+    let v = this.form.controls[this.element.FieldID()].value;
+    let valid = this.element.validateValue(v);
+
+    return valid;
+  }
 }

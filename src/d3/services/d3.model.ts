@@ -77,7 +77,13 @@ export class D3ModelContainer extends Records<string> {
     return this._UIElements;
   }
 
-
+  OutputAll(): any {
+    return {
+      FormName: this.SourceID,
+      RecordCount: 14,
+      Content: this.testData
+    };
+  }
 
   get testData() {
     let fields: Field<string>[] = [];

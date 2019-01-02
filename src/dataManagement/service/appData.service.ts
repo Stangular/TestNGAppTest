@@ -7,17 +7,16 @@ import { AppDataModel, ListItem } from '../../dataManagement/model/data/appData.
 export class AppDataService {
     _appData: AppDataModel = new AppDataModel();
     
-    constructor(public _httpService: DataHTTPService) {
-    }
-
+    constructor(public _httpService: DataHTTPService) {}
+    
     GetList(listName: string): ListItem[] {
         let list = this._appData.Lists.find(l => l.listName == listName);
         if (!list || !list.items || list.items.length <= 0) {
             return [new ListItem(1, 0,'List not available')];
         }
-         return list.items;
+        return list.items;
     }
-
+     
     GetListIdFromName(listType: string, name: string): number {
         let list = this.GetList(listType);
         let item = list.find(i => i.label == name);

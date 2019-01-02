@@ -11,12 +11,11 @@ import { SystemInventoryComponent } from './Tools/SystemInventory.component';
 import { HRMProductionHistoryComponent } from './Hot_Mill/Production_Reports/HRMProductionHistory.component';
 import { NASRoute } from './NAS_APP.routes'
 import { DataHTTPService } from '../dataManagement/service/dataHTTP.service'
-
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCoffee, faFilter, faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { CanvasModule } from '../canvas/canvas.module';
-
+//import { CanvasModule } from '../canvas/canvas.module';
+import { ViewModule } from '../ui/components/views/view.module';
 // Add an icon to the library for convenient access in other components
 library.add(
   faCoffee
@@ -32,7 +31,8 @@ library.add(
     , d3Module
     , NASRoute
     , FontAwesomeModule
-    , CanvasModule
+  //  , CanvasModule
+    , ViewModule
   ],
 
   declarations: [
@@ -40,7 +40,7 @@ library.add(
     SystemInventoryComponent,
     HRMProductionHistoryComponent
   ],
-  exports: [ngMaterialModule, d3Module],
+  exports: [ngMaterialModule, d3Module,ViewModule],
 
   providers: [D3Service
     , FilterService

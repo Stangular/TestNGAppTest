@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
 
-import { IRecordService } from '../../../dataManagement/model/records';
+import { IRecordService, IRecordManager, Records } from '../../../dataManagement/model/records';
 import { DataHTTPService } from '../../../dataManagement/service/dataHTTP.service';
 
 import {
@@ -88,11 +88,13 @@ export class FilterService implements IRecordService {
 
   }
 
-  public get Content(): FilterSystemInventoryModel {
-    if (null == this._filterA) {
-      this._filterA = new FilterSystemInventoryModel(this.d3Service.D3, 'testtable1');
-    }
-    return this._filterA;
+
+  public get Content(): IRecordManager {
+    //if (null == this._filterA) {
+    //  this._filterA = new FilterSystemInventoryModel(this.d3Service.D3, 'testtable1');
+    //}
+    //return this._filterA;
+    return this._filterD;
   }
 
   contentSuccess(data: any) {
@@ -124,14 +126,36 @@ export class FilterService implements IRecordService {
     // }
 
   }
-  
+
+  filterSource(formName: string) {
+    let source: Records<string>;
+    switch (formName) {
+      case 'TestMultSeriesLineChart': source = this._filterA; break;
+      case 'TestNormalizedStackedBarChart': source = this._filterB; break;
+      case 'TestNormalizedStackedBarChart': source = this._filterC; break;
+      case 'VBarChart': source = this._filterD; break;
+    }
+    return source;
+  }
 
   contentFail(data: any) {
     console.error(JSON.stringify(data));
   }
 
+  public Save(formName: string) {
+    let source: Records<string>;
+    switch (formName) {
+      case 'TestMultSeriesLineChart': source = this._filterA; break;
+      case 'TestNormalizedStackedBarChart': source = this._filterB; break;
+      case 'TestNormalizedStackedBarChart': source = this._filterC; break;
+      case 'VBarChart': source = this._filterD; break;
+    }
+    this.dataHTTPService.postContent(source.NewContent);
+  }
+
   public Init(formname: string) {
-    this.contentSuccess({ formName: formname, content:[] });
+    this.contentSuccess({ formName: formname, content: [] });
+    this._filterD.First();
   //  let p = 'http://localhost:52462/api/data/' + formname;
   //  this.dataHTTPService.getContent(p).subscribe(
   //    data => { this.contentSuccess(data) },

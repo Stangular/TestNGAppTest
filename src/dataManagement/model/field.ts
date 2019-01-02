@@ -1,4 +1,4 @@
-import { IElementDefinition } from './definitions/elementDefinition';
+import { IElementDefinition } from './definitions/ElementDefinition';
 import { IRecord } from './records';
 
 export abstract class Field<T> {
@@ -18,7 +18,7 @@ export abstract class Field<T> {
   public get Data() {
     return this._data;
   }
-  
+
   public ValueIndex(value: any) {
     return this._data.findIndex(v => v === value);
   }
@@ -30,9 +30,14 @@ export abstract class Field<T> {
   }
 
   AddNew(fieldDef: IElementDefinition<T>): void {
-    this._data.push(fieldDef.DefaultValue());
-    //  fieldDef.ResetToInvalid();
+    if (fieldDef) {
+      this._data.push(fieldDef.DefaultValue());
+    }
+  }
 
+  RemoveLast(): void {
+  
+      this._data.pop();
   }
 
   Copy(recordNumber: number) {

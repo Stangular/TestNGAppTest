@@ -13,6 +13,8 @@ import {
   , MatGridListModule
   , MatTableModule
   , MatExpansionModule
+  , MatSidenavModule
+  , MatDialogModule 
 } from '@angular/material';
 
 @NgModule({
@@ -31,6 +33,8 @@ import {
     , MatGridListModule
     , MatTableModule
     , MatExpansionModule
+    , MatSidenavModule
+    , MatDialogModule 
   ],
 
   declarations: [],
@@ -46,6 +50,8 @@ import {
     , MatGridListModule
     , MatTableModule
     , MatExpansionModule
+    , MatSidenavModule
+    , MatDialogModule 
   ],
 
   providers: []

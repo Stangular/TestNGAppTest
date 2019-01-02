@@ -1,10 +1,18 @@
-<!--<div [formGroup]="form" class="form-group" [class.has-error]="!isValid">-->
-    <mat-form-field>
-        <input matInput
-               [formControlName]="element.FieldID()"
-               [id]="element.FieldID()"
-               [placeholder]="element.Label()"
-               [type]="element.Type()"
-               [value]="element.CurrentValue()" />
-    </mat-form-field>
-<!--</div>-->
+<div style="display:inline-block; margin-right:10px">
+  <label>{{element.Label()}}:</label>
+</div>
+<div style="display:inline-block">
+  <mat-form-field class="example-full-width" [floatLabel]="'never'" *ngIf="editMode">
+    <input matInput
+           (mouseout)="onblur()"
+           [id]="element.FieldID()"
+           [placeholder]="element.Label()"
+           [type]="element.Type()"
+           [value]="element.UIConvert()" />
+  </mat-form-field>
+</div>
+<div *ngIf="!editMode">
+  <label matInput>{{element.CurrentValue()}}</label>
+</div>
+
+

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IElementDefinition, EditElementDefinition, ElementModel } from '../model/definitions/elementDefinition';
+import { IElementDefinition, EditElementDefinition, ElementModel } from '../model/definitions/ElementDefinition';
 
 @Injectable()
 export class ElementDefinitionFactoryService {

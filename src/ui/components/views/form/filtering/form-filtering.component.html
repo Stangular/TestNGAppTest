@@ -1,0 +1,61 @@
+
+  <mat-grid-list cols="8" rowHeight="80px">
+    <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+      <!-- field selector --->
+      <button mat-icon-button color="default" (click)="Sort()">
+        <mat-icon aria-label="Ascending"
+                  *ngIf="selectedElement && selectedElement.SortOrder() == sortOrder.ascending">arrow_drop_up</mat-icon>
+        <mat-icon aria-label="None"
+                  *ngIf="selectedElement && selectedElement.SortOrder() == sortOrder.unsorted">remove</mat-icon>
+        <mat-icon aria-label="Descending"
+                  *ngIf="selectedElement && selectedElement.SortOrder() == sortOrder.descending">arrow_drop_down</mat-icon>
+      </button>
+      <mat-form-field>
+        <mat-select placeholder="Field" [(ngModel)]="selectedElement">
+          <mat-option *ngFor="let e of elements" [value]="e">
+            {{e.Label()}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <!-- filter type selector --->
+      <mat-form-field>
+        <mat-select placeholder="Filter Option">
+          <mat-option *ngFor="let t of filterSelection" [value]="t">
+            {{t}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <!-- filter type selector --->
+      <input-edit *ngIf="ElementSelected" [element]="selectedElement"
+                  [form]="form"></input-edit>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="2" [rowspan]="1">
+      <div class="filter-button-row">
+        <button mat-mini-fab color="default"
+                [disabled]="!ElementSelected"
+                (click)="Apply()">
+          <mat-icon aria-label="Apply Filter">forward</mat-icon>
+        </button>
+      </div>
+      <div class="filter-button-row">
+        <button mat-mini-fab color="default"
+                [disabled]="!ElementSelected"
+                (click)="RemoveFromField()">
+          <mat-icon aria-label="Clear Filter">block</mat-icon>
+        </button>
+      </div>
+      <div class="filter-button-row">
+        <button mat-mini-fab color="default"
+                (click)="RemoveAll()">
+          <mat-icon aria-label="Remove All">clear_circle</mat-icon>
+        </button>
+      </div>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="4" [rowspan]="1">
+    </mat-grid-tile>
+
+  </mat-grid-list>

@@ -1,0 +1,9 @@
+
+<table class="defaultTable">  
+  <tr>
+    <th  *ngFor="let element of elements">{{element.Label()}}</th>
+  </tr>
+  <tr *ngFor="let d of fields[0].Data; index as i">
+    <td *ngFor="let element of elements">{{CellData(element,i)}}</td>
+  </tr>
+</table>

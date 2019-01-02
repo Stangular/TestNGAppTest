@@ -75,25 +75,54 @@ export interface IRecordService {
 export interface IRecordManager {
 
   Form: FormGroup;
-  GetFormDefinition(): void;
+  GetFormDefinition(): IElementDefinition<any>[];
   // AsList(valueName?: string): IListItem[];
   IsValid(): boolean;
+}
+
+
+export class Paging {
+  constructor(private pageTotal: number, private pageSize: number = 10, private pageNumber: number = 0) {
+
+  }
+
+  get PageSize() { return this.pageSize; }
+  get PageNumber() { return this.pageNumber; }
+
+  gotoFirstPage() {
+    this.pageNumber = 0; return this.pageNumber;
+  }
+
+  gotoNextPage() {
+    this.pageNumber = this.pageNumber + 1; return this.pageNumber;
+  }
+
+  gotoPreviousPage() {
+    this.pageNumber = this.pageNumber - 1; return this.pageNumber;
+  }
+
+  gotoFinalPage() {
+    this.pageNumber = this.pageTotal - 1; return this.pageNumber;
+  }
 }
 
 export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   protected _UIElements: IElementDefinition<any>[] = [];
-  protected _childRecords: Records<T>[] = [];
+  //protected _childRecords: Records<T>[] = [];
 
   protected _form: FormGroup;
   private _selectedItem: number = -1;
-  private _filter: { field: '', value: '' }[] = [];
-  private _sort: { field: '', direction: boolean }[] = [];
+  protected _new: number[] = [];
+  protected _dirty: number[] = [];
+  // private _filter: { field: '', value: '',  }[] = [];
+  //private _sort: { field: '', direction: boolean }[] = [];
   // private _lazyState : LazyState; ie {pageCount:0,pageSize:0,pageNumber:0,complete:boolean,filters:[]}
 
-  constructor(private formName: string
+  constructor(private formName: string, private sourceID: string = ''
     , protected _fields: Field<any>[] = []
-    , private _recordCount = 0) {
+    , private _recordCount = 0
+    ) {
 
     this._selectedItem = 0;
     this.createFormGroup();
@@ -103,12 +132,13 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     return this._UIElements;
   }
 
-  abstract GetFormDefinition(): void;
+  abstract GetFormDefinition(): IElementDefinition<any>[];
   abstract New(data: any): Field<any>;
   abstract UpdateDependentUI(): void;
   abstract GetUIValue(fieldID: string): any;
-  abstract get testData(): Field<any>[];
-  abstract ChartData(chartID: string): { xparam: number, yparam: number } [];
+  abstract OutputAll(): any;
+ // abstract get testData(): Field<any>[];
+  abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
 
   private createFormGroup() {
     let group: any = {};
@@ -117,17 +147,26 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
       group[e.FieldID()] = new FormControl(e.CurrentValue() || '');
     });
     this._form = new FormGroup(group);
+    //this._UIElements.forEach(e => {
+    //  let contrl = this._form.controls[e.FieldID()];
+    //  //contrl.parent.valueChanges.subscribe( // TODO: evaluate as alternative to blur
+    //  //  changes => this.updateField(changes)
+    //  //);
+    //});
   }
 
-  public Test() {
-    if (this._fields.length <= 0) {
-      this._fields = this.testData;
-    }
-  }
+  //public updateField(changes: any) {
+  //  const sss = 'sss';
+  //}
+  //public Test() {
+  //  if (this._fields.length <= 0) {
+  //    this._fields = this.testData;
+  //  }
+  //}
 
-  public AddDependentRecord(records: Records<T>) {
-    this._childRecords.push(records);
-  }
+  //public AddDependentRecord(records: Records<T>) {
+  //  this._childRecords.push(records);
+  //}
 
   protected get UIElements(): IElementDefinition<any>[] {
     return this._UIElements;
@@ -145,14 +184,45 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     return this.formName;
   }
 
+  get SourceID(): string {
+    return this.sourceID;
+  }
+
   get Form(): FormGroup {
     return this._form;
   }
 
+  get IsNewForm() {
+    return this._UIElements.some(e => e.isNew());
+  }
+
+  RemoveNewForm() {
+    if (!this.IsNewForm) {
+      return false;
+    }
+    this._fields.forEach(f =>f.RemoveLast());
+    this._recordCount = this.Count;
+    this._selectedItem = this.Count - 1;
+    this.UpdateUI();
+  return true;
+  }
+
   get IsDirty(): boolean {
 
-    return this._UIElements.some(e => e.isDirty())
-      || this._childRecords.some(r => r.IsDirty);
+    return this._UIElements.some(e => e.isDirty());
+  }
+
+  SetDirty(): void {
+    if (this._UIElements.some(e => e.isDirty())) {
+      this._dirty.push(this.SelectedIndex());
+    }
+    else {
+      const v = this._dirty.findIndex(r => r == this.SelectedIndex());
+      if (v && v >= 0) {
+        this._dirty.splice(v, 1);
+      }
+    }
+
   }
 
   IsValid(): boolean {
@@ -160,20 +230,35 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   }
 
   get Count(): number {
-    return this._recordCount;
+    return (this._fields.length > 0) ? this._fields[0].Data.length : 0;  // this._recordCount;
   }
 
   NewRecord(): boolean {
-    if (this.IsDirty) {// if the current record is dirty you do not want tit...
+    if (this.IsDirty) {// if the current record is dirty you do not want to leave it...
       return false; // isdirty   TODO: Dirty record message?
     }
     this._fields.forEach(f =>
       f.AddNew(this._UIElements
         .find(e => e.FieldID() == f.FieldId)));
 
-    this._selectedItem = this._recordCount;
-    this._recordCount = this._recordCount + 1;
+    this._selectedItem = this.Count;
+    this._recordCount = this._selectedItem + 1;
+    this._new.push(this._selectedItem);
     this.UpdateUI();
+  }
+
+  get NewContent() {
+    let flds: Field<T>[] = [];
+    const self = this;
+    this._new.forEach(function (r, i) {
+      self._UIElements.forEach(function (e, j) {
+        const fld = self._fields.find(f => f.FieldId == e.FieldID());
+        if (fld) {
+          fld.Data[r];
+        }
+      });
+    });
+    return this._fields;
   }
 
   CopyRecord(recordNumber: number): boolean {
@@ -189,25 +274,35 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   public LoadData(content: IRecord[] = [], converters: Converter[] = [], recordCount = 0) {
     let self = this;
-    if (content.length <= 0) {
-      this.Test();
-      return;
-    }
+    //if (content.length <= 0) {
+    ////  this.Test();
+    //  this._selectedItem = 0;
+    //  this.UpdateUI();
+    //  return;
+    //}
+    this._fields.length = 0;
     this._recordCount = recordCount;
     content.forEach(function (c, i) {
-      let fldID = c.fieldID;
-      let convert = converters.find(x => x.DataID == fldID);
-      if (!!convert) {
-        fldID = convert.UIID;
-        c.fieldID = fldID;
-      }
-      let fldElm = self._UIElements.find(e => e.FieldID() == fldID);
+      let fldID = c.fieldID.toLowerCase();
+      //let convert = converters
+      //  .find(x => x.DataID.toLowerCase() == fldID);
+      //if (!!convert) {
+      //  fldID = convert.UIID;
+      //  c.fieldID = fldID;
+      //}
+      let fldElm = self
+        ._UIElements
+        .find(e => e.FieldID().toLowerCase() == fldID);
       if (!!fldElm) {
         self._fields.push(self.New(c));
         fldElm.ResetToDefault();
       }
     });
-    return this.First();
+    if (recordCount > 0 && this._selectedItem >= recordCount) {
+      this._selectedItem = recordCount - 1;
+
+    }
+    this.UpdateUI();
   }
 
   public First(): boolean {
@@ -244,7 +339,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     }
     if (this.IsDirty) {// if the current record is dirty you do not want to leave it...
       console.log(index + ' is dirty');
-      return false; // isdirty   TODO: Dirty record message?
+      return false; // isdirty   TODO: Dirty record message (or just disable buttons)?
     }
     this._selectedItem = index;
     this.UpdateUI();
@@ -259,14 +354,55 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   private InitUIField(field: Field<any>): void {
 
-    if (!!field) {
-      let elmdef = this._UIElements.find(e => e.FieldID() == field.FieldId);
-      let contrl = this._form.controls[field.FieldId];
-      elmdef.SetInitialValue(field.Value(this._selectedItem));
-      contrl.setValue(elmdef.CurrentValue());
+    if (field) {
+      let elmdef = this._UIElements
+        .find(e => e.FieldID().toLowerCase() == field.FieldId.toLowerCase());
+      if (elmdef) {
+        elmdef.SetInitialValue(field.Value(this._selectedItem));
+        let contrl = this._form.controls[field.FieldId];
+        if (contrl) {
+          let v = elmdef.UIConvert();
+          contrl.setValue(v);
+        }
+      }
     }
   }
 
+  ResetToInitial() {
+    this._UIElements.forEach(e => {
+      let contrl = this._form.controls[e.FieldID()];
+      if (contrl) {
+          if (e.UpdateCurrentValue(e.InitialValue())) {
+            contrl.setValue(e.InitialValue());
+          }
+      }
+    });
+  }
+
+  UpdateCurrent() {
+    this._UIElements.forEach(e => {
+      e.Clean();
+      let fld = this._fields.find(f => f.FieldId == e.FieldID());
+      fld.Data[this.SelectedIndex()] = e.InitialValue();
+      let contrl = this._form.controls[e.FieldID()];
+      if (contrl) { contrl.setValue(e.InitialValue()); }
+    });
+  }
+
+  UpdateRecord(elmID: string) {
+
+    let contrl = this._form.controls[elmID];
+    if (contrl) {
+      let elmdef = this._UIElements.find(e => e.FieldID() == elmID);
+      if (elmdef) {
+        const elm: any = document.getElementById(elmID); // <- Non-angular, but seems to work pretty well anyway....
+        const v = elmdef.Type() == 'number' ? parseInt(elm.value) : elm.value;
+        if (elmdef.UpdateCurrentValue(v)) {
+          contrl.setValue(v);
+        }
+      }
+    }
+  }
   //get DataAsJson() {
   //  let data: any [] = [];
   //  this._fields.forEach(function (f, i) {
@@ -284,7 +420,9 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     let self = this;
     let fldElm;
     this._fields.forEach(function (f, i) {
-      fldElm = self._UIElements.find(e => e.FieldID() == f.FieldId);
+      fldElm = self
+        ._UIElements
+        .find(e => e.FieldID().toLowerCase() == f.FieldId.toLowerCase());
       fldElm.UpdateCurrentValue(self.GetUIValue(f.FieldId));
     });
   }
@@ -333,15 +471,17 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   OutputCurrentValues(converters: Converter[] = []) {
     this.UpdateModel();
-    return this.GetOutputContent();
+    return {
+      FormName: this.sourceID,
+      RecordCount: 1,
+      Content: this.GetOutputContent()
+    };
   }
 
-  OutputAll(): any {
-    return {
-      FormName: this.formName,
-      RecordCount: 1,
-      Content: this.OutputCurrentValues()
-    };
+  
+
+  get onLastRecord(): boolean {
+    return (this._selectedItem == this.Count - 1);
   }
 
   protected addElement<T>(elm: IElementDefinition<T>) {

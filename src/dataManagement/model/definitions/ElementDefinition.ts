@@ -1,8 +1,60 @@
 import { IValidator } from './Validation';
+import * as moment from 'moment';
 
 export interface IUpdateType {
   Update(type: IUpdateType): void;
   Copy(): IUpdateType;
+}
+
+
+export enum FilterType {
+  none = 0,
+  greaterThan = 1,
+  lessThan = 2,
+  equal = 3,
+  greaterThanORequal = 4,
+  lessThanORequal = 5,
+  contains = 6,
+  doesNotContain = 7
+}
+
+export enum SortOrder {
+  unsorted = 0,
+  ascending = 1,
+  descending = 2
+}
+
+export class ElementFilter<T> {
+
+  constructor(private value: T, private filterType: FilterType, private sortOrder: SortOrder = SortOrder.unsorted) { }
+
+  get Value() { return this.value; }
+  get FilterType() { return this.filterType; }
+  get SortOrder() { return this.sortOrder; }
+
+  SetNextSortOrder() {
+    switch (this.sortOrder) {
+      case SortOrder.unsorted: this.sortOrder = SortOrder.ascending; break;
+      case SortOrder.ascending: this.sortOrder = SortOrder.descending; break;
+      case SortOrder.descending: this.sortOrder = SortOrder.unsorted; break;
+    }
+  }
+  ResetFilter(value: T, filterType: FilterType) {
+    this.value = value;
+    this.filterType = filterType;
+  }
+
+  static get FilterList() {
+    let filterTypes: string[] = [];
+    filterTypes.push('less than');
+    filterTypes.push('less than or equal to');
+    filterTypes.push('equal to');
+    filterTypes.push('greater than or equal to');
+    filterTypes.push('greater than');
+    filterTypes.push('contains');
+    filterTypes.push('does not contain');
+    return filterTypes;
+  }
 }
 
 export class ElementModel<T>{
@@ -15,6 +67,11 @@ export class ElementModel<T>{
   defaultValue: T;
   mask: number = 0; // RegExp[] = []; //or {ID:'',mask:RegExp[] = []}
   validator: number = 0;
+  filterValue: T;
+  filterType: FilterType = FilterType.none;
+  sortOrder: SortOrder = SortOrder.unsorted;
+  autoDirtyOnDefault: boolean = false;
+  //filter: ElementFilter<T> = null;
 
   constructor(model: ElementModel<T> = null) {
     if (model != null) {
@@ -25,10 +82,13 @@ export class ElementModel<T>{
       this.type = model.type;
       this.mask = model.mask;
       this.validator = model.validator;
+      this.filterType = model.filterType;
+      this.filterValue = model.filterValue;
+      this.sortOrder = model.sortOrder;
+      //  this.filter = model.filter;
     }
   }
 }
-
 export interface IElementDefinition<T> {
 
   FormID(): string;
@@ -40,10 +100,10 @@ export interface IElementDefinition<T> {
   DefaultValue(): T;
   InitialValue(): T;
   CurrentValue(): T;
-  //  DBType(): dbtype;
   Mask(): number;
 
   init(): void;
+  isNew(): boolean;
   isDirty(): boolean;
   Clean(): void;
   ResetToDefault(): void;
@@ -52,9 +112,17 @@ export interface IElementDefinition<T> {
   SetInitialValue(v: T): boolean;
   UpdateCurrentValue(v: T): boolean;
 
+  setFilter(value: T, filterType: FilterType);
+  FilterValue(): T;
+  FilterType(): FilterType;
+  SortOrder(): SortOrder;
+  SetNextSortOrder(): void;
+  UIConvert(): void;
+
 };
 
 export class EditElementDefinition<T> implements IElementDefinition<T> {
+
 
   constructor(
     private _model: ElementModel<T>,
@@ -84,6 +152,45 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
   //  }
   //  this.ResetToDefault();
   //}
+
+  //setFilter(value: T, filterType: FilterType) {
+  //  if (this._model.filter) {
+  //    this._model.filter.ResetFilter(value, filterType);
+  //  }
+  //  else {
+  //    this._model.filter = new ElementFilter(value, filterType);
+  //  }
+  //}
+
+  //filtersss(): ElementFilter<T> {
+  //  return null;
+  //}
+
+  setFilter(value: T, filterType: FilterType) {
+    this._model.filterValue = value;
+    this._model.filterType = filterType;
+  }
+
+  FilterValue(): T {
+    return this._model.filterValue;
+  }
+
+  FilterType(): FilterType {
+    return this._model.filterType;
+  }
+
+  SetNextSortOrder(): void {
+    switch (this._model.sortOrder) {
+      case SortOrder.unsorted: this._model.sortOrder = SortOrder.ascending; break;
+      case SortOrder.ascending: this._model.sortOrder = SortOrder.descending; break;
+      case SortOrder.descending: this._model.sortOrder = SortOrder.unsorted; break;
+    }
+  }
+
+
+  SortOrder(): SortOrder {
+    return this._model.sortOrder;
+  }
 
   init(): void {
 
@@ -125,14 +232,21 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
     return this._currentValue || this.InitialValue();
   }
 
+  isNew(): boolean {
+    return (this._model.autoDirtyOnDefault
+      && this.CurrentValue() == this.DefaultValue());
+  }
+
   isDirty(): boolean {
-    return this._initialValue !== this._currentValue;
+
+    return this._initialValue !== this._currentValue || this.isNew();
   }
 
   ResetToDefault(): void {
     this._initialValue = this.DefaultValue();
-    this._currentValue = this.DefaultValue();
+    this._currentValue = this._initialValue;
   }
+  
 
   //  ResetToInvalid(): void {
   //       this._initialValue = this._defaultValue;
@@ -169,6 +283,17 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
       this._currentValue = v;
     }
     return res;
+  }
+  /// Converts the currentValue if necessary for UI display.
+  UIConvert() {
+    let c:any;
+    switch (this.Type()) {
+      case 'date':
+        c = moment(this._currentValue).format("YYYY-MM-DD");
+        break;
+      default: c = this._currentValue;
+    }
+    return c;
   }
 };
 

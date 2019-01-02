@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from '../Services/filter/filter.service';
-import { IElementDefinition } from '../../dataManagement/model/definitions/elementDefinition';
+import { IElementDefinition } from '../../dataManagement/model/definitions/ElementDefinition';
 import { TheCanvasState } from '../../canvas/models/DisplayValues';
 import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
 
@@ -32,10 +32,11 @@ export class SystemInventoryComponent implements OnInit {
   //}
 
   InitForm(): FormGroup {
-    //this.elements = this.filterService.Content.GetFormDefinition();
-    //this.form = this.filterService.Content.Form;
+   // this.elements = this.filterService.Content.GetFormDefinition();
+   // this.form = this.filterService.Content.Form;
  //   this.filterService.Init('TestMultSeriesLineChart');
-  //  this.filterService.Init('testtable1');
+    //  this.filterService.Init('testtable1');
+    
     this.filterService.Init('VBarChart');
     return this.form;
   }

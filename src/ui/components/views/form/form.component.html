@@ -1,0 +1,29 @@
+<fa-icon aria-label="Filter content" icon="filter"></fa-icon>
+<form-filter></form-filter>
+<mat-card class="example-card">
+  <mat-card-header>
+    <mat-card-title>
+      {{source.FormName}}
+    </mat-card-title>
+    <mat-card-subtitle>{{metaInfo}}d</mat-card-subtitle>
+  </mat-card-header>
+  <form class="example-form">
+    <div [formGroup]="form" class="form-group">
+      <detail-view [elements]="elements"
+                   [form]="form"
+                   [formDirty]="source.IsDirty"
+                   [formNew]="source.IsNew"
+                   (action)="action($event)"
+                   (blur)="UpdateElement($event)"
+                   *ngIf="view == viewType.detail"></detail-view>
+      <table-view [elements]="elements" [fields]="source.Fields" *ngIf="view == viewType.table"></table-view>
+      <app-canvas *ngIf="view == viewType.graphic"></app-canvas>
+    </div>
+    <form-pager (pageaction)="page($event)"
+                (viewaction)="viewChange($event)"
+                [recordCount]="source.Count"
+                [formDirty]="source.IsDirty"
+                [recordNumber]="source.SelectedIndex()">
+    </form-pager>
+  </form>
+</mat-card>

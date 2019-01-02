@@ -2,8 +2,17 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\canvas"
+    "\\src\\dataManagement",
+    "\\src\\dataManagement\\model",
+    "\\src\\NAS_App",
+    "\\src\\NAS_App\\Services",
+    "\\src\\NAS_App\\Services\\filter",
+    "\\src\\ui",
+    "\\src\\ui\\components",
+    "\\src\\ui\\components\\views",
+    "\\src\\ui\\components\\views\\form",
+    "\\src\\ui\\module"
   ],
-  "SelectedNode": "\\src",
+  "SelectedNode": "\\src\\NAS_App\\Services\\filter\\filter.model.ts",
   "PreviewInSolutionExplorer": false
 }
