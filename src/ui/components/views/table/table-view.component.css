@@ -18,7 +18,16 @@ table, td, th {
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #FBFBFB;
+}
+
+tr:nth-child(odd) {
+  background-color: #FDFDFD;
+}
+
+.selected {
+  background-color: #663300 !important;
+  color: #ffffcc;
 }
 
 tr:hover {
@@ -29,6 +38,22 @@ th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: #d6d6d6;
-  color: white;
+  background-color: #003300;
+  color: yellow;
+}
+
+.header-filter {
+  width: 100%;
+  text-align: right;
+}
+
+.header-filter_remove {
+  width: 100%;
+  text-align: right;
+  color: tomato;
+}
+
+.header-label {
+  width: 100%;
+  text-align: left;
 }

@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
-//import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
+import {
+  Http, Response, Headers, RequestOptions, URLSearchParams} from '@angular/http';
 import { HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 
 //import { IElementDefinition } from '../UI/model/ElementDefinition';
@@ -13,23 +14,25 @@ import { IForm } from '../model/form/form';
 @Injectable()
 export class DataHTTPService {
 
-  // private _options: RequestOptions;
-  private _headers: Headers = new Headers();
+   private _options: RequestOptions;
+  private _headers: HttpHeaders = new HttpHeaders();
 
   private _startupData: any;
   constructor(private http: HttpClient) { }
 
   public InitializeOptions(userToken: string) {
-    this._headers = new Headers({
-      'Authorization': 'bearer ' + userToken,
-      'Content-Type': 'application/json; charset=utf-8'
-    });
+    this._headers = new HttpHeaders();
+    this._headers.set('Content-Type', 'application/json');
+    this._headers.set('Accept', 'application/json');
+
     const requestOptions = {
       params: new HttpParams()
     };
     //https://stackoverflow.com/questions/45797513/angular4-http-httpclient-requestoptions
-    //   this._options = new RequestOptions({ headers: this._headers });
-    //   this._options.params.set()
+    //https://www.techiediaries.com/angular-by-example-httpclient-get/
+
+  //    this._options = new RequestOptions({ headers: this._headers });
+  //    this._options.params.set()
   }
 
   private processData(res: any) {
@@ -43,8 +46,17 @@ export class DataHTTPService {
     return error.statusText;
   }
 
-  getContent(formName: string, restPath: string = 'http://localhost:52462/api/data'): Observable<IForm> {
-    return this.http.get(restPath + '/' + formName)
+  getContent(filter: any, restPath: string = 'http://localhost:52462/api/data/GetFilteredContent'): Observable<IForm> {
+    let f: any = { formName: 'charttestTableA', paging: { pageLength: 4, pageNumber: 1 }, filters: [{ FieldId: 'income', Sort: 2, Value: 0, Operation: 0 }] };
+    this._headers.set('Content-Type', 'application/json');
+    this._headers.set('Accept', 'application/json');
+
+    let myParams = new HttpParams();
+    myParams.set('filter', f);
+   // let options = new RequestOptions({ headers: this._headers, params: myParams });
+
+    let self = this;
+    return this.http.get(restPath, {params: myParams })
       .pipe(map(response => this.processData(response), catchError(this.handleError)));
   }
 

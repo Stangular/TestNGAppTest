@@ -1,61 +1,30 @@
 
-  <mat-grid-list cols="8" rowHeight="80px">
-    <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-      <!-- field selector --->
-      <button mat-icon-button color="default" (click)="Sort()">
-        <mat-icon aria-label="Ascending"
-                  *ngIf="selectedElement && selectedElement.SortOrder() == sortOrder.ascending">arrow_drop_up</mat-icon>
-        <mat-icon aria-label="None"
-                  *ngIf="selectedElement && selectedElement.SortOrder() == sortOrder.unsorted">remove</mat-icon>
-        <mat-icon aria-label="Descending"
-                  *ngIf="selectedElement && selectedElement.SortOrder() == sortOrder.descending">arrow_drop_down</mat-icon>
-      </button>
-      <mat-form-field>
-        <mat-select placeholder="Field" [(ngModel)]="selectedElement">
-          <mat-option *ngFor="let e of elements" [value]="e">
-            {{e.Label()}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
-      <!-- filter type selector --->
-      <mat-form-field>
-        <mat-select placeholder="Filter Option">
-          <mat-option *ngFor="let t of filterSelection" [value]="t">
-            {{t}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
-      <!-- filter type selector --->
-      <input-edit *ngIf="ElementSelected" [element]="selectedElement"
-                  [form]="form"></input-edit>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="2" [rowspan]="1">
-      <div class="filter-button-row">
-        <button mat-mini-fab color="default"
-                [disabled]="!ElementSelected"
-                (click)="Apply()">
-          <mat-icon aria-label="Apply Filter">forward</mat-icon>
-        </button>
-      </div>
-      <div class="filter-button-row">
-        <button mat-mini-fab color="default"
-                [disabled]="!ElementSelected"
-                (click)="RemoveFromField()">
-          <mat-icon aria-label="Clear Filter">block</mat-icon>
-        </button>
-      </div>
-      <div class="filter-button-row">
-        <button mat-mini-fab color="default"
-                (click)="RemoveAll()">
-          <mat-icon aria-label="Remove All">clear_circle</mat-icon>
-        </button>
-      </div>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="4" [rowspan]="1">
-    </mat-grid-tile>
+<div class="dialog-form">
+  <h1 mat-dialog-title>Select Filter Parameters...</h1>
+  <div mat-dialog-content>
+    <div class="dialog-form">
+      <mat-grid-list cols="1" rowHeight="30px">
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+          <mat-form-field [floatLabel]="'never'" style="width:90%">
+            <mat-select placeholder="Filter Option" [(ngModel)]="data.operation">
+              <mat-option *ngFor="let t of filterSelection" [value]="t">
+                {{t.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+          <input-edit [element]="selectedElement"
+                      [form]="form"
+                      (blur)="UpdateFilter($event)"></input-edit>
+        </mat-grid-tile>
 
-  </mat-grid-list>
+      </mat-grid-list>
+    </div>
+
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
+    <button mat-button [mat-dialog-close]="FilterData" cdkFocusInitial>{{okMessage}}</button>
+  </div>
+</div>

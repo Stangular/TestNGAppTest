@@ -13,7 +13,10 @@ import { FormInputElementComponent } from '../../../ui/components/edit/form-inpu
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { AcknowlegeDeleteDialog } from '../../components/views/form/dialogs/acknowledgeDelete/acknowledge-delete-dialog.component'
-import { faCoffee, faFilter, faChevronDown, faSort,  } from '@fortawesome/free-solid-svg-icons';
+import { faCoffee, faFilter, faChevronDown, faSort, } from '@fortawesome/free-solid-svg-icons';
+import { SaveFormSuccessSnackComponent } from '../snacks/success/save/form/save-form-success-snack.component'
+import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
+
 library.add(
   faCoffee
   , faFilter
@@ -28,6 +31,7 @@ library.add(
     , CanvasModule
     , ngMaterialModule
     , FontAwesomeModule
+    , Ng4LoadingSpinnerModule.forRoot()
   ],
 
   declarations: [
@@ -38,16 +42,20 @@ library.add(
     , FormComponent
     , FormPagingComponent
     , FormFilteringComponent
+    , SaveFormSuccessSnackComponent
     , AcknowlegeDeleteDialog
-
   ],
-  exports: [DetailViewComponent
+  exports: [
+    DetailViewComponent
     , CardViewComponent
     , TableViewComponent
     , FormComponent
     , FormFilteringComponent
+    , SaveFormSuccessSnackComponent
     , AcknowlegeDeleteDialog],
-  entryComponents: [AcknowlegeDeleteDialog],
+  entryComponents: [
+    AcknowlegeDeleteDialog
+    , FormFilteringComponent],
   providers: []
 })
 export class ViewModule { }

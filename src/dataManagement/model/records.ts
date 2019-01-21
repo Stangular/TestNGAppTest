@@ -1,5 +1,5 @@
 import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
-import { IElementDefinition, EditElementDefinition, } from './definitions/ElementDefinition';
+import { IElementDefinition, EditElementDefinition, SortOrder, FilterType } from './definitions/ElementDefinition';
 import { IDataItem, DataItem, DataItems } from './data/dataitem';
 import { IListNavigator } from './list/ListNavigator';
 import { Field } from './field';
@@ -86,31 +86,64 @@ export class Paging {
 
   }
 
+  UpdateTotal(pageTotal: number, pageSize: number = 10, pageNumber: number = 0) {
+    this.pageTotal = pageTotal;
+  }
+
+  UpdateSize(pageSize: number) {
+    if (this.pageSize != pageSize) {
+      this.pageSize = pageSize;
+      if (this.pageTotal > 0 && pageSize > this.pageTotal) {
+        this.pageSize = this.pageTotal;
+      }
+      this.pageNumber = 0;
+    }
+  }
+
+  get TotalSize() { return this.pageTotal; }
+  get PageOffset() { return this.pageNumber * this.pageSize; }
   get PageSize() { return this.pageSize; }
   get PageNumber() { return this.pageNumber; }
+  get PageCount() { return this.pageTotal / this.pageSize; }
 
   gotoFirstPage() {
-    this.pageNumber = 0; return this.pageNumber;
+    let pn = this.pageNumber;
+    this.pageNumber = 0;
+    return pn == 0;   // retunr true if  already on the first page...
+
   }
 
   gotoNextPage() {
-    this.pageNumber = this.pageNumber + 1; return this.pageNumber;
+    let nextPage = this.pageNumber + 1;
+    if ( nextPage * this.pageSize >= this.pageTotal)
+    {
+      return false;
+    }
+    this.pageNumber = nextPage;
+    return true;
   }
 
   gotoPreviousPage() {
-    this.pageNumber = this.pageNumber - 1; return this.pageNumber;
+    if (this.pageNumber <= 0) {
+      return false;
+    }
+    this.pageNumber = this.pageNumber - 1;
+    return true;
   }
 
   gotoFinalPage() {
-    this.pageNumber = this.pageTotal - 1; return this.pageNumber;
+    let pn = this.pageNumber;
+    this.pageNumber = (this.TotalSize / this.pageSize) - 1;
+    return pn == this.pageNumber; // Return true if already on the final page...
   }
 }
 
 export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
+  protected page: Paging = new Paging(0); 
   protected _UIElements: IElementDefinition<any>[] = [];
   //protected _childRecords: Records<T>[] = [];
-
+  protected _pageSize: number = 10;  
   protected _form: FormGroup;
   private _selectedItem: number = -1;
   protected _new: number[] = [];
@@ -122,10 +155,12 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   constructor(private formName: string, private sourceID: string = ''
     , protected _fields: Field<any>[] = []
     , private _recordCount = 0
-    ) {
+    , totalRecordCount = 0
+  ) {
 
     this._selectedItem = 0;
     this.createFormGroup();
+    this.page.UpdateTotal(totalRecordCount);
   }
 
   public get FormElements(): IElementDefinition<any>[] {
@@ -137,7 +172,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   abstract UpdateDependentUI(): void;
   abstract GetUIValue(fieldID: string): any;
   abstract OutputAll(): any;
- // abstract get testData(): Field<any>[];
+  // abstract get testData(): Field<any>[];
   abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
 
   private createFormGroup() {
@@ -180,6 +215,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     }
   }
 
+  
   get FormName(): string {
     return this.formName;
   }
@@ -200,11 +236,11 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     if (!this.IsNewForm) {
       return false;
     }
-    this._fields.forEach(f =>f.RemoveLast());
+    this._fields.forEach(f => f.RemoveLast());
     this._recordCount = this.Count;
     this._selectedItem = this.Count - 1;
     this.UpdateUI();
-  return true;
+    return true;
   }
 
   get IsDirty(): boolean {
@@ -231,6 +267,16 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   get Count(): number {
     return (this._fields.length > 0) ? this._fields[0].Data.length : 0;  // this._recordCount;
+  }
+
+  get Total(): number {
+    return this.page.TotalSize;
+  }
+
+  get CurrentRecordNumber() {
+    let rn = this.page.PageSize * this.page.PageNumber;
+    rn += this._selectedItem;
+    return rn;
   }
 
   NewRecord(): boolean {
@@ -272,7 +318,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     return this.Final();
   }
 
-  public LoadData(content: IRecord[] = [], converters: Converter[] = [], recordCount = 0) {
+  public LoadData(content: IRecord[] = [], converters: Converter[] = [], recordCount = 0, totalRecordCount = 0) {
     let self = this;
     //if (content.length <= 0) {
     ////  this.Test();
@@ -282,6 +328,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     //}
     this._fields.length = 0;
     this._recordCount = recordCount;
+    this.page.UpdateTotal(totalRecordCount);
     content.forEach(function (c, i) {
       let fldID = c.fieldID.toLowerCase();
       //let convert = converters
@@ -293,32 +340,55 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
       let fldElm = self
         ._UIElements
         .find(e => e.FieldID().toLowerCase() == fldID);
-      if (!!fldElm) {
-        self._fields.push(self.New(c));
+      if (fldElm) {
+        self._fields.push(self.New( c ));
         fldElm.ResetToDefault();
       }
     });
     if (recordCount > 0 && this._selectedItem >= recordCount) {
       this._selectedItem = recordCount - 1;
-
     }
     this.UpdateUI();
   }
 
+  get PageSize() {
+    return this.page.PageSize;
+  }
+
   public First(): boolean {
-    return this.Goto(0);
+    this.Goto(0);
+    return( this.page.gotoFirstPage());
   }
 
   public Final(): boolean {
-    return this.Goto(this.Count - 1);
+    this.Goto(this.Count - 1);
+    return( this.page.gotoFinalPage());
+  }
+
+  public NextPage(): boolean {
+    return this.page.gotoNextPage();
   }
 
   public Next(): boolean {
-    return this.Goto(this._selectedItem + 1);
+    if (this.Goto(this._selectedItem + 1)) {
+      return true;
+    }
+    this._selectedItem = 0;
+    this.page.gotoNextPage();
+    return false;
+  }
+
+  public PreviousPage(): boolean {
+    return this.page.gotoPreviousPage();
   }
 
   public Previous(): boolean {
-    return this.Goto(this._selectedItem - 1);
+    if (this.Goto(this._selectedItem - 1)) {
+      return true;
+    }
+    this._selectedItem = this.Count - 1;
+    this.page.gotoPreviousPage();
+    return false;
   }
 
   public SelectItem<T>(value: T): boolean {
@@ -327,20 +397,22 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   public SelectItemByField(fieldId: string, value: any): boolean {
     let fld = this._fields.find(f => f.FieldId == fieldId);
-    if (!!fld) {
+    if (fld) {
       return this.Goto(fld.ValueIndex(value));
     }
     return false;
   }
+  
+  public Goto(index: number): boolean {
 
-  protected Goto(index: number): boolean {
-    if (index < 0 || index >= this.Count) {// invalid index...
-      return false; // invalid
-    }
     if (this.IsDirty) {// if the current record is dirty you do not want to leave it...
       console.log(index + ' is dirty');
       return false; // isdirty   TODO: Dirty record message (or just disable buttons)?
     }
+    if (index < 0 || index >= this.Count) {
+     return false;
+    }
+
     this._selectedItem = index;
     this.UpdateUI();
     return true;
@@ -372,9 +444,9 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     this._UIElements.forEach(e => {
       let contrl = this._form.controls[e.FieldID()];
       if (contrl) {
-          if (e.UpdateCurrentValue(e.InitialValue())) {
-            contrl.setValue(e.InitialValue());
-          }
+        if (e.UpdateCurrentValue(e.InitialValue())) {
+          contrl.setValue(e.InitialValue());
+        }
       }
     });
   }
@@ -389,17 +461,27 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     });
   }
 
-  UpdateRecord(elmID: string) {
+  Filter(pagesize: number = 10) {
+    this.page.UpdateSize(pagesize);
+    this._selectedItem = 0;
+    let f = {
+      formName: this.SourceID,
+      paging: { pageLength: this.page.PageSize, pageNumber: this.page.PageNumber },
+      filters: []
+    }
+    this._UIElements.forEach(e => {
+      if (e.getFilter().Set) { f.filters.push(e.getFilter()); }
+    });
+    return f;
+  }
 
-    let contrl = this._form.controls[elmID];
-    if (contrl) {
-      let elmdef = this._UIElements.find(e => e.FieldID() == elmID);
-      if (elmdef) {
-        const elm: any = document.getElementById(elmID); // <- Non-angular, but seems to work pretty well anyway....
-        const v = elmdef.Type() == 'number' ? parseInt(elm.value) : elm.value;
-        if (elmdef.UpdateCurrentValue(v)) {
-          contrl.setValue(v);
-        }
+  UpdateRecord(elmID: string) {
+    let elmdef = this._UIElements.find(e => e.FieldID() == elmID);
+    if (elmdef) {
+      elmdef.UpdateFromUI();
+      let contrl = this._form.controls[elmID];
+      if (contrl) {
+        contrl.setValue(elmdef.UpdateFromUI());
       }
     }
   }
@@ -478,7 +560,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     };
   }
 
-  
+
 
   get onLastRecord(): boolean {
     return (this._selectedItem == this.Count - 1);

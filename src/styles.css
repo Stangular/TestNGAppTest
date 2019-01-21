@@ -5,6 +5,10 @@
 @import '~material-icons/iconfont/material-icons.css';
 @import '~font-awesome/css/font-awesome.css';
 
+body {
+  display: block;
+  margin: 0px;
+}
 
 nav {
   margin-top: 16px;

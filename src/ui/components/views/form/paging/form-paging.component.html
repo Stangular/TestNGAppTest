@@ -1,42 +1,27 @@
 <mat-grid-list cols="3" rowHeight="50px">
   <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-    <div class="page-button-row">
-      <button mat-mini-fab color="default" (click)="view(viewType.detail)">
-        <mat-icon aria-label="detail View">view_compact</mat-icon>
-      </button>
-      <button mat-mini-fab color="default" (click)="view(viewType.table)">
-        <mat-icon aria-label="Grid View">grid_on</mat-icon>
-      </button>
-      <button mat-mini-fab color="default" (click)="view(viewType.card)">
-        <mat-icon aria-label="Card View">art_track</mat-icon>
-      </button>
-      <button mat-mini-fab color="default" (click)="view(viewType.graphic)">
-        <mat-icon aria-label="graphic View">equalizer</mat-icon>
-      </button>
-      <button mat-mini-fab color="default" (click)="view(viewType.graphic)">
-        <mat-icon aria-label="graphic View">pie_chart</mat-icon>
-      </button>
-      <button mat-mini-fab color="default" (click)="view(viewType.graphic)">
-        <mat-icon aria-label="graphic View">show_chart</mat-icon>
-      </button>
-    </div>
+
   </mat-grid-tile><mat-grid-tile [colspan]="1" [rowspan]="1">
     <div class="page-button-row">
-      <button mat-mini-fab color="default" (click)="page(0)" [disabled]="formDirty || firstRecord">
+      <button mat-icon-button color="default" (click)="page(0)" [disabled]="prevDisabled">
         <mat-icon aria-label="First Record">first_page</mat-icon>
       </button>
-      <button mat-mini-fab color="default" (click)="page(1)" [disabled]="formDirty || firstRecord">
+      <button mat-icon-button color="default" (click)="page(1)" [disabled]="prevDisabled">
         <mat-icon aria-label="Previous Record">chevron_left</mat-icon>
       </button>
-      <button mat-mini-fab color="default" (click)="page(2)" [disabled]="formDirty || finalRecord">
+      <button mat-icon-button color="default" (click)="page(2)" [disabled]="nextDisabled">
         <mat-icon aria-label="Next Record">chevron_right</mat-icon>
       </button>
-      <button mat-mini-fab color="default" (click)="page(3)" [disabled]="formDirty || finalRecord">
+      <button mat-icon-button color="default" (click)="page(3)" [disabled]="nextDisabled">
         <mat-icon aria-label="Last Record">last_page</mat-icon>
       </button>
     </div>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <span>Page Size:</span>
+      <select matNativeControl  [ngModel]="pageSizeModel" (ngModelChange)="changePageSize($event)">
+        <option *ngFor="let o of sizeOptions; index as i"  [value]="o">{{o}}</option>
+      </select>
   </mat-grid-tile>
 
 

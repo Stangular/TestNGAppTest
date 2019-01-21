@@ -1,8 +1,8 @@
-<div style="display:inline-block; margin-right:10px">
-  <label>{{element.Label()}}:</label>
+<div style="display:inline-block; width:60px; margin-right:10px" *ngIf="element.Label().length > 1">
+  <label>{{element.Label()}}</label>
 </div>
 <div style="display:inline-block">
-  <mat-form-field class="example-full-width" [floatLabel]="'never'" *ngIf="editMode">
+  <mat-form-field class="example-full-width" style="width:100%; text-align:left" [floatLabel]="'never'" *ngIf="editMode">
     <input matInput
            (mouseout)="onblur()"
            [id]="element.FieldID()"

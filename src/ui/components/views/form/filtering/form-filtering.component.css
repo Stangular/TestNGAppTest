@@ -1,6 +1,22 @@
 
-.filter-button-row button {
+/*.filter-button-row button {
   margin-right: 8px;
   margin-bottom: 8px;
   margin-top: 8px;
+}
+
+.page-size {
+  min-width: 150px;
+  max-width: 500px;
+  width: 20%;
+}*/
+
+.dialog-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
 }

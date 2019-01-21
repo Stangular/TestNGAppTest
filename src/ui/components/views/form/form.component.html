@@ -1,29 +1,97 @@
-<fa-icon aria-label="Filter content" icon="filter"></fa-icon>
-<form-filter></form-filter>
-<mat-card class="example-card">
+<!--<fa-icon aria-label="Filter content" icon="filter"></fa-icon>-->
+<!--<form-filter [elements]="elements" [form]="form"></form-filter>-->
+<mat-card class="form-card">
   <mat-card-header>
     <mat-card-title>
       {{source.FormName}}
     </mat-card-title>
-    <mat-card-subtitle>{{metaInfo}}d</mat-card-subtitle>
+    <mat-card-subtitle>{{metaInfo}}</mat-card-subtitle>
+    <mat-tab-group [selectedIndex]="activeView" style="width:90%"
+               (selectedIndexChange)="TabChange($event)">
+      <!--<mat-tab>
+        <ng-template mat-tab-label>
+          <i class="fa fa-filter" style="padding-right:5px"></i>
+          Filter
+        </ng-template>
+        <form-filter [elements]="elements" [form]="form"></form-filter>
+      </mat-tab>-->
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">view_compact</mat-icon>
+          Detail
+        </ng-template>
+        <form-pager (pageaction)="page($event)"
+                    [recordCount]="source.Total"
+                    [formDirty]="source.IsDirty"
+                    [pageSize]="source.PageSize"
+                    (pagesizeOut)="SetFormContent($event)"
+                    [recordNumber]="source.CurrentRecordNumber">
+        </form-pager>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">grid_on</mat-icon>
+          Table
+        </ng-template>
+        <form-pager (pageaction)="page($event)"
+                    [mode]="pagingMode.byPage"
+                    [recordCount]="source.Total"
+                    [pageCount]="source.page.PageCount"
+                    [formDirty]="source.IsDirty"
+                    [pageSize]="source.PageSize"
+                    (pagesizeOut)="SetFormContent($event)"
+                    [pageNumber]="source.page.PageNumber">
+        </form-pager>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">equalizer</mat-icon>
+          Bar Chart
+        </ng-template>
+
+       Bar Chart
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">pie_chart</mat-icon>
+          Pie Chart
+        </ng-template>
+
+        Pie Chart
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">show_chart</mat-icon>
+          Line Chart
+        </ng-template>
+
+        Line Chart
+      </mat-tab>
+    </mat-tab-group>
   </mat-card-header>
-  <form class="example-form">
-    <div [formGroup]="form" class="form-group">
-      <detail-view [elements]="elements"
-                   [form]="form"
-                   [formDirty]="source.IsDirty"
-                   [formNew]="source.IsNew"
-                   (action)="action($event)"
-                   (blur)="UpdateElement($event)"
-                   *ngIf="view == viewType.detail"></detail-view>
-      <table-view [elements]="elements" [fields]="source.Fields" *ngIf="view == viewType.table"></table-view>
-      <app-canvas *ngIf="view == viewType.graphic"></app-canvas>
-    </div>
-    <form-pager (pageaction)="page($event)"
-                (viewaction)="viewChange($event)"
-                [recordCount]="source.Count"
-                [formDirty]="source.IsDirty"
-                [recordNumber]="source.SelectedIndex()">
-    </form-pager>
-  </form>
+  <mat-card-content>
+    <!--<ng4-loading-spinner> </ng4-loading-spinner>-->
+    <form class="example-form">
+      <div [formGroup]="form" class="form-group">
+        <detail-view [elements]="elements"
+                     [form]="form"
+                     [servicing]="saveing"
+                     [formDirty]="source.IsDirty"
+                     [formNew]="source.IsNew"
+                     (action)="action($event)"
+                     (blur)="UpdateElement($event)"
+                     *ngIf="view == viewType.detail"></detail-view>
+        <table-view  [source]="source"
+                    (gotoDetail)="SetTab(1)"
+                    (sortChange)="tableSort()"
+                    (applyFilter)="applyFilter()"
+                    *ngIf="view == viewType.table"></table-view>
+        <app-canvas *ngIf="view == viewType.graphic"></app-canvas>
+      </div>
+
+    </form>
+  </mat-card-content>
 </mat-card>

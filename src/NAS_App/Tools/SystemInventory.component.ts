@@ -26,6 +26,9 @@ export class SystemInventoryComponent implements OnInit {
   }
 
 
+  get Source() {
+    return this.filterService.filterSource('VBarChart');
+  }
  
   //getElement(elementID: string) {
   //  return this.elements.find(e => e.FieldID() === elementID) || {};

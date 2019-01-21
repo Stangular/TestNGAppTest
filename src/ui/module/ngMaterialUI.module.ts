@@ -1,6 +1,6 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { NgModule } from '@angular/core'; 
 import {
   MatToolbarModule
   , MatListModule
@@ -12,9 +12,13 @@ import {
   , MatSelectModule
   , MatGridListModule
   , MatTableModule
+  , MatTabsModule
   , MatExpansionModule
   , MatSidenavModule
-  , MatDialogModule 
+  , MatDialogModule
+  , MatSnackBarModule
+  , MatProgressSpinnerModule
+  , MatPaginatorModule
 } from '@angular/material';
 
 @NgModule({
@@ -32,9 +36,13 @@ import {
     , MatSelectModule
     , MatGridListModule
     , MatTableModule
+    , MatTabsModule
     , MatExpansionModule
     , MatSidenavModule
-    , MatDialogModule 
+    , MatDialogModule
+    , MatSnackBarModule
+    , MatProgressSpinnerModule
+    , MatPaginatorModule
   ],
 
   declarations: [],
@@ -49,9 +57,13 @@ import {
     , MatSelectModule
     , MatGridListModule
     , MatTableModule
+    , MatTabsModule
     , MatExpansionModule
     , MatSidenavModule
-    , MatDialogModule 
+    , MatDialogModule
+    , MatSnackBarModule
+    , MatProgressSpinnerModule
+    , MatPaginatorModule
   ],
 
   providers: []

@@ -6,15 +6,14 @@ export interface IUpdateType {
   Copy(): IUpdateType;
 }
 
-
 export enum FilterType {
   none = 0,
-  greaterThan = 1,
-  lessThan = 2,
+  lessThan = 1,
+  lessThanORequal = 2,
   equal = 3,
   greaterThanORequal = 4,
-  lessThanORequal = 5,
-  contains = 6,
+  greaterThan = 5,
+ contains = 6,
   doesNotContain = 7
 }
 
@@ -26,39 +25,40 @@ export enum SortOrder {
 
 export class ElementFilter<T> {
 
-  constructor(private value: T, private filterType: FilterType, private sortOrder: SortOrder = SortOrder.unsorted) { }
+  constructor() { }
+  FieldId: string = '';
+  Sort: SortOrder = SortOrder.unsorted;
+  Value: any;
+  Operation: FilterType = FilterType.none;
 
-  get Value() { return this.value; }
-  get FilterType() { return this.filterType; }
-  get SortOrder() { return this.sortOrder; }
+  get Set() {
+    return this.Sort != SortOrder.unsorted
+      || this.Operation != FilterType.none;
+  }
 
-  SetNextSortOrder() {
-    switch (this.sortOrder) {
-      case SortOrder.unsorted: this.sortOrder = SortOrder.ascending; break;
-      case SortOrder.ascending: this.sortOrder = SortOrder.descending; break;
-      case SortOrder.descending: this.sortOrder = SortOrder.unsorted; break;
+  get Description() {
+    let d: string = '';
+    switch (this.Operation) {
+      case FilterType.greaterThan: d += "> " + this.Value.toString(); break;
+      case FilterType.lessThan: d += "< " + this.Value.toString(); break;
+      case FilterType.equal: d += "= " + this.Value.toString(); break;
+      case FilterType.greaterThanORequal: d += ">= " + this.Value.toString(); break;
+      case FilterType.lessThanORequal: d += "<= " + this.Value.toString(); break;
+      case FilterType.contains: d += "contains " + this.Value.toString(); break;
+      case FilterType.doesNotContain: d += "does not contain " + this.Value.toString(); break;
     }
-  }
-  ResetFilter(value: T, filterType: FilterType) {
-    this.value = value;
-    this.filterType = filterType;
+
+    return d;
   }
 
-  static get FilterList() {
-    let filterTypes: string[] = [];
-    filterTypes.push('less than');
-    filterTypes.push('less than or equal to');
-    filterTypes.push('equal to');
-    filterTypes.push('greater than or equal to');
-    filterTypes.push('greater than');
-    filterTypes.push('contains');
-    filterTypes.push('does not contain');
-    return filterTypes;
+  Remove() {
+    this.Operation = FilterType.none;
   }
 }
 
 export class ElementModel<T>{
 
+  // userPermission: ePermission;  edit/view
   formID: string = '';
   fieldID: string = '';
   observe: boolean = true;
@@ -67,11 +67,11 @@ export class ElementModel<T>{
   defaultValue: T;
   mask: number = 0; // RegExp[] = []; //or {ID:'',mask:RegExp[] = []}
   validator: number = 0;
-  filterValue: T;
-  filterType: FilterType = FilterType.none;
-  sortOrder: SortOrder = SortOrder.unsorted;
+ // filterValue: T;
+ // filterType: FilterType = FilterType.none;
+//  sortOrder: SortOrder = SortOrder.unsorted;
   autoDirtyOnDefault: boolean = false;
-  //filter: ElementFilter<T> = null;
+  filter: ElementFilter<T> = new ElementFilter();
 
   constructor(model: ElementModel<T> = null) {
     if (model != null) {
@@ -82,12 +82,15 @@ export class ElementModel<T>{
       this.type = model.type;
       this.mask = model.mask;
       this.validator = model.validator;
-      this.filterType = model.filterType;
-      this.filterValue = model.filterValue;
-      this.sortOrder = model.sortOrder;
+      this.filter.FieldId = model.fieldID;
+      this.filter.Operation = model.filter.Operation;
+      this.filter.Value = model.filter.Value;
+      this.filter.Sort = model.filter.Sort;
       //  this.filter = model.filter;
     }
   }
+
+
 }
 export interface IElementDefinition<T> {
 
@@ -111,13 +114,15 @@ export interface IElementDefinition<T> {
   validateValue(v: T): boolean;
   SetInitialValue(v: T): boolean;
   UpdateCurrentValue(v: T): boolean;
-
+  UpdateFromUI(): T;
   setFilter(value: T, filterType: FilterType);
-  FilterValue(): T;
-  FilterType(): FilterType;
+  getFilter();
+  //FilterValue(): T;
+  //FilterType(): FilterType;
   SortOrder(): SortOrder;
   SetNextSortOrder(): void;
-  UIConvert(): void;
+  UIConvert(): T;
+  UIValueConvert(value: T): T;
 
 };
 
@@ -129,67 +134,45 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
     protected _initialValue: T = _model.defaultValue,
     protected _currentValue: T = _initialValue
   ) {
-
     this.ResetToDefault();
   }
-
-
-  //constructor(
-  //  private _formID: string,
-  //  private _fieldID: string,
-  //  private _observe: boolean,
-  //  protected _defaultValue: T,
-  //  protected _initialValue: T = _defaultValue,
-  //  protected _currentValue: T = _initialValue,
-  //  private _label = '',
-  //  private _type: string = 'text',
-  //  private _mask: RegExp[] = [], //or {ID:'',mask:RegExp[] = []}
-  //  private _validators: IValidator[] = []
-  //) {
-
-  //  if (!this._validators) {
-  //    _validators = [];
-  //  }
-  //  this.ResetToDefault();
-  //}
-
-  //setFilter(value: T, filterType: FilterType) {
-  //  if (this._model.filter) {
-  //    this._model.filter.ResetFilter(value, filterType);
-  //  }
-  //  else {
-  //    this._model.filter = new ElementFilter(value, filterType);
-  //  }
-  //}
-
-  //filtersss(): ElementFilter<T> {
-  //  return null;
-  //}
+  
+  getFilter() {
+    this._model.filter.FieldId = this._model.fieldID;
+    return this._model.filter;
+  }
 
   setFilter(value: T, filterType: FilterType) {
-    this._model.filterValue = value;
-    this._model.filterType = filterType;
+    this._model.filter.Value = value;
+    this._model.filter.Operation = filterType;
   }
 
-  FilterValue(): T {
-    return this._model.filterValue;
-  }
+  //FilterValue(): T {
+  //  return this._model.;
+  //}
 
-  FilterType(): FilterType {
-    return this._model.filterType;
-  }
+  //FilterType(): FilterType {
+  //  return this._model.filterType;
+  //}
 
   SetNextSortOrder(): void {
-    switch (this._model.sortOrder) {
-      case SortOrder.unsorted: this._model.sortOrder = SortOrder.ascending; break;
-      case SortOrder.ascending: this._model.sortOrder = SortOrder.descending; break;
-      case SortOrder.descending: this._model.sortOrder = SortOrder.unsorted; break;
+    switch (this._model.filter.Sort) {
+      case SortOrder.unsorted: this._model.filter.Sort = SortOrder.ascending; break;
+      case SortOrder.ascending: this._model.filter.Sort = SortOrder.descending; break;
+      case SortOrder.descending: this._model.filter.Sort = SortOrder.unsorted; break;
     }
   }
 
+  get Model() {
+    return new ElementModel(this._model);
+  }
+
+  get Duplicate() {
+    return new EditElementDefinition(this._model, this._currentValue);
+  }
 
   SortOrder(): SortOrder {
-    return this._model.sortOrder;
+    return this._model.filter.Sort;
   }
 
   init(): void {
@@ -238,15 +221,22 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
   }
 
   isDirty(): boolean {
-
-    return this._initialValue !== this._currentValue || this.isNew();
+    let isDirty = false;
+    switch (this.Type()) {
+      case 'date':
+        let c = moment(this._currentValue).format("YYYY-MM-DD");
+        let i = moment(this._initialValue).format("YYYY-MM-DD");
+        isDirty = c != i;
+        break;
+      default: isDirty = this._initialValue !== this._currentValue;
+    }
+    return isDirty || this.isNew();
   }
 
   ResetToDefault(): void {
     this._initialValue = this.DefaultValue();
     this._currentValue = this._initialValue;
   }
-  
 
   //  ResetToInvalid(): void {
   //       this._initialValue = this._defaultValue;
@@ -257,6 +247,14 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
     this._initialValue = this._currentValue;
   }
 
+  UpdateFromUI(): T {
+    const elm: any = document.getElementById(this.FieldID()); // <- Non-angular, but seems to work pretty well anyway....
+    if (elm) {
+      const v = this.Type() == 'number' ? parseInt(elm.value) : elm.value;
+      this.UpdateCurrentValue(v);
+    }
+    return this._currentValue;
+  }
   validateValue(v: T): boolean {
     let res = true;
 
@@ -285,13 +283,24 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
     return res;
   }
   /// Converts the currentValue if necessary for UI display.
-  UIConvert() {
-    let c:any;
+  UIConvert(): T {
+    let c: any;
     switch (this.Type()) {
       case 'date':
         c = moment(this._currentValue).format("YYYY-MM-DD");
         break;
       default: c = this._currentValue;
+    }
+    return c;
+  }
+
+  UIValueConvert(value: T): T {
+    let c: any;
+    switch (this.Type()) {
+      case 'date':
+        c = moment(value).format("YYYY-MM-DD");
+        break;
+      default: c = value;
     }
     return c;
   }

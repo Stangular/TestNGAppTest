@@ -1,44 +1,53 @@
-<mat-sidenav-container class="example-container">
-  <mat-sidenav opened mode="side" position="end" style="width:80px; text-align:right">
-    <div>
+<div style="height:75vh">
+  <mat-sidenav-container class="example-container" style="height:75vh">
+    <mat-sidenav opened mode="side" position="end" style="width:80px; text-align:right">
+      <div>
+        <div class="action-button-row">
+          <button mat-mini-fab color="default"
+                  (click)="onAction(actionType.create)"
+                  [disabled]="formDirty">
+            <mat-icon aria-label="New Record">add</mat-icon>
+          </button>
+        </div>
+        <div class="action-button-row">
+          <button mat-mini-fab color="default"
+                  (click)="onAction(actionType.remove)">
+            <mat-icon aria-label="Remove Record">remove</mat-icon>
+          </button>
+        </div>
+        <div class="action-button-row">
+          <button mat-mini-fab color="default"
+                  (click)="onAction(actionType.save)"
+                  [disabled]="!formDirty">
+            <mat-progress-spinner *ngIf="servicing" class="example-margin"
+                                  [color]="color"
+                                  [diameter]="diameter"
+                                  [mode]="mode"
+                                  [value]="value">
+            </mat-progress-spinner>
+            <mat-icon aria-label="Save" *ngIf="!servicing">send</mat-icon>
+          </button>
 
-      <div class="action-button-row">
-        <button mat-mini-fab color="default"
-                (click)="onAction(actionType.create)"
-                [disabled]="formDirty">
-          <mat-icon aria-label="New Record">add</mat-icon>
-        </button>
+        </div>
+        <div class="action-button-row">
+          <button mat-mini-fab color="default"
+                  (click)="onAction(actionType.undo)"
+                  [disabled]="!formDirty || formNew">
+            <mat-icon aria-label="Undo Changes">undo</mat-icon>
+          </button>
+        </div>
       </div>
-      <div class="action-button-row">
-        <button mat-mini-fab color="default"
-                (click)="onAction(actionType.remove)">
-          <mat-icon aria-label="Remove Record">remove</mat-icon>
-        </button>
-      </div>
-      <div class="action-button-row">
-        <button mat-mini-fab color="default"
-                (click)="onAction(actionType.save)"
-                [disabled]="!formDirty">
-          <mat-icon aria-label="Save">send</mat-icon>
-        </button>
-      </div>
-      <div class="action-button-row">
-        <button mat-mini-fab color="default"
-                (click)="onAction(actionType.undo)"
-                [disabled]="!formDirty || formNew">
-          <mat-icon aria-label="Undo Changes">undo</mat-icon>
-        </button>
-      </div>
-    </div>
-  </mat-sidenav>
-  <mat-grid-list cols="2" rowHeight="200px">
-    <mat-grid-tile *ngFor="let elm of displayElements"
-                   [colspan]="1"
-                   [rowspan]="1"
-                   [style.background]="'white'">
-      <input-edit [element]="elm" (blur)="onBlur($event)"
-                  [form]="form"></input-edit>
-    </mat-grid-tile>
-  </mat-grid-list>
+    </mat-sidenav>
+  
+      <mat-grid-list cols="1" rowHeight="60px">
+        <mat-grid-tile *ngFor="let elm of displayElements"
+                       [colspan]="1"
+                       [rowspan]="1"
+                       [style.background]="'transparent'">
+          <input-edit [element]="elm" (blur)="onBlur($event)"
+                      [form]="form"></input-edit>
+        </mat-grid-tile>
+      </mat-grid-list>
 
-</mat-sidenav-container>
+  </mat-sidenav-container>
+</div>

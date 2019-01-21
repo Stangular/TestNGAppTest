@@ -16,8 +16,16 @@ export enum ActionType {
   styleUrls: ['detail-view.component.css']
 })
 export class DetailViewComponent {
+
+  color = 'primary';
+  mode = 'indeterminate';
+  value = 50;
+  diameter = 30;
+
+
   actionType = ActionType;
   @Input() formDirty: boolean = false;
+  @Input() servicing: boolean = false;
   @Input() formNew: boolean = false;
   @Input() elements: IElementDefinition<any>[] = [];
   @Input() form;
@@ -27,12 +35,12 @@ export class DetailViewComponent {
 
   onAction(action: ActionType) {
     this.action.emit(action);
-    
   }
 
   get displayElements() {
     return this.elements.filter(e => e.Label() != ':');
   }
+
   onBlur(elmId = { id: '', value: '' }) {
     this.blur.emit(elmId);
   }

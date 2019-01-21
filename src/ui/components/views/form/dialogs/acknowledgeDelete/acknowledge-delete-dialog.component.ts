@@ -4,6 +4,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export interface DialogData {
   result: string;
   why: string;
+  question: string;
 }
 
 @Component({
@@ -17,7 +18,7 @@ export class AcknowlegeDeleteDialog {
   constructor(
     public dialogRef: MatDialogRef<AcknowlegeDeleteDialog>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-
+    this.deleteQuestion = data.question || 'Are you certain you wish to remove this item?';
   }
 
   onNoClick(): void {

@@ -1,9 +1,54 @@
-
-<table class="defaultTable">  
-  <tr>
-    <th  *ngFor="let element of elements">{{element.Label()}}</th>
-  </tr>
-  <tr *ngFor="let d of fields[0].Data; index as i">
-    <td *ngFor="let element of elements">{{CellData(element,i)}}</td>
-  </tr>
+<table class="defaultTable">
+  <thead>
+    <tr>
+      <th *ngFor="let element of VisibleElements" style="width:10%">
+        <mat-grid-list cols="3" rowHeight="20px">
+          <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
+            <div style="text-align:left"><span>{{element.Model.filter.Description}}</span></div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+            <div class="header-label">
+              {{ElementLabel(element)}}
+              <button mat-icon-button color="default" (click)="Sort(element)">
+                <mat-icon aria-label="Ascending"
+                          *ngIf="element.SortOrder() == sortOrder.ascending">arrow_drop_up</mat-icon>
+                <mat-icon aria-label="None"
+                          *ngIf="element.SortOrder() == sortOrder.unsorted">remove</mat-icon>
+                <mat-icon aria-label="Descending"
+                          *ngIf="element.SortOrder() == sortOrder.descending">arrow_drop_down</mat-icon>
+              </button>
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+            <div class="header-filter" *ngIf="element.Model.filter.Operation == filterType.none">
+              <i class="fa fa-filter" style="padding-right:5px" (click)="toggleFilter(element)"></i>
+            </div><div class="header-filter_remove" *ngIf="element.Model.filter.Operation != filterType.none">
+              <i class="fa fa-filter" style="padding-right:5px" (click)="removeFilter(element)"></i>
+            </div>
+          </mat-grid-tile>
+        </mat-grid-list>
+      </th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let d of source.Fields[0].Data; index as i"
+        (click)="selectRecord(i)"
+        [class.selected]="source.SelectedIndex()==i">
+      <td *ngFor="let element of VisibleElements" style="width:10%">
+        {{CellData(element,i)}}
+      </td>
+      <td style="text-align:right">
+        <button mat-icon-button color="default" (click)="GotoDetail(i)">
+          <mat-icon aria-label="Ascending">view_compact</mat-icon>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <!--<tr>
+      <td>Sum</td>
+      <td>$180</td>
+    </tr>-->
+  </tfoot>
 </table>
