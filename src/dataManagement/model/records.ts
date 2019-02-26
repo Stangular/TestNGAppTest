@@ -175,6 +175,11 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   // abstract get testData(): Field<any>[];
   abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
 
+  get hasFilters() {
+    let r = this._UIElements.findIndex(e => e.HasFilter());
+    return r >= 0;
+  }
+
   private createFormGroup() {
     let group: any = {};
     this.GetFormDefinition();
@@ -231,6 +236,15 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   get IsNewForm() {
     return this._UIElements.some(e => e.isNew());
   }
+
+
+
+  RemoveAllFilters() {
+    this._UIElements.forEach(e => {
+      e.setFilter(undefined, FilterType.none);
+    });
+  }
+
 
   RemoveNewForm() {
     if (!this.IsNewForm) {
@@ -470,7 +484,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
       filters: []
     }
     this._UIElements.forEach(e => {
-      if (e.getFilter().Set) { f.filters.push(e.getFilter()); }
+       f.filters.push(e.getFilter());
     });
     return f;
   }

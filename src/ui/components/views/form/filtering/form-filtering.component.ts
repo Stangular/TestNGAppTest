@@ -40,6 +40,7 @@ export class FormFilteringComponent {
 
   // @Input() elements: IElementDefinition<any>[] = [];
   selectedElement: IElementDefinition<any>;
+  label: string = '';
   @Input() cancelMessage: string = 'No';
   @Input() okMessage: string = 'Ok';
 
@@ -48,6 +49,7 @@ export class FormFilteringComponent {
   constructor(public dialogRef: MatDialogRef<FormFilteringComponent>,
     @Inject(MAT_DIALOG_DATA) public data: FilterDialogData) {
     data.elementModel.fieldID = data.elementModel.fieldID + '_filter';
+    this.label = data.elementModel.label;
     data.elementModel.label = '';
     this.selectedElement = new EditElementDefinition(data.elementModel);
     this.selectedElement.UpdateCurrentValue(data.elementModel.defaultValue);
@@ -88,6 +90,10 @@ export class FormFilteringComponent {
     if (this.selectedElement) {
       this.applyfilter.emit(this.pageSize);
     }
+  }
+
+  get DialogTitle() {
+    return 'Define Filter Parameters for ' + this.label;
   }
 
   UpdateFilter(elmId = { id: '', value: '' }) {

@@ -30,30 +30,61 @@ export class ElementFilter<T> {
   Sort: SortOrder = SortOrder.unsorted;
   Value: any;
   Operation: FilterType = FilterType.none;
+  apply: boolean = false;
+  result: { FieldId: string, Sort: SortOrder, Value: any, Operation: FilterType } = { FieldId: '', Sort: SortOrder.unsorted, Value: undefined, Operation: FilterType.none };
 
-  get Set() {
-    return this.Sort != SortOrder.unsorted
-      || this.Operation != FilterType.none;
+  get Filter() {
+
+    this.result.FieldId = this.FieldId;
+    this.result.Sort = this.Sort;
+    this.result.Value = undefined;
+    this.result.Operation = FilterType.none;
+
+    if (this.apply) {
+      this.result.Value = this.Value;
+      this.result.Operation = this.Operation;
+    }
+
+    return this.result;
+
   }
 
   get Description() {
     let d: string = '';
-    switch (this.Operation) {
-      case FilterType.greaterThan: d += "> " + this.Value.toString(); break;
-      case FilterType.lessThan: d += "< " + this.Value.toString(); break;
-      case FilterType.equal: d += "= " + this.Value.toString(); break;
-      case FilterType.greaterThanORequal: d += ">= " + this.Value.toString(); break;
-      case FilterType.lessThanORequal: d += "<= " + this.Value.toString(); break;
-      case FilterType.contains: d += "contains " + this.Value.toString(); break;
-      case FilterType.doesNotContain: d += "does not contain " + this.Value.toString(); break;
+    if (this.apply) {
+      switch (this.Operation) {
+        case FilterType.greaterThan: d += "> " + this.Value.toString(); break;
+        case FilterType.lessThan: d += "< " + this.Value.toString(); break;
+        case FilterType.equal: d += "= " + this.Value.toString(); break;
+        case FilterType.greaterThanORequal: d += ">= " + this.Value.toString(); break;
+        case FilterType.lessThanORequal: d += "<= " + this.Value.toString(); break;
+        case FilterType.contains: d += "contains " + this.Value.toString(); break;
+        case FilterType.doesNotContain: d += "does not contain " + this.Value.toString(); break;
+      }
     }
-
     return d;
   }
 
   Remove() {
+
     this.Operation = FilterType.none;
+    this.Value = undefined;
+    this.apply = false;
   }
+
+  get Applied() {
+    return this.apply;
+  }
+
+  Toggle() {
+    if (this.Operation == FilterType.none) {
+      this.apply = false;
+      return; // cannot apply if no operation defined...
+    }
+    this.apply = !this.apply;
+  }
+
+
 }
 
 export class ElementModel<T>{
@@ -123,7 +154,7 @@ export interface IElementDefinition<T> {
   SetNextSortOrder(): void;
   UIConvert(): T;
   UIValueConvert(value: T): T;
-
+  HasFilter(): boolean;
 };
 
 export class EditElementDefinition<T> implements IElementDefinition<T> {
@@ -139,12 +170,13 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
   
   getFilter() {
     this._model.filter.FieldId = this._model.fieldID;
-    return this._model.filter;
+    return this._model.filter.Filter;
   }
 
   setFilter(value: T, filterType: FilterType) {
     this._model.filter.Value = value;
     this._model.filter.Operation = filterType;
+    this._model.filter.apply = filterType != FilterType.none;
   }
 
   //FilterValue(): T {
@@ -163,7 +195,7 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
     }
   }
 
-  get Model() {
+  get CloneModel() {
     return new ElementModel(this._model);
   }
 
@@ -177,6 +209,26 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
 
   init(): void {
 
+  }
+
+  HasFilter(): boolean {
+    return this._model.filter.Operation > FilterType.none;
+  }
+
+  get FilterOperation() {
+    return this._model.filter.Operation;
+  }
+
+  ToggleFilter() {
+    this._model.filter.Toggle();
+  }
+
+  get FilterDescription() {
+    return this._model.filter.Description;
+  }
+
+  get FilterApplied() {
+    return this._model.filter.Applied;
   }
 
   Label(): string {

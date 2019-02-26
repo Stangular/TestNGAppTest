@@ -21,9 +21,7 @@ export class TableViewComponent {
   sortOrder = SortOrder;
   filterType = FilterType;
 
-  constructor(
-     public dialog: MatDialog) {
-  }
+  constructor(public dialog: MatDialog) {}
 
   CellData(elm: IElementDefinition<string>, row: number): string {
 
@@ -55,11 +53,25 @@ export class TableViewComponent {
   }
 
   toggleFilter(elm: EditElementDefinition<any>) {
-    this.showFilter(elm);
+    if (elm.FilterOperation != FilterType.none) {
+      elm.ToggleFilter();
+      this.applyFilter.emit();
+    }
+    else {
+      this.showFilter(elm);
+    }
+  }
+
+  removeAllFilters() {
+    this.source.RemoveAllFilters();
+    this.applyFilter.emit();
+  }
+
+  saveFilters() {
   }
 
   removeFilter(elm: EditElementDefinition<any>) {
-    elm.Model.filter.Remove();
+    elm.setFilter('', FilterType.none);
     this.applyFilter.emit();
   }
 
@@ -71,24 +83,13 @@ export class TableViewComponent {
   showFilter(elm: EditElementDefinition<any>): void {
     const dialogRef = this.dialog.open(FormFilteringComponent, {
       width: '400px',
-      data: { value: '', operation: '', elementModel: elm.Model }
+      data: { value: '', operation: '', elementModel: elm.CloneModel }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The Filter Dialog closed...');
       elm.setFilter(result.value, result.operation.type);
       this.applyFilter.emit();
-      //if ('remove' == result.result) {
-      //  let model = new EntityRemoveModel();
-      //  model.Id = this.source.GetFieldValue('id');
-      //  model.why = result.why;
-      //  this.httpService.deleteContent(model).subscribe(
-      //    data => { this.deleteSuccess(data) },
-      //    err => { this.deleteFail(err) });
-      //}
-      //   this.httpService.
-
-
     });
   }
 }

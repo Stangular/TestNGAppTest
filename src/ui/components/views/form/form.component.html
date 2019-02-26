@@ -85,7 +85,7 @@
                      (blur)="UpdateElement($event)"
                      *ngIf="view == viewType.detail"></detail-view>
         <table-view  [source]="source"
-                    (gotoDetail)="SetTab(1)"
+                    (gotoDetail)="SetTab(0)"
                     (sortChange)="tableSort()"
                     (applyFilter)="applyFilter()"
                     *ngIf="view == viewType.table"></table-view>
