@@ -64,7 +64,7 @@ export class FormComponent {
 
     this.spinnerService.show();
     this.httpService.postContent(this.source.Filter(pageSize)
-      , 'http://localhost:52462/api/data/GetFilteredContent').subscribe(
+      , 'https://localhost:44336/api/data/GetFilteredContent').subscribe(
       data => { this.initSuccess(data) },
       err => { this.initFail(err) });
   }

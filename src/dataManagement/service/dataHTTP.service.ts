@@ -10,6 +10,7 @@ import { HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { IForm } from '../model/form/form';
+import { TokenService } from '../../app/services/user/token/token.service';
 
 @Injectable()
 export class DataHTTPService {
@@ -18,7 +19,9 @@ export class DataHTTPService {
   private _headers: HttpHeaders = new HttpHeaders();
 
   private _startupData: any;
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private tokenService: TokenService) { }
 
   public InitializeOptions(userToken: string) {
     this._headers = new HttpHeaders();
@@ -35,6 +38,17 @@ export class DataHTTPService {
   //    this._options.params.set()
   }
 
+   httpOptions(params: HttpParams) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + this.tokenService.Token || ''
+      })
+    };
+    return httpOptions;
+  }
+
   private processData(res: any) {
     //this._records.
 
@@ -46,7 +60,7 @@ export class DataHTTPService {
     return error.statusText;
   }
 
-  getContent(filter: any, restPath: string = 'http://localhost:52462/api/data/GetFilteredContent'): Observable<IForm> {
+  getContent(filter: any, restPath: string = 'https://localhost:44336/api/data/GetFilteredContent'): Observable<IForm> {
     let f: any = { formName: 'charttestTableA', paging: { pageLength: 4, pageNumber: 1 }, filters: [{ FieldId: 'income', Sort: 2, Value: 0, Operation: 0 }] };
     this._headers.set('Content-Type', 'application/json');
     this._headers.set('Accept', 'application/json');
@@ -56,7 +70,7 @@ export class DataHTTPService {
    // let options = new RequestOptions({ headers: this._headers, params: myParams });
 
     let self = this;
-    return this.http.get(restPath, {params: myParams })
+    return this.http.get(restPath, , this.httpOptions(myParams))
       .pipe(map(response => this.processData(response), catchError(this.handleError)));
   }
 
@@ -71,16 +85,17 @@ export class DataHTTPService {
     return this._startupData;
   }
 
-  postContent(content: any, restPath: string = 'http://localhost:52462/api/data'): Observable<IForm> {
+  postContent(content: any, restPath: string = 'https://localhost:44336/api/data'): Observable<IForm> {
     return this.http.post(
-      restPath
-      , content)
+      restPath, 
+      content,
+      this.httpOptions(new HttpParams()))
       .pipe(map(response =>
         this.processData(response),
         catchError(this.handleError)));
   }
 
-  updateContent(content: any, restPath: string = 'http://localhost:52462/api/data'): Observable<IForm> {
+  updateContent(content: any, restPath: string = 'https://localhost:44336/api/data'): Observable<IForm> {
     return this.http.put(
       restPath, content)
       .pipe(map(response =>
@@ -88,7 +103,7 @@ export class DataHTTPService {
         catchError(this.handleError)));
   }
 
-  deleteContent(content: any, restPath: string = 'http://localhost:52462/api/data/DeletePost'): Observable<IForm> {
+  deleteContent(content: any, restPath: string = 'https://localhost:44336/api/data/DeletePost'): Observable<IForm> {
 
     return this.http.post(
       restPath, content)

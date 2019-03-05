@@ -16,6 +16,14 @@
     "lib": [
       "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      "user-login-lib": [
+        "dist/user-login-lib"
+      ],
+      "user-login-lib/*": [
+        "dist/user-login-lib/*"
+      ]
+    }
   }
 }

@@ -1,0 +1,12 @@
+<div class="dialog-form"  style="background-color:lightcoral;">
+  <h1 mat-dialog-title>Dialog</h1>
+  <div mat-dialog-content>
+
+    <app-login (close)="onClose($event)"></app-login>
+
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
+    <!--<button mat-button [mat-dialog-close]="data" cdkFocusInitial>{{okMessage}}</button>-->
+  </div>
+</div>

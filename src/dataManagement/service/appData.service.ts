@@ -35,7 +35,7 @@ export class AppDataService {
     }
 
     PromiseLoad(appName: string = ''): Promise<any> {
-        let p = 'http://localhost:52462/api/data/lists';
+      let p = 'https://localhost:44336/api/data/lists';
       return this._httpService.startUpPromise(p).then(data => {
             if (data) {
                 this._appData.SetLists(data);

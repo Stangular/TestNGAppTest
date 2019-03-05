@@ -1,0 +1,45 @@
+<mat-grid-list [cols]="layout.getLayoutColumnCount(layoutIndex)"
+               [rowHeight]="layout.getLayoutRowHeight(layoutIndex)"
+               [gutterSize]="1">
+  <mat-grid-tile *ngFor="let c of layout.Columns(layoutIndex); index as i"
+                 [colspan]="c.ColSpan(layout.Layout.Size)"
+                 [rowspan]="c.RowSpan(layout.Layout.Size)"
+                 [style.background]="c.Color">
+    <div *ngIf="c.Content == 'slotA'" class="tile-content">
+      <ng-content select="[content-type='slotA']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotB'" class="tile-content">
+      <ng-content select="[content-type='slotB']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotC'" class="tile-content">
+      <ng-content select="[content-type='slotC']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotD'" class="tile-content">
+      <ng-content select="[content-type='slotD']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotE'" class="tile-content">
+      <ng-content select="[content-type='slotE']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotF'" class="tile-content">
+      <ng-content select="[content-type='slotF']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotG'" class="tile-content">
+      <ng-content select="[content-type='slotG']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotH'" class="tile-content">
+      <ng-content select="[content-type='slotH']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotI'" class="tile-content">
+      <ng-content select="[content-type='slotI']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotJ'" class="tile-content">
+      <ng-content select="[content-type='slotJ']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotK'" class="tile-content">
+      <ng-content select="[content-type='slotK']"></ng-content>
+    </div>
+    <div *ngIf="c.Content == 'slotL'" class="tile-content">
+      <ng-content select="[content-type='slotL']"></ng-content>
+    </div>
+  </mat-grid-tile>
+</mat-grid-list>

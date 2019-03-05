@@ -1,53 +1,38 @@
-<mat-grid-list cols="4" rowHeight="40px">
-  <mat-grid-tile colspan="4">
-    <mat-toolbar color="primary">
-      <span>{{pageTitle}}</span>
-
-      <!-- This fills the remaining space of the current row -->
-      <span class="toolbar-spacer">
-        <span>
-          <div class="button-row">
-            <button mat-icon-button [matMenuTriggerFor]="mes">
-              MES
-            </button>
-            <button mat-icon-button [matMenuTriggerFor]="hr">
-              HR
-            </button>
-          </div>
-        </span>
-        <span class="toolbar-spacer"></span>
-        <span></span>
-      </span>
-      <span>
-        <div class="button-row">
-          <!--<button mat-icon-button>
-            <fa-icon aria-label="Filter Page" icon="filter"></fa-icon>
-          </button>-->
-          <button mat-icon-button color="error">
-            <mat-icon aria-label="PDF">insert_photo</mat-icon>
-          </button>
-          <button mat-icon-button color="accent">
-            <mat-icon aria-label="Text">publish</mat-icon>
-          </button>
-          <button mat-icon-button color="default">
-            <mat-icon aria-label="Send as Email">email</mat-icon>
-          </button>
-        </div>
-      </span>
-    </mat-toolbar>
-  </mat-grid-tile>
-  <!--<mat-grid-tile colspan="4">
-    <span class="toolbar-spacer"></span>
-    <span>
-      <div class="button-row">
-        <button mat-raised-button color="primary" (click)="filterService.ApplyFilter()">Go</button>
-        <button mat-raised-button color="primary" (click)="filterService.ResetFilter()">Reset</button>
-      </div>
-    </span>
-  </mat-grid-tile>-->
-  <!--<mat-grid-tile colspan="4" rowspan="10" [style.background]="red">
-  </mat-grid-tile>-->
-</mat-grid-list>
+<!--<mat-grid-list cols="4" rowHeight="40px">
+  <mat-grid-tile colspan="4">-->
+<mat-toolbar color="primary">
+  <span>{{pageTitle}}</span>
+  <!--<mat-menu>-->
+  <!-- This fills the remaining space of the current row -->
+  <span class="toolbar-spacer"></span>
+  <button mat-icon-button [matMenuTriggerFor]="mes" *ngIf="userService.isLoggedIn">
+    MES
+  </button>
+  <button mat-icon-button [matMenuTriggerFor]="hr" *ngIf="userService.isLoggedIn">
+    HR
+  </button>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <button mat-icon-button color="error">
+    <mat-icon aria-label="PDF">insert_photo</mat-icon>
+  </button>
+  <button mat-icon-button color="accent">
+    <mat-icon aria-label="Text">publish</mat-icon>
+  </button>
+  <button mat-icon-button color="default">
+    <mat-icon aria-label="Send as Email">email</mat-icon>
+  </button>
+  <button mat-icon-button color="default" routerLink="/login" *ngIf="!userService.isLoggedIn">
+    <mat-icon aria-label="Login">input</mat-icon>
+  </button>
+  <button mat-icon-button color="default" *ngIf="userService.isLoggedIn" [matMenuTriggerFor]="user">
+    <mat-icon aria-label="Login">person</mat-icon>
+  </button>
+</mat-toolbar>
 
 <mat-menu #mes="matMenu">
   <button mat-menu-item [matMenuTriggerFor]="hotmill">Hot Mill</button>
@@ -62,6 +47,13 @@
   <button mat-menu-item routerLink="/hrmproductionhistory">HRM Production History</button>
 </mat-menu>
 
+<mat-menu #user="matMenu">
+  <div style="padding:10px; background-color:WindowFrame">
+    <a mat-menu-item routerLink="/userInfo">{{userService.UserName}}</a>
+  </div>
+  <button mat-menu-item (click)="Logout()">Log Out</button>
+</mat-menu>
+
 <mat-menu #tools="matMenu">
   <button mat-menu-item routerLink="/systeminventory">System Inventory</button>
 </mat-menu>
@@ -69,6 +61,7 @@
 <mat-menu #hr="matMenu">
   <button mat-menu-item>Employee Swipes Report</button>
 </mat-menu>
+
 <router-outlet></router-outlet>
 
 

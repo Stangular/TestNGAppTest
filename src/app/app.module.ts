@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -14,7 +15,16 @@ import { NAS_AppModule } from '../NAS_App/NAS_App.module';
 //import "@angular/material/prebuilt-themes/indigo-pink.css";
 import '../styles/styles.scss';
 import '../styles/headings.css';
+import { TokenService } from './services/user/token/token.service';
+import { UserService } from './services/user/app-user.service';
 
+import { LayoutService } from './services/layout/layout-service.service';
+
+import { PopupContentComponent } from './popup/popup-content.component';
+import { LoginComponent } from './login/login.component';
+import { ContentUtilityComponent } from './common/content-utility/content-utility.component';
+
+//import { UserLoginLibModule } from 'user-login-lib';
 @NgModule({
   imports: [
     CommonModule
@@ -24,17 +34,26 @@ import '../styles/headings.css';
     , BrowserModule
     , BrowserAnimationsModule
     , NAS_AppModule
+    , FormsModule
+    , ReactiveFormsModule
+    //, UserLoginLibModule
   ],
 
   declarations: [
     AppComponent
     , NavMenuComponent
+    , PopupContentComponent
+    , LoginComponent, ContentUtilityComponent
   ],
 
   exports: [
     NavMenuComponent
   ],
-  providers: [AppDataService],
+  providers: [
+    AppDataService
+    , TokenService
+    , UserService
+    , LayoutService],
   bootstrap: [AppComponent]
 })
 

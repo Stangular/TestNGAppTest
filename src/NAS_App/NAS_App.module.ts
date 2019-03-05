@@ -20,7 +20,7 @@ import { ViewModule } from '../ui/components/views/view.module';
 library.add(
   faCoffee
   , faFilter
-  , faChevronDown );
+  , faChevronDown);
 
 @NgModule({
   imports: [
@@ -31,16 +31,16 @@ library.add(
     , d3Module
     , NASRoute
     , FontAwesomeModule
-  //  , CanvasModule
+    //  , CanvasModule
     , ViewModule
   ],
 
   declarations: [
-    NAS_APPPrimaryOutletPageComponent,
-    SystemInventoryComponent,
-    HRMProductionHistoryComponent
+    NAS_APPPrimaryOutletPageComponent
+    , SystemInventoryComponent
+    , HRMProductionHistoryComponent
   ],
-  exports: [ngMaterialModule, d3Module,ViewModule],
+  exports: [ngMaterialModule, d3Module, ViewModule],
 
   providers: [D3Service
     , FilterService

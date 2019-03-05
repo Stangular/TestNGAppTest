@@ -122,6 +122,46 @@
           }
         }
       }
+    },
+    "user-login-lib": {
+      "root": "projects/user-login-lib",
+      "sourceRoot": "projects/user-login-lib/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/user-login-lib/tsconfig.lib.json",
+            "project": "projects/user-login-lib/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/user-login-lib/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/user-login-lib/src/test.ts",
+            "tsConfig": "projects/user-login-lib/tsconfig.spec.json",
+            "karmaConfig": "projects/user-login-lib/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/user-login-lib/tsconfig.lib.json",
+              "projects/user-login-lib/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "TestNGApp2"

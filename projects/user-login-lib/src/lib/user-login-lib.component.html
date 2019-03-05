@@ -1,0 +1,82 @@
+<div style="margin-bottom:1px">
+  <content-utility [layoutName]="'masterA'">
+    <div content-type="slotA">
+      <div class="view-header">
+        Log in
+      </div>
+      <div class="view-header">
+        <a color="primary" routerLink="/register">Register</a>
+      </div>
+      <div class="view-header">
+        <a color="primary" routerLink="/forgotPassword">Forgot Password</a>
+      </div>
+      <!--<app-test-auth></app-test-auth>-->
+    </div>
+    <div content-type="slotB">
+      <form [formGroup]="rForm" class="login-form">
+        <mat-grid-list [cols]="layout.getLayoutColumnCount(layoutIndex)"
+                       [gutterSize]="10"
+                       [rowHeight]="layout.getLayoutRowHeight(layoutIndex)">
+          <mat-grid-tile [colspan]="layout.ColSpan(layoutIndex,0)"
+                         [rowspan]="layout.RowSpan(layoutIndex,0)">
+            <mat-form-field class="login-full-width" floatlabel="never">
+              <div class="authform" style="display:inline-block; width:60px; margin-right:10px">
+                <label>Email</label>
+              </div>
+              <div>
+                <input type="email"
+                       matInput value=""
+                       formControlName="email"
+                       [errorStateMatcher]="matcher" />
+              </div>
+              <mat-hint>someone@somewhere.com</mat-hint>
+              <mat-error *ngIf="control('email')?.hasError('email')">
+                Please enter a valid email address
+              </mat-error>
+              <mat-error *ngIf="control('email')?.hasError('required')">
+                Email is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="layout.ColSpan(layoutIndex,1)"
+                         [rowspan]="layout.RowSpan(layoutIndex,0)"
+                         [style.background]="transparent">
+            <mat-form-field class="login-full-width" floatlabel="never">
+              <div class="authform" style="display:inline-block; width:60px; margin-right:10px">
+                <label>Password</label>
+              </div>
+              <div>
+                <input type="password"
+                       name="password"
+                       formControlName="password"
+                       matInput value=""
+                       [errorStateMatcher]="matcher" />
+              </div>
+              <mat-error *ngIf="control('password')?.hasError('pattern')
+                      && !control('password')?.hasError('minlength')">
+                Please enter a valid password.
+              </mat-error>
+              <mat-error *ngIf="control('password')?.hasError('minlength')">
+                Password must be at least 8 characters in length
+              </mat-error>
+              <mat-error *ngIf="control('password')?.hasError('required')">
+                Password is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="layout.ColSpan(layoutIndex,2)"
+                         [rowspan]="layout.RowSpan(layoutIndex,0)">
+            <button mat-icon-button
+                    [disabled]="!rForm.valid"
+                    (click)="login()">
+              <mat-icon aria-label="login">send</mat-icon>
+            </button>
+
+          </mat-grid-tile>
+        </mat-grid-list>
+      </form>
+    </div>
+    <div content-type="slotC"></div>
+
+  </content-utility>
+</div>

@@ -15,7 +15,9 @@ export class AppComponent implements AfterContentInit {
   //constructor(public appDataService: AppDataService) {
   //  appDataService.PromiseLoad();
   //}
-
+  constructor() {
+    let sss = 0;
+  }
   ngAfterContentInit() {
 
 
