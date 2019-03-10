@@ -52,6 +52,8 @@ export class UserService {
 
   logoutFail(data: any) {
     console.error("log out failed: " + JSON.stringify(data));
+    this.SetUser(new UserModel());
+    this.router.navigate(['/login']);
   }
 
   Logout() {

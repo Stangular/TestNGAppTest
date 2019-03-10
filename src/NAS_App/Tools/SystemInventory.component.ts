@@ -11,7 +11,6 @@ import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
 })
 export class SystemInventoryComponent implements OnInit {
 
-  barSystem: ChartLayer;
   elements: IElementDefinition<any>[] = [];
   form: FormGroup;
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
@@ -21,7 +20,6 @@ export class SystemInventoryComponent implements OnInit {
   ngOnInit() {
 
     this.InitForm();
-    this.barSystem = this.filterService.ChartGraphic(800,600,'bar');
     // register D3 view...
   }
 

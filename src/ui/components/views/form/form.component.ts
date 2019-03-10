@@ -1,4 +1,4 @@
-import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter, AfterContentInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Records } from '../../../../dataManagement/model/records';
@@ -9,6 +9,9 @@ import { AcknowlegeDeleteDialog } from './dialogs/acknowledgeDelete/acknowledge-
 import { DataHTTPService } from '../../../../dataManagement/service/dataHTTP.service';
 import { MatSnackBar } from '@angular/material';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { ChartLayer } from '../../../../canvas/models/custom/layers/charts/chart.layer';
+import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
+import { MessageService } from 'src/app/messaging/message.service';
 
 export enum ViewType {
   detail = 0,
@@ -33,9 +36,11 @@ export class EntityRemoveModel {
   templateUrl: 'form.component.html',
   styleUrls: ['form.component.css']
 })
-export class FormComponent {
+export class FormComponent implements OnInit, AfterContentInit {
 
+  barSystem: ChartLayer;
   @Input() source: Records<string>;
+
   form: any;
   elements: any;
   public viewType = ViewType;
@@ -48,8 +53,12 @@ export class FormComponent {
     private httpService: DataHTTPService
     , public dialog: MatDialog
     , private snacker: MatSnackBar
+    , private messageService: MessageService
     , private spinnerService: Ng4LoadingSpinnerService) {
     this.view = this.viewType.detail;
+  }
+
+  ngAfterContentInit() {
   }
 
   ngOnInit() {
@@ -57,7 +66,6 @@ export class FormComponent {
     this.form = this.source.Form;
     this.elements = this.source.GetFormDefinition();
     this.SetFormContent(this.source.PageSize);
-
   }
 
   private SetFormContent(pageSize: number = 10) {
@@ -131,6 +139,9 @@ export class FormComponent {
   initSuccess(data: any) {
     this.spinnerService.hide();
     this.source.LoadData(data.content, [], data.recordCount, data.totalAvailableCount);
+    this.barSystem = this.source.ChartGraphic('bar', 1200, 600, 'bar');
+    setTimeout(() => this.messageService.sendMessage(0), 0);
+
   }
 
   initFail(data: any) {
@@ -158,6 +169,12 @@ export class FormComponent {
     this.Snack('Form removed');
   }
 
+  onSelect(shapeSelectResult: ShapeSelectResult) {
+    if (this.source.SelectItemByField('Id', shapeSelectResult.id)) {
+      this.SetTab(0);
+    }
+  }
+
   deleteFail(data: any) {
     console.error(JSON.stringify(data));
     this.saveing = false;
@@ -179,6 +196,20 @@ export class FormComponent {
   
   page(code: number) {
     let reload = false;
+    //switch (this.view) {
+    //  case ViewType.detail:
+    //    switch (code) {
+    //      case 0: reload = !this.source.First();    break;
+    //      case 1: reload = !this.source.Previous(); break;
+    //      case 2: reload = !this.source.Next();     break;
+    //      case 3: reload = !this.source.Final();    break;
+    //    }
+    //  case ViewType.table: {
+
+    //  }
+    //    break;
+      
+    //}
     switch (code) {
       case 0:
         reload = !this.source.First();
@@ -191,15 +222,30 @@ export class FormComponent {
           reload = true;
           this.source.PreviousPage();
         }
+        else if (this.view == ViewType.graphic) {
+          reload = true;
+          this.source.PreviousPage();
+        }
         break;
       case 2:
-        if (this.view == ViewType.detail) {
-          reload = !this.source.Next();
+        switch (this.view) {
+          case ViewType.detail: reload = !this.source.Next(); break;
+          case ViewType.table:
+            reload = true;
+            this.source.NextPage();
+            break;
+          case ViewType.graphic:
+            reload = true;
+            this.source.NextPage();
+            break;
         }
-        else if (this.view == ViewType.table) {
-          reload = true;
-          this.source.NextPage();
-        }
+        //if (this.view == ViewType.detail) {
+        //  reload = !this.source.Next();
+        //}
+        //else if (this.view == ViewType.table) {
+        //  reload = true;
+        //  this.source.NextPage();
+        //}
         break;
       case 3:
         reload = !this.source.Final();

@@ -6,6 +6,8 @@ import { Margin } from '../../../../shapes/primitives/margin';
 import { Size } from '../../../../shapes/primitives/size';
 import { AppDataService } from '../../../../../../dataManagement/service/appData.service';
 import { IScale } from '../axis/axis.layer'
+import { Point } from 'src/canvas/models/shapes/primitives/point';
+import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 
 // DataContent{
 // page{ size:0,number:0}
@@ -15,18 +17,27 @@ import { IScale } from '../axis/axis.layer'
 
 export abstract class ContentLayer extends ContextLayer {
 
-  constructor( margins: Margin, size: Size, layerId: string) {
+  constructor( private margins: Margin, private size: Size, layerId: string) {
     super(layerId, 'default');
-
-
-
-
   }
 
   abstract XScale(): IScale;
   abstract YScale(): IScale;
+  abstract positionOnAxis(axis: AxisLayer): void;
+
+  get Margins() {
+    return this.margins;
+  }
+
+  get Size() {
+    return this.size;
+  }
 
   Draw(context: any) {
     super.Draw(context);
+  }
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+    return super.SelectShape(shapeSelectResult);
   }
 }

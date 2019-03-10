@@ -9,6 +9,7 @@ import { StateIndex, UIStates } from '../../../../../DisplayValues'
 import { ContentLayer } from '../content.layer';
 //import { Records } from '../../../../../../../dataManagement/model/records';
 import { AppDataService } from '../../../../../../../dataManagement/service/appData.service';
+import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 
 
 // DataContent{
@@ -18,8 +19,10 @@ import { AppDataService } from '../../../../../../../dataManagement/service/appD
 // 
 
 export class Bar implements IContextItem{
-  bar: Rectangle;
-  constructor(id: string,
+  area: Rectangle;
+  sourceID: string = '';
+  constructor(sid: string,
+    id: string,
     minValue: number,
     maxValue: number,
     value: number,
@@ -27,28 +30,38 @@ export class Bar implements IContextItem{
     offset: number,
     width: number,
     state: StateIndex) {
-
+    this.sourceID = sid;
     let h = ((value / maxValue) * size.Height);
     let t = size.Height - h;
     h -= 2;
-    let l = offset + 5 ;
-    this.bar = new Rectangle(id, t, l, width, h,state );
+    let l = offset;
+    this.area = new Rectangle( id, t, l, width, h,state );
   }
 
-  get Id(): string { return this.bar.Id; }
+  get Id(): string { return this.area.Id; }
 
   Draw(context: any): void {
-    this.bar.Draw(context);
+    this.area.Draw(context);
+  }
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean{
+    if (this.area.SelectShape(shapeSelectResult)) {
+      shapeSelectResult.id = this.sourceID;
+      shapeSelectResult.type = 'bar';
+      return true;
+    }
+    return false;
   }
 }
 
 export class BarLayer extends ContentLayer {
 
-  bars: Bar[] = [];
+ // bars: Bar[] = [];
   //labeledData {label:string,param: string}
   constructor(
     minValue: number,
     maxValue: number,
+    idData: string [],
     data: number[],
     margins: Margin,
     size: Size ) {
@@ -59,34 +72,42 @@ export class BarLayer extends ContentLayer {
     barState.setState(UIStates.foreground, 1);
     barState.setState(UIStates.color, 4);
     barState.setState(UIStates.weight, 0);
-    let barwidth = (size.Width / data.length) - 10;
+    let barcount = data.length;
+    let w = size.Width - (margins.Left + margins.Right);
+    let barwidth = (w / barcount);
+    barwidth = (barwidth * 80) / 100;
     let offset = 0;
     let self = this;
+    
     let chartSize = new Size(size.Width - margins.Right, size.Height - margins.Bottom);
-    const origin: Point = new Point(margins.Left, size.Height);
-    offset = margins.Left;
     data.forEach(function (d, i) {
-      let bar = new Bar('barchart' + i, minValue, maxValue, d, chartSize, offset, barwidth, barState);
-      offset += ( barwidth + 10 );
+      let bar = new Bar(idData[i],'barchart' + i, minValue, maxValue, d, chartSize, offset, barwidth, barState);
       self.AddContent(bar);
     });
-    // height of chart area, xaxis base line, yaxis base line
-    //  xparam as % of height = top;
-    //  rHgt = baseline - top;
-    //  width = increment - padding
-    //  left = tick x position - bar width 
+    
+  }
 
-    // max value, min value  ( max - min )/hgt = count
-    // 
+  CreateContent( axis: AxisLayer) {
+
+  }
+  
+
+  positionOnAxis(axis: AxisLayer) {
+
+    this.content.forEach(function (c, i) {
+      let bar = (<Bar>c);
+      let tick = axis.XTicks.find(t => t.id == bar.sourceID);
+      if (tick) {
+        bar.area.positionOnTick(tick.point.X - (bar.area.Width / 2), 0);
+      }
+    });
   }
 
   XScale(): IScale {
-    let xScale = new NumericScale(0, 100, 20, 5);
     return new NumericScale(0, 100, 20, 5);
   }
 
   YScale(): IScale {
-    let xScale = new NumericScale(0, 100, 20, 5);
     return new NumericScale(0, 100, 20, 5);
   }
 }

@@ -19,7 +19,7 @@
   </mat-grid-tile>
   <mat-grid-tile [colspan]="1" [rowspan]="1">
       <span>Page Size:</span>
-      <select matNativeControl  [ngModel]="pageSizeModel" (ngModelChange)="changePageSize($event)">
+      <select matNativeControl  [ngModel]="pageingService.model.pageSizeModel" (ngModelChange)="changePageSize($event)">
         <option *ngFor="let o of sizeOptions; index as i"  [value]="o">{{o}}</option>
       </select>
   </mat-grid-tile>

@@ -49,26 +49,17 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="form-tab-icon">equalizer</mat-icon>
-          Bar Chart
+          Dashboard
         </ng-template>
-
-       Bar Chart
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">pie_chart</mat-icon>
-          Pie Chart
-        </ng-template>
-
-        Pie Chart
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">show_chart</mat-icon>
-          Line Chart
-        </ng-template>
-
-        Line Chart
+        <form-pager (pageaction)="page($event)"
+                    [mode]="pagingMode.byPage"
+                    [recordCount]="source.Total"
+                    [pageCount]="source.page.PageCount"
+                    [formDirty]="source.IsDirty"
+                    [pageSize]="source.PageSize"
+                    (pagesizeOut)="SetFormContent($event)"
+                    [pageNumber]="source.page.PageNumber">
+        </form-pager>
       </mat-tab>
     </mat-tab-group>
   </mat-card-header>
@@ -76,20 +67,24 @@
     <!--<ng4-loading-spinner> </ng4-loading-spinner>-->
     <form class="example-form">
       <div [formGroup]="form" class="form-group">
-        <detail-view [elements]="elements"
+        <detail-view *ngIf="view == viewType.detail"
+                     [elements]="elements"
                      [form]="form"
                      [servicing]="saveing"
                      [formDirty]="source.IsDirty"
                      [formNew]="source.IsNew"
                      (action)="action($event)"
-                     (blur)="UpdateElement($event)"
-                     *ngIf="view == viewType.detail"></detail-view>
-        <table-view  [source]="source"
+                     (blur)="UpdateElement($event)"></detail-view>
+        <table-view *ngIf="view == viewType.table"
+                    [source]="source"
                     (gotoDetail)="SetTab(0)"
                     (sortChange)="tableSort()"
-                    (applyFilter)="applyFilter()"
-                    *ngIf="view == viewType.table"></table-view>
-        <app-canvas *ngIf="view == viewType.graphic"></app-canvas>
+                    (applyFilter)="applyFilter()"></table-view>
+        <app-canvas *ngIf="view == viewType.graphic"
+                    [canvasID]="ex2"
+                    [system]="barSystem"
+                    [width]="1200" [height]="600"
+                    (select)="onSelect($event)"></app-canvas>
       </div>
 
     </form>

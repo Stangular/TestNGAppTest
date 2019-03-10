@@ -7,6 +7,7 @@ import { D3AxisModel } from '../axis/d3.axis.model';
 import { Records } from '../../dataManagement/model/records';
 import { Field, BaseField } from '../../dataManagement/model/field';
 import { DataHTTPService } from '../../dataManagement/service/dataHTTP.service';
+import { ChartLayer } from '../../canvas/models/custom/layers/charts/chart.layer';
 
 export class D3ModelContainer extends Records<string> {
   _data: D3ChartModel[] = [];
@@ -22,6 +23,8 @@ export class D3ModelContainer extends Records<string> {
 
   }
 
+
+
   ChartData(chartID: string): { xparam: number, yparam: number }[] {
     let data: { xparam: number, yparam: number }[];
     if (chartID == 'bar') {
@@ -35,6 +38,10 @@ export class D3ModelContainer extends Records<string> {
       }
     }
     return data;
+  }
+
+  ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
+    return null;
   }
 
   Draw(d3: any, idsss: string, chartType: string, width: number, height: number, offsetX: number = 0, offsetY: number = 0) {

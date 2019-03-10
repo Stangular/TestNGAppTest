@@ -3,6 +3,8 @@ import { IContextItem, ContextSystem } from '../IContextItem';
 import { ILine } from './Iline'
 import { Line } from './line'
 import { StateIndex } from '../DisplayValues'
+import { Point } from '../shapes/primitives/point';
+import { ShapeSelectResult } from '../shapes/shapeSelected';
 
 export class Path implements IContextItem {
 
@@ -24,5 +26,9 @@ export class Path implements IContextItem {
     context.stroke();
 
     context.closePath();
+  }
+
+  SelectShape(shapeSelectResult: ShapeSelectResult) {
+    return false;
   }
 }

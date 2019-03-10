@@ -1,21 +1,29 @@
+import { Point } from "./shapes/primitives/point";
+import { ShapeSelectResult } from "./shapes/shapeSelected";
+
+
 export interface IContextItem {
 
   Id: string;
   Draw(context: any): void;
-
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean;
 }
 
 export interface IContextSystem extends IContextItem {
   Content: IContextItem[];
   AddContent(content: IContextItem);
   RemoveContent(id: string): boolean;
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean;
 }
 
 export class ContextLayer implements IContextSystem {
-  constructor(private id: string, private displayState: string, protected content: IContextItem[] = []) { }
+  constructor(
+    private id: string,
+    private displayState: string,
+    protected content: IContextItem[] = []) { }
 
   get Id() { return this.id; }
-
+  
   Draw(context: any) {
     this.content.forEach(function (item, i) { item.Draw(context); });
   }
@@ -53,8 +61,19 @@ export class ContextLayer implements IContextSystem {
     return true;
   };
 
-  RemoveContentById(contentId: string): boolean {
-    return (this.SelectContentById(contentId)) ? this.RemoveContent() : false;
+
+  //RemoveContentById(contentId: string): boolean {
+  //  return (this.SelectContentById(contentId)) ? this.RemoveContent() : false;
+  //}
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean{
+    let bRes = false;
+    this.content.forEach(function (item, i) {
+      if (!bRes) {
+        bRes = item.SelectShape(shapeSelectResult);
+      }
+    });
+    return bRes;
   }
 }
 
@@ -95,7 +114,21 @@ export class ContextSystem implements IContextSystem{
     return false;
   }
 
+  Clear() {
+    this.layers.forEach(function (l, i) { l.RemoveAllContent(); });   
+  }
+
   SelectLayerById(layerId: string) {
     return this.SelectLayer(this.layers.findIndex(l => l.Id === layerId));
+  }
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean{
+    let bRes = false;
+    this.layers.forEach(function (l, i) {
+      if (!bRes) {
+        bRes = l.SelectShape(shapeSelectResult);
+     }
+    });
+    return bRes;
   }
 }

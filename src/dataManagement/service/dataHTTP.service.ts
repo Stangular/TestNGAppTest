@@ -70,7 +70,7 @@ export class DataHTTPService {
    // let options = new RequestOptions({ headers: this._headers, params: myParams });
 
     let self = this;
-    return this.http.get(restPath, , this.httpOptions(myParams))
+    return this.http.get(restPath, this.httpOptions(myParams))
       .pipe(map(response => this.processData(response), catchError(this.handleError)));
   }
 

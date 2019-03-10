@@ -15,7 +15,7 @@ export interface IShape {
 
   DrawShape(context: any);
  // Track(point: TrackingPoint);
-//  HitTest(point: TrackingPoint);
+//  SetToPosition(point: TrackingPoint);
 }
 
 

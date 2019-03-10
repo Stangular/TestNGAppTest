@@ -8,6 +8,8 @@ import { Area } from '../../../shapes/primitives/area';
 import { Margin } from '../../../shapes/primitives/margin';
 import { Size } from '../../../shapes/primitives/size';
 import { ContentFactory } from './content/content.factory';
+import { Point } from 'src/canvas/models/shapes/primitives/point';
+import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 
 
 export class ChartLayer extends ContextLayer {
@@ -50,7 +52,17 @@ export class ChartLayer extends ContextLayer {
       
     this.axisLayer = new AxisLayer(margins, size, xTick, yTick, state);
 
+    if (this.contentLayer) {
+      this.contentLayer.positionOnAxis(this.axisLayer);
+    }
 
+  }
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+    if (this.contentLayer) {
+      return this.contentLayer.SelectShape(shapeSelectResult);
+    }
+    return false;
   }
 
   Draw(context: any) {

@@ -1,1 +1,7 @@
-<canvas #thiscanvas [id]="canvasID" [width]="width" [height]="height" style="border:1px solid #000000;"></canvas>
+<canvas #thiscanvas
+        [id]="canvasID"
+        [width]="width"
+        [height]="height"
+        (click)="OnClick($event)"
+        style="border:1px solid #000000;">
+</canvas>

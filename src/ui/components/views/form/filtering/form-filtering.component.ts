@@ -25,7 +25,7 @@ export class FormFilteringComponent {
   selections: IElementDefinition<any>[] = [];
   // selectedElementFilter: IElementDefinition<any>;
   sortOrder = SortOrder;
-  selectedFilterType: any;
+//  selectedFilterType: any;
   pageSize: number = 10;
   filterSelection: FilterValues[] = [
     { type: 0, label: 'none' },
@@ -99,7 +99,7 @@ export class FormFilteringComponent {
   UpdateFilter(elmId = { id: '', value: '' }) {
     this.selectedElement.setFilter(
       this.selectedElement.UpdateFromUI()
-      , this.selectedFilterType.type);
+      , this.data.operation.type);
   }
 
   RemoveFromField() {

@@ -1,5 +1,6 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { ViewType, PagingMode } from '../form.component';
+import { PagingService } from './service/paging.service';
 
 
 @Component({
@@ -7,9 +8,8 @@ import { ViewType, PagingMode } from '../form.component';
   templateUrl: 'form-paging.component.html',
   styleUrls: ['form-paging.component.css']
 })
-export class FormPagingComponent {
+export class FormPagingComponent implements OnInit {
   
-  pageSizeModel: number = 10;
   @Input() mode: PagingMode = PagingMode.byRecord; 
   @Input() formDirty: boolean = false;
   @Input() recordCount: number;
@@ -23,10 +23,16 @@ export class FormPagingComponent {
 
   public viewType = ViewType
 
-  constructor() { }
+  constructor(private pageingService: PagingService) { }
 
   changePageSize(size: string) {
+    this.pageingService.model.pageSizeModel = Number(size);
     this.pagesizeOut.emit(parseInt(size));
+  }
+
+  ngOnInit() {
+    // this.pageingService.model.mode;
+    
   }
 
   get prevDisabled() {

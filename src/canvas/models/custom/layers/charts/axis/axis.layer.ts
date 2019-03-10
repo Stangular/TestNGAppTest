@@ -10,6 +10,12 @@ import * as moment from 'moment';
 // tick { length:0 offset:0, label:{value:'',state:0}[] }
 // axisName
 
+
+export interface IScale {
+  Labels(): any[];
+}
+
+
 export class Tick {
   constructor(public labeling: { scale: IScale, width: number, height: number, angle: number }[],
     public length: number,
@@ -17,13 +23,9 @@ export class Tick {
     public baseLine: number) { }
 }
 
-export interface IScale {
-  Labels(): string[];
-}
-
 export class Scale implements IScale {
 
-  constructor(private labels: string[]) {}
+  constructor(private labels: any[]) { }
 
   Labels() {
     return this.labels;
@@ -32,7 +34,7 @@ export class Scale implements IScale {
 
 export class NumericScale implements IScale {
 
-  labels: string[] = [];
+  labels: any[] = [];
   // inc: number = 0; // ie 10,20,etc...
   constructor(private min: number = 0, private max: number = 0, private base: number,
     private inc: number = 1, private stub: string = '', private append: string = '') {
@@ -49,7 +51,7 @@ export class NumericScale implements IScale {
 
     for (let i = this.min; i <= this.max; i += this.inc) {
 
-        this.labels.push((i % this.base == 0) ? i.toString() + this.append : this.stub);
+      this.labels.push({ label: (i % this.base == 0) ? i.toString() + this.append : this.stub, id: '' });
     }
     this.labels.push();
   }
@@ -127,57 +129,79 @@ export class TimeScale implements IScale {
 
 export class AxisLayer extends ContextLayer {
 
-  constructor(private margins: Margin, private size: Size, xTick: Tick, yTick: Tick, chartState: StateIndex) {
+  xTicks: { point: Point, id: string }[] = [];
+  yTicks: Point[] = []
+  constructor(private margins: Margin, private size: Size, private xTick: Tick, private yTick: Tick, chartState: StateIndex) {
     super('axislines', 'default');
 
 
-   const origin: Point = new Point(margins.Left, size.Height);
+    const origin: Point = new Point(margins.Left, size.Height);
 
-    this.addYTickLine(yTick, chartState,origin);
-    this.addXTickLine(xTick, chartState,origin);
+    this.addYTickLine(yTick, chartState, origin);
+    this.addXTickLine(xTick, chartState, origin);
   }
 
-  addLabel(id: string, label: any, top: number, left: number,width:number,height:number,angle:number, chartState: StateIndex) {
+  addLabel(id: string, label: any, top: number, left: number, width: number, height: number, angle: number, chartState: StateIndex) {
     this.AddContent(new TextCenter(
       id, top, left,
       width, height,
       chartState, label, angle));
   }
 
-  addYTickLine(tick: Tick, chartState: StateIndex,origin: Point) {
+  get XTick() {
+    return this.xTick;
+  }
+
+  get YTick() {
+    return this.yTick;
+  }
+
+  get XTicks() {
+    return this.xTicks;
+  }
+
+  get YTicks() {
+    return this.yTicks;
+  }
+
+  addYTickLine(tick: Tick, chartState: StateIndex, origin: Point) {
 
     super.AddContent(new Line('yLine', origin, new Point(this.margins.Left, this.margins.Top), chartState));
-  
+
     let self = this;
     let start = origin.Y;
     let offset = this.margins.Left - tick.length + tick.offset;
     let count = tick.labeling[0].scale.Labels().length;
-    let intervalSize = Math.round((this.size.Height - this.margins.Top ) / count);
+    let pt: Point;
+    let intervalSize = Math.round((this.size.Height - this.margins.Top) / count);
     for (let i = 0; i < count; i = i + 1) {
+      pt = new Point(origin.X, start);
       this.AddContent(new Line('ytic_' + i,
         new Point(offset, start),
-        new Point(origin.X, start),
+        pt,
         chartState));
       start -= intervalSize;
+      this.yTicks.push(pt);
     }
     let x = 0;
     start = origin.Y;
+    offset = offset - tick.length - 5;
     tick.labeling.forEach(function (label, i) {
-      x = (label.height / 2 );
+      x = (label.height / 2);
       let lbls = label.scale.Labels();
       for (let j = 0; j < lbls.length; j = j + 1) {
         self.addLabel('lbl_' + j,
-          lbls[j], start - x,
+          lbls[j].label, start - x,
           offset - label.width, label.width, label.height, label.angle, chartState);
         start -= intervalSize;
       }
     });
   }
 
-  addXTickLine(tick: Tick, chartState: StateIndex,origin: Point) {
+  addXTickLine(tick: Tick, chartState: StateIndex, origin: Point) {
 
-    let width = this.size.Width;
- 
+    let width = this.size.Width - (this.margins.Left + this.margins.Right);
+    width -= 50;
     super.AddContent(new Line('xLine', origin, new Point(width, this.size.Height), chartState));
 
     let self = this;
@@ -185,14 +209,18 @@ export class AxisLayer extends ContextLayer {
     let intervalSize = width / count;
     let start = origin.X + (intervalSize / 2);
     let h = origin.Y;
-    for (let i = 0; i < count; i = i + 1) {
-      this.AddContent(new Line('xtic_' + i,
-        new Point(start, h),
+    let pt: Point;
+    
+    tick.labeling[0].scale.Labels().forEach(function (l,i) {
+      pt = new Point(start, h);
+      self.AddContent(new Line('xtic_' + i,
+        pt,
         new Point(start, h + 5),
         chartState));
-      
+      self.xTicks.push({ point: pt, id: l.id });
       start += intervalSize;
-    }
+    });
+   
     let x = 0;
     h += 6;
 
@@ -202,7 +230,7 @@ export class AxisLayer extends ContextLayer {
       let lbls = label.scale.Labels();
       for (let j = 0; j < lbls.length; j = j + 1) {
         self.addLabel('lbl_' + j,
-          lbls[j], h,
+          lbls[j].label, h,
           start - x, label.width, label.height, label.angle, chartState);
         start += intervalSize;
       }

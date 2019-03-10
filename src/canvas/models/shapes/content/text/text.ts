@@ -2,6 +2,8 @@ import { IShape } from '../../IShape';
 import { Shape } from '../../shape';
 import { IContextItem, ContextSystem } from '../../../IContextItem';
 import { DisplayValues, StateIndex, UIStates } from '../../../DisplayValues'
+import { Point } from '../../primitives/point';
+import { ShapeSelectResult } from '../../shapeSelected';
 
 
 
@@ -56,6 +58,12 @@ export class Text extends Shape implements IContextItem {
 
     this.DrawShape(context);
     context.closePath();
+  }
+
+
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+    return (this.IsPointInShape(shapeSelectResult.point));
   }
 }
 

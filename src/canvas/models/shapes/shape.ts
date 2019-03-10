@@ -36,7 +36,18 @@ export abstract class Shape implements IShape {
   get Center(): Point { return this._center; }
 
   abstract DrawShape(context: any);
-  
+
+  positionOnTick(x:number,y:number) {
+
+    if (x > 0) { this.left = x; }
+    if (y > 0) { this.top = y; }
+
+  }
+
+  IsPointInShape(point: Point) {
+    return ( this.top < point.Y && this.Bottom > point.Y
+      && this.left < point.X && this.Right > point.X );
+  }
 }
 
 //export class Shapes extends Shape {

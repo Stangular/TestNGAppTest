@@ -7,6 +7,7 @@ import { TableViewComponent } from '../views/table/table-view.component';
 import { FormComponent } from '../views/form/form.component';
 import { FormFilteringComponent } from '../views/form/filtering/form-filtering.component';
 import { FormPagingComponent } from '../views/form/paging/form-paging.component';
+import { PagingService } from '../views/form/paging/service/paging.service';
 import { ngMaterialModule } from '../../module/ngMaterialUI.module';
 import { CanvasModule } from '../../../canvas/canvas.module';
 import { FormInputElementComponent } from '../../../ui/components/edit/form-input.component';
@@ -56,6 +57,8 @@ library.add(
   entryComponents: [
     AcknowlegeDeleteDialog
     , FormFilteringComponent],
-  providers: []
+  providers: [
+    PagingService
+  ]
 })
 export class ViewModule { }

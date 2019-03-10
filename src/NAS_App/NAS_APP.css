@@ -30,6 +30,9 @@ table {
 
 
 
+.basic-container {
+  padding: 30px;
+}
 
 div#layout {
   text-align: center;

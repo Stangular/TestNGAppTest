@@ -23,6 +23,7 @@ import { LayoutService } from './services/layout/layout-service.service';
 import { PopupContentComponent } from './popup/popup-content.component';
 import { LoginComponent } from './login/login.component';
 import { ContentUtilityComponent } from './common/content-utility/content-utility.component';
+import { MessageService } from './messaging/message.service';
 
 //import { UserLoginLibModule } from 'user-login-lib';
 @NgModule({
@@ -53,7 +54,9 @@ import { ContentUtilityComponent } from './common/content-utility/content-utilit
     AppDataService
     , TokenService
     , UserService
-    , LayoutService],
+    , LayoutService
+    , MessageService],
+
   bootstrap: [AppComponent]
 })
 

@@ -5,6 +5,7 @@ import { Point } from '../shapes/primitives/point';
 import { IContextItem, ContextSystem } from '../IContextItem';
 import { ILine } from './Iline'
 import { DisplayValues, StateIndex, UIStates} from '../DisplayValues'
+import { ShapeSelectResult } from '../shapes/shapeSelected';
 
 export class Line implements IContextItem, ILine {
 
@@ -22,7 +23,7 @@ export class Line implements IContextItem, ILine {
 
   public DrawLine(context: any) {
 
-    context.lineColor = DisplayValues.GetColor(this.state.Index[UIStates.color]);
+    context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.color]);
     context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
 
     this.moveToSource(context);
@@ -46,5 +47,11 @@ export class Line implements IContextItem, ILine {
     context.stroke();
 
     context.closePath();
+  }
+
+
+  SelectShape(shapeSelectResult: ShapeSelectResult) {
+    return false;
+   // this.IsPointInShape(point);
   }
 }

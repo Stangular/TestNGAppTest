@@ -2,6 +2,8 @@ import { IShape } from './Ishape';
 import { Shape } from './shape';
 import { IContextItem, ContextSystem } from '../IContextItem';
 import { DisplayValues, StateIndex, UIStates} from '../DisplayValues'
+import { Point } from './primitives/point';
+import { ShapeSelectResult } from './shapeSelected';
 
 export class Ellipse extends Shape implements IContextItem {
 
@@ -50,5 +52,10 @@ export class Ellipse extends Shape implements IContextItem {
     this.DrawShape(context);
 
     context.closePath();
+  }
+
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+    return (this.IsPointInShape(shapeSelectResult.point));
   }
 }

@@ -40,7 +40,7 @@ library.add(
     , SystemInventoryComponent
     , HRMProductionHistoryComponent
   ],
-  exports: [ngMaterialModule, d3Module, ViewModule],
+  exports: [ngMaterialModule, d3Module],
 
   providers: [D3Service
     , FilterService

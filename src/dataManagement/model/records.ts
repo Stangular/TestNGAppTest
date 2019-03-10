@@ -172,8 +172,10 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   abstract UpdateDependentUI(): void;
   abstract GetUIValue(fieldID: string): any;
   abstract OutputAll(): any;
+
   // abstract get testData(): Field<any>[];
   abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
+  abstract ChartGraphic(chartID: string, width: number, height: number, chartName: string);
 
   get hasFilters() {
     let r = this._UIElements.findIndex(e => e.HasFilter());
@@ -334,26 +336,13 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   public LoadData(content: IRecord[] = [], converters: Converter[] = [], recordCount = 0, totalRecordCount = 0) {
     let self = this;
-    //if (content.length <= 0) {
-    ////  this.Test();
-    //  this._selectedItem = 0;
-    //  this.UpdateUI();
-    //  return;
-    //}
+ 
     this._fields.length = 0;
     this._recordCount = recordCount;
     this.page.UpdateTotal(totalRecordCount);
     content.forEach(function (c, i) {
       let fldID = c.fieldID.toLowerCase();
-      //let convert = converters
-      //  .find(x => x.DataID.toLowerCase() == fldID);
-      //if (!!convert) {
-      //  fldID = convert.UIID;
-      //  c.fieldID = fldID;
-      //}
-      let fldElm = self
-        ._UIElements
-        .find(e => e.FieldID().toLowerCase() == fldID);
+      let fldElm = self._UIElements.find(e => e.FieldID().toLowerCase() == fldID);
       if (fldElm) {
         self._fields.push(self.New( c ));
         fldElm.ResetToDefault();

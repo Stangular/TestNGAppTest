@@ -8,7 +8,7 @@ import {
   FilterSystemInventoryModel
   , FilterCityTemperatureModel
   , FilterNormalizedStackedBarChartModel
-  , FilterBasicBarChartModel
+ , FilterBasicBarChartModel
 } from './filter.model';
 
 import { D3Service } from '../../../d3/services/d3.service';
@@ -71,9 +71,9 @@ export class FilterService implements IRecordService {
 
     let layer: ChartLayer;
 
-    switch (chartName) {
-      case 'bar': layer = this._filterD.ChartGraphic(width, height); break;
-    }
+    //switch (chartName) {
+    //  case 'bar': layer = this._filterD.ChartGraphic(width, height); break;
+    //}
 
     return layer;
   }
