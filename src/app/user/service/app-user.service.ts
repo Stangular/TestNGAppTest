@@ -3,7 +3,7 @@ import { UserModel, LoginModel } from './user.model';
 import { Router } from '@angular/router';
 import { DataHTTPService } from '../../../dataManagement/service/dataHTTP.service';
 //import { Observable, Subject } from 'rxjs';
-import { TokenService } from './token/token.service';
+import { TokenService } from '../token/token.service';
 @Injectable()
 export class UserService {
   //private subject = new Subject<any>();

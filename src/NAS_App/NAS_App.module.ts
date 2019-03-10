@@ -16,6 +16,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCoffee, faFilter, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 //import { CanvasModule } from '../canvas/canvas.module';
 import { ViewModule } from '../ui/components/views/view.module';
+import { AppUserComponent } from 'src/app/user/app-user-component/app-user.component';
 // Add an icon to the library for convenient access in other components
 library.add(
   faCoffee
@@ -39,6 +40,7 @@ library.add(
     NAS_APPPrimaryOutletPageComponent
     , SystemInventoryComponent
     , HRMProductionHistoryComponent
+    , AppUserComponent
   ],
   exports: [ngMaterialModule, d3Module],
 

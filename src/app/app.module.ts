@@ -15,8 +15,8 @@ import { NAS_AppModule } from '../NAS_App/NAS_App.module';
 //import "@angular/material/prebuilt-themes/indigo-pink.css";
 import '../styles/styles.scss';
 import '../styles/headings.css';
-import { TokenService } from './services/user/token/token.service';
-import { UserService } from './services/user/app-user.service';
+import { TokenService } from './user/token/token.service';
+import { UserService } from './user/service/app-user.service';
 
 import { LayoutService } from './services/layout/layout-service.service';
 
@@ -44,7 +44,8 @@ import { MessageService } from './messaging/message.service';
     AppComponent
     , NavMenuComponent
     , PopupContentComponent
-    , LoginComponent, ContentUtilityComponent
+    , LoginComponent
+    , ContentUtilityComponent
   ],
 
   exports: [

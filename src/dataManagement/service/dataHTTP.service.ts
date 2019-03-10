@@ -10,7 +10,7 @@ import { HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { IForm } from '../model/form/form';
-import { TokenService } from '../../app/services/user/token/token.service';
+import { TokenService } from '../../app/user/token/token.service';
 
 @Injectable()
 export class DataHTTPService {

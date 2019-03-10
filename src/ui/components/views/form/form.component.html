@@ -1,5 +1,6 @@
 <!--<fa-icon aria-label="Filter content" icon="filter"></fa-icon>-->
 <!--<form-filter [elements]="elements" [form]="form"></form-filter>-->
+
 <mat-card class="form-card">
   <mat-card-header>
     <mat-card-title>
@@ -7,7 +8,7 @@
     </mat-card-title>
     <mat-card-subtitle>{{metaInfo}}</mat-card-subtitle>
     <mat-tab-group [selectedIndex]="activeView" style="width:90%"
-               (selectedIndexChange)="TabChange($event)">
+                   (selectedIndexChange)="TabChange($event)">
       <!--<mat-tab>
         <ng-template mat-tab-label>
           <i class="fa fa-filter" style="padding-right:5px"></i>
@@ -64,6 +65,7 @@
     </mat-tab-group>
   </mat-card-header>
   <mat-card-content>
+
     <!--<ng4-loading-spinner> </ng4-loading-spinner>-->
     <form class="example-form">
       <div [formGroup]="form" class="form-group">
@@ -88,5 +90,7 @@
       </div>
 
     </form>
+
+
   </mat-card-content>
 </mat-card>

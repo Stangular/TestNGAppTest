@@ -4,7 +4,7 @@ import { NgForm, FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from './Services/filter/filter.service';
 //import { MatDialog, MatDialogRef, MatDialogConfig } from '@angular/material';
 import { LoginComponent } from '../app/login/login.component';
-import { UserService } from '../app/services/user/app-user.service';
+import { UserService } from '../app/user/service/app-user.service';
 //import { } '../dataManagement/'
 
 
@@ -17,8 +17,7 @@ export class NAS_APPPrimaryOutletPageComponent implements OnInit {
     , public userService: UserService ) { }
   pageTitle: string = 'Page Title';
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   Logout() {
     this.userService.Logout();

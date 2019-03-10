@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormBuilder, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { UserService } from '../services/user/app-user.service';
+import { UserService } from '../user/service/app-user.service';
 import { LayoutService } from '../services/layout/layout-service.service';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
