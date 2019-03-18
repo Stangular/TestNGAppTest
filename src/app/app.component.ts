@@ -1,4 +1,5 @@
-import { Component, AfterContentInit } from '@angular/core';
+import { Component, HostListener, AfterContentInit, OnInit } from '@angular/core';
+import { LayoutService } from './services/layout/layout-service.service';
 
 
 @Component({
@@ -7,14 +8,23 @@ import { Component, AfterContentInit } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent implements AfterContentInit {
+export class AppComponent implements AfterContentInit, OnInit {
   title = 'TestNGApp2';
  
-  constructor() {
+  constructor(private layout: LayoutService) {
     let sss = 0;
   }
   ngAfterContentInit() {
 
 
+  }
+
+  ngOnInit() {
+    this.layout.Layout.SetWindowWidth(window.innerWidth);
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.layout.Layout.SetWindowWidth(window.innerWidth);
   }
 }

@@ -1,4 +1,5 @@
 import { Point } from "./shapes/primitives/point";
+import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult } from "./shapes/shapeSelected";
 
 
@@ -23,7 +24,7 @@ export class ContextLayer implements IContextSystem {
     protected content: IContextItem[] = []) { }
 
   get Id() { return this.id; }
-  
+
   Draw(context: any) {
     this.content.forEach(function (item, i) { item.Draw(context); });
   }

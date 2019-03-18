@@ -88,6 +88,11 @@ export class FilterSystemInventoryModel extends Records<string> {
   ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
     return null;
   }
+
+  ChartIDFrom(chartNumber: number) {
+    return '';
+  }
+
 }
 
 
@@ -134,6 +139,12 @@ export class FilterCityTemperatureModel extends Records<string> {
   ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
     return null;
   }
+
+  ChartIDFrom(chartNumber: number) {
+    return '';
+  }
+
+
   UpdateDependentUI(): void {
 
   }
@@ -248,6 +259,11 @@ export class FilterBarCharModel extends Records<string> {
     return null;
 
   }
+
+  ChartIDFrom(chartNumber: number) {
+    return '';
+  }
+
   OutputAll(): any {
     return {
       FormName: this.SourceID,
@@ -418,6 +434,11 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
   ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
     return null;
   }
+
+  ChartIDFrom(chartNumber: number) {
+    return '';
+  }
+
   New(data: any): Field<any> {
     return new BaseField(data);
   }
@@ -526,6 +547,21 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
   }
 }
 
+export class BarChartModel{
+
+  private staticValue: Number = 0;
+  private variableValue: Number = 0;
+
+  constructor(
+    private income: number,
+    private date: Date) { }
+
+
+  CalculateVariablePosition( pos: Number, variableExtent:number, maxValue: number ) {
+    return ((this.income / maxValue) * variableExtent);
+  }
+}
+
 export class FilterBasicBarChartModel extends Records<string> {
 
   axisModel: D3AxisModel;// = new D3AxisModel();
@@ -607,19 +643,21 @@ export class FilterBasicBarChartModel extends Records<string> {
     return data;
   }
 
-  
-  ChartGraphic(chartID: string,width: number, height: number, chartName:string = ''): ChartLayer {
+  ChartIDFrom(chartNumber: number) {
+     
+  }
 
+  ValueToDateGraphic(width: number, height: number, chartName: string = '') {
     let f = this.Fields.find(f => f.FieldId == 'Id');//
     let fid = f.Data;
-    
+
     let fx = this.Fields.find(f => f.FieldId == 'date').Data;
     // Chart has its own order...
     let fxx = fx.map(d => d)
-     fxx.sort(function (a, b) {
+    fxx.sort(function (a, b) {
       let mb = moment(b);
       let ma = moment(a);
-      return (mb > ma ? -1 : 1 );
+      return (mb > ma ? -1 : 1);
     });
     let fy = this.Fields.find(f => f.FieldId == 'income');
 
@@ -628,9 +666,9 @@ export class FilterBasicBarChartModel extends Records<string> {
     }
     let d: string = '';
     let r: string[] = [];
-    let years: { label: string, id: string } []= [];
-    let months: { label: string, id: string } [] = [];
-    
+    let years: { label: string, id: string }[] = [];
+    let months: { label: string, id: string }[] = [];
+
     for (let i = 0; i < fx.length; i++) {
       d = fx[i];
       // calculate percentage of total height -  x/H = (d/500)* H 
@@ -664,7 +702,7 @@ export class FilterBasicBarChartModel extends Records<string> {
     let margins = new Margin(10, 50, 10, 60);
     let chart: ChartLayer;
 
-    let bar = new BarLayer(0, 2000, fid, fy.Data, margins, new Size(width,height));
+    let bar = new BarLayer(0, 2000, fid, fy.Data, margins, new Size(width, height));
     chart = new ChartLayer(
       width, height,
       margins, xTick, yTick, 'barchart', 'bc1',
@@ -672,6 +710,14 @@ export class FilterBasicBarChartModel extends Records<string> {
     return chart;
   }
 
+  ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
+    let chart: ChartLayer;
+    switch (chartID) {
+      case 'chart2': chart = this.ValueToDateGraphic(width, height, chartName); break;
+      default: chart = null; break;
+    }
+    return chart;
+  }
 
   SetDataView() {
 

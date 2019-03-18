@@ -29,7 +29,7 @@ export class LoginComponent  {
   constructor(
     private userService: UserService,
     private _formBuilder: FormBuilder,
-    private layout: LayoutService) {
+    public layout: LayoutService) {
     this.rForm = this._formBuilder.group({
       email: ["", [Validators.required, Validators.email]],
       password: ["", [Validators.required, Validators.minLength(8),

@@ -23,7 +23,7 @@ export class FormPagingComponent implements OnInit {
 
   public viewType = ViewType
 
-  constructor(private pageingService: PagingService) { }
+  constructor(public pageingService: PagingService) { }
 
   changePageSize(size: string) {
     this.pageingService.model.pageSizeModel = Number(size);

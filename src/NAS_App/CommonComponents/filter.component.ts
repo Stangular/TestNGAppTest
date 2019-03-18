@@ -4,9 +4,9 @@ import { FilterService } from '../Services/filter/filter.service';
 
 @Component({
   selector: 'filter_component',
-  templateUrl: './project.component.html'
+  templateUrl: './filter.component.html'
 })
-export class ProjectComponent implements OnInit {
+export class FilerComponent implements OnInit {
 
 
   constructor( public filterService: FilterService) { }

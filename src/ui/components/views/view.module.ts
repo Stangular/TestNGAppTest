@@ -17,6 +17,7 @@ import { AcknowlegeDeleteDialog } from '../../components/views/form/dialogs/ackn
 import { faCoffee, faFilter, faChevronDown, faSort, } from '@fortawesome/free-solid-svg-icons';
 import { SaveFormSuccessSnackComponent } from '../snacks/success/save/form/save-form-success-snack.component'
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
+import { SelectListComponent } from '../select/form-list-select.component';
 
 library.add(
   faCoffee
@@ -44,6 +45,7 @@ library.add(
     , FormPagingComponent
     , FormFilteringComponent
     , SaveFormSuccessSnackComponent
+    , SelectListComponent
     , AcknowlegeDeleteDialog
   ],
   exports: [

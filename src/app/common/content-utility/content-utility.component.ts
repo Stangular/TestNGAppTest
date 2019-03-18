@@ -9,7 +9,7 @@ import { LayoutService } from '../../services/layout/layout-service.service';
 export class ContentUtilityComponent implements OnInit {
   layoutIndex: number = -1;
   @Input() layoutName: string = 'base';
-  constructor(private layout: LayoutService) {
+  constructor(public layout: LayoutService) {
     this.layoutName = 'base';
   }
 

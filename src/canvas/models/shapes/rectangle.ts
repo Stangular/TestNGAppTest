@@ -20,6 +20,7 @@ export class Rectangle extends Shape implements IContextItem {
       state);
   }
 
+
   DrawShape(context: any): void {
 
     context.rect(this.Left, this.Top, this.Width, this.Height);

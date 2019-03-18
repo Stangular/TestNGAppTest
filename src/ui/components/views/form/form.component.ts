@@ -38,7 +38,7 @@ export class EntityRemoveModel {
 })
 export class FormComponent implements OnInit, AfterContentInit {
 
-  barSystem: ChartLayer;
+ // barSystem: ChartLayer;
   @Input() source: Records<string>;
 
   form: any;
@@ -68,7 +68,7 @@ export class FormComponent implements OnInit, AfterContentInit {
     this.SetFormContent(this.source.PageSize);
   }
 
-  private SetFormContent(pageSize: number = 10) {
+  public SetFormContent(pageSize: number = 10) {
 
     this.spinnerService.show();
     this.httpService.postContent(this.source.Filter(pageSize)
@@ -138,10 +138,13 @@ export class FormComponent implements OnInit, AfterContentInit {
 
   initSuccess(data: any) {
     this.spinnerService.hide();
-    this.source.LoadData(data.content, [], data.recordCount, data.totalAvailableCount);
-    this.barSystem = this.source.ChartGraphic('bar', 1200, 600, 'bar');
-    setTimeout(() => this.messageService.sendMessage(0), 0);
-
+    this.source.LoadData(
+      data.content, [],
+      data.recordCount,
+      data.totalAvailableCount);
+ //   this.barSystem = this.source.ChartGraphic('bar', 0, 0, 'bar');
+    setTimeout(() =>
+      this.messageService.sendMessage(0), 0);
   }
 
   initFail(data: any) {

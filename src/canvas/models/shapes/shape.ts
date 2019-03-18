@@ -32,7 +32,6 @@ export abstract class Shape implements IShape {
   get Width(): number { return this.width; }
   get Height(): number { return this.height; }
 
-
   get Center(): Point { return this._center; }
 
   abstract DrawShape(context: any);

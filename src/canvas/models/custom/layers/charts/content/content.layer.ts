@@ -17,7 +17,7 @@ import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 
 export abstract class ContentLayer extends ContextLayer {
 
-  constructor( private margins: Margin, private size: Size, layerId: string) {
+  constructor(protected margins: Margin, protected size: Size, layerId: string) {
     super(layerId, 'default');
   }
 

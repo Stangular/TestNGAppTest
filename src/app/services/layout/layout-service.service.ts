@@ -38,9 +38,4 @@ export class LayoutService {
   get Layout() {
     return this.layout;
   }
-
-  RemoveMe() {
-
-  }
-
 }

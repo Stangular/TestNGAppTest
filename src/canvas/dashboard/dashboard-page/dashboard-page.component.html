@@ -1,0 +1,12 @@
+<mat-grid-list [cols]="layout.getLayoutColumnCount(layoutIndex)"
+               [rowHeight]="layout.getLayoutRowHeight(layoutIndex)">
+  <mat-grid-tile *ngFor="let c of layout.Columns(layoutIndex); index as i"
+                 [colspan]="c.ColSpan(layout.Layout.Size)"
+                 [rowspan]="c.RowSpan(layout.Layout.Size)"
+                 [style.background]="c.Color">
+    <app-canvas [canvasID]="c.contentName"
+                [source]="source"
+                (select)="onSelect($event)"></app-canvas>
+  </mat-grid-tile>
+</mat-grid-list>
+

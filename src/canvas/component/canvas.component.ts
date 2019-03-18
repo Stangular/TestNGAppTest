@@ -6,6 +6,7 @@ import {
   Input,
   Output,
   ViewChild,
+  AfterContentInit,
   OnDestroy
 } from '@angular/core';
 import { ContextSystem, ContextLayer } from '../models/IContextItem';
@@ -21,32 +22,49 @@ import { ShapeSelectResult } from '../models/shapes/shapeSelected';
 import { Records } from 'src/dataManagement/model/records';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
+import { CanvasService } from '../canvas.service';
 
+export class CanvasContextModel {
+  size: Size = new Size();
+  data: any;
+
+  constructor() {
+
+  }
+}
 
 @Component({
   selector: 'app-canvas',
   templateUrl: './canvas.component.html',
-  styleUrls: ['./canvas.component.css']
+  styleUrls: ['./canvas.component.css'],
+  host: {
+    '(window:resize)': 'onResize($event)'
+  }
 })
-export class CanvasComponent implements OnInit, OnDestroy {
+export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   subscription: Subscription;
+  width: number = 0;
+  height: number = 0;
+  system: ContextSystem;
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
+  @Input() id: string = '';
   @Input() source: Records<string>;
   @ViewChild('thiscanvas') CanvasComponent: ElementRef;
   @Input() canvasID: string = 'testCanvas';
-  @Input() width: number = 200;
-  @Input() height: number = 200;
   @Input() margin: Margin;
-  @Input() system: ContextSystem;
   @Output() select: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
+
 
   private point: Point = new Point();
 
-  constructor(private messageService: MessageService) {
-    this.subscription = this.messageService.getMessage().subscribe(message => { this.Draw(); });
+  constructor(private messageService: MessageService, private canvasService: CanvasService) {
+
+    this.width = 1200; //rect.width;
+    this.height = 600; //rect.height;
+    this.subscription = this.messageService.getMessage().subscribe(message => { this.ReDraw(); });
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   get Canvas() {
     return <HTMLCanvasElement>this.CanvasComponent.nativeElement;
@@ -57,8 +75,9 @@ export class CanvasComponent implements OnInit, OnDestroy {
       this.Canvas.getContext('2d'));
   }
 
-  ngAfterViewInit(): void {
-    this.Draw();
+  ngAfterContentInit(): void {
+    setTimeout(() =>
+      this.ReDraw(), 10);
   }
 
   OnClick(e: any) {
@@ -70,10 +89,36 @@ export class CanvasComponent implements OnInit, OnDestroy {
     this.point.SetToPosition(x, y);
     this.shapeSelectResult.point.SetToPosition(x, y);
     this.shapeSelectResult.id = "";
-    if (this.system.SelectShape(this.shapeSelectResult))
-    {
+    if (this.system.SelectShape(this.shapeSelectResult)) {
       this.select.emit(this.shapeSelectResult);
     }
+  }
+
+  setSize() {
+    let parent: Element = (<Element>this.Canvas.parentNode);
+    parent = parent.parentElement;
+    while (parent.localName != 'mat-grid-tile') {
+      parent = parent.parentElement;
+    }
+    let styles = getComputedStyle(parent);
+    let w = parent.offsetWidth || parent.clientWidth; // bug in typescript?  They do exist...
+    let h = parent.offsetHeight || parent.clientHeight;
+
+    this.width = w;
+    this.height = h;
+    this.Canvas.width = this.width;
+    this.Canvas.height = this.height;
+  }
+
+  onResize(event) {
+    
+    this.ReDraw();
+  }
+
+  ReDraw() {
+    this.setSize();
+    this.system = this.source.ChartGraphic(this.canvasID, this.width, this.height, 'bar');
+    this.Draw();
   }
 
   Draw() {

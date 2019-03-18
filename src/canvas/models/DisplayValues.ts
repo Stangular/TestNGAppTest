@@ -99,7 +99,7 @@ export class TheCanvasState {
     DisplayValues.SetColor('exlyrtext1color', '#a0120c');
     DisplayValues.SetColor('transparent', 'transparent');
     DisplayValues.SetWeight('exlyrrect1border', 0.3);
-    DisplayValues.SetFont('exlyrtext1font', 'Verdana');
+    DisplayValues.SetFont('exlyrtext1font', '9px Verdana');
 
     
   }

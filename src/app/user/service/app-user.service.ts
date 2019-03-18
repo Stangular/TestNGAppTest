@@ -25,8 +25,8 @@ export class UserService {
   }
 
   SetUser(model: any) {
-    if (model.model) {
-      this.userModel = model.model;
+    if (model) {
+      this.userModel = model;
       window.localStorage.setItem('user', JSON.stringify(this.userModel));
       this.tokenService.Token = this.userModel.token;
     }
@@ -34,7 +34,7 @@ export class UserService {
 
   loginSuccess(data: any) {
     if (data.status[0] == 'success') {
-      this.SetUser(data);
+      this.SetUser(data.model);
       this.router.navigate(['/']);
    }
   }
@@ -45,8 +45,12 @@ export class UserService {
 
   logoutSuccess(data: any) {
     if (data.status[0] == 'success') {
-      this.SetUser(data);
+      this.SetUser(data.model);
       this.router.navigate(['/login']);
+    }
+    else {
+      this.SetUser(new UserModel());
+
     }
   }
 

@@ -140,7 +140,7 @@ export class Paging {
 
 export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
-  protected page: Paging = new Paging(0); 
+  public page: Paging = new Paging(0); 
   protected _UIElements: IElementDefinition<any>[] = [];
   //protected _childRecords: Records<T>[] = [];
   protected _pageSize: number = 10;  
@@ -176,6 +176,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   // abstract get testData(): Field<any>[];
   abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
   abstract ChartGraphic(chartID: string, width: number, height: number, chartName: string);
+  abstract ChartIDFrom(chartNumber: number );
 
   get hasFilters() {
     let r = this._UIElements.findIndex(e => e.HasFilter());

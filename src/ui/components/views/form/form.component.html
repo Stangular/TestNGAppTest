@@ -82,11 +82,10 @@
                     (gotoDetail)="SetTab(0)"
                     (sortChange)="tableSort()"
                     (applyFilter)="applyFilter()"></table-view>
-        <app-canvas *ngIf="view == viewType.graphic"
-                    [canvasID]="ex2"
-                    [system]="barSystem"
-                    [width]="1200" [height]="600"
-                    (select)="onSelect($event)"></app-canvas>
+        <app-dashboard-page *ngIf="view == viewType.graphic"
+                    [layoutName]="'dashboardA'"
+                    [source]="source"
+                    (select)="onSelect($event)"></app-dashboard-page>
       </div>
 
     </form>
