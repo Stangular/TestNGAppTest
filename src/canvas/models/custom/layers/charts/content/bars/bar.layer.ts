@@ -44,8 +44,8 @@ export class Bar implements IContextItem{
     this.area.Draw(context);
   }
 
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean{
-    if (this.area.SelectShape(shapeSelectResult)) {
+  Select(shapeSelectResult: ShapeSelectResult): boolean{
+    if (this.area.Select(shapeSelectResult)) {
       shapeSelectResult.id = this.sourceID;
       shapeSelectResult.type = 'bar';
       return true;

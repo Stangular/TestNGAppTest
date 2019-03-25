@@ -2,4 +2,17 @@
         class="chart"
         [id]="canvasID"
         (click)="OnClick($event)"
-        style="border:1px solid #000000;"></canvas>
+        (mousemove)="OnMouseMove($event)"
+        style="border:1px solid #000000; background-color:transparent">
+
+</canvas>
+<div *ngIf="editOn" style="position:absolute; top:0; left:0; width:300px; height:300px; background-color:transparent">
+  <canvas #actCanvas
+          class="chart"
+           (click)="OnActiveClick($event)"
+          [id]="'canvasIDsss'"
+          style="border:1px solid #00ff00; background-color:#eeeeee; opacity:0.5">
+
+  </canvas>
+</div>
+

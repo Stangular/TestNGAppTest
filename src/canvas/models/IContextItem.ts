@@ -7,14 +7,15 @@ export interface IContextItem {
 
   Id: string;
   Draw(context: any): void;
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean;
+  Select(criteria: any): boolean;
 }
 
 export interface IContextSystem extends IContextItem {
   Content: IContextItem[];
   AddContent(content: IContextItem);
-  RemoveContent(id: string): boolean;
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean;
+  RemoveContent(): IContextItem;
+  RemoveContentById(id:string): IContextItem;
+
 }
 
 export class ContextLayer implements IContextSystem {
@@ -56,10 +57,20 @@ export class ContextLayer implements IContextSystem {
     while (this.RemoveContent());
   }
 
-  RemoveContent(): boolean {
-    if (this.content.length <= 0) { return false;}
+  RemoveContent(): IContextItem {
+    if (this.content.length <= 0) { return null; }
+    let item = this.content[0];
     this.content.splice(0, 1);
-    return true;
+    return item;
+  };
+
+  RemoveContentById(id: string): IContextItem {
+    if (this.content.length <= 0) { return null; }
+    let ndx = this.content.findIndex(c => c.Id == id);
+    if (ndx < 0) { return null; }
+    let item = this.content[ndx];
+    this.content.splice(ndx, 1);
+    return item;
   };
 
 
@@ -67,11 +78,11 @@ export class ContextLayer implements IContextSystem {
   //  return (this.SelectContentById(contentId)) ? this.RemoveContent() : false;
   //}
 
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean{
+  Select(shapeSelectResult: ShapeSelectResult): boolean{
     let bRes = false;
     this.content.forEach(function (item, i) {
       if (!bRes) {
-        bRes = item.SelectShape(shapeSelectResult);
+        bRes = item.Select(shapeSelectResult);
       }
     });
     return bRes;
@@ -93,7 +104,7 @@ export class ContextSystem implements IContextSystem{
 
   AddContent(content: IContextItem) { this.layers[0].AddContent(content); }
 
-  RemoveContent(id: string): boolean {
+  RemoveContent(): IContextItem {
     return this.layers[0].RemoveContent();
   };
 
@@ -123,11 +134,11 @@ export class ContextSystem implements IContextSystem{
     return this.SelectLayer(this.layers.findIndex(l => l.Id === layerId));
   }
 
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean{
+  Select(shapeSelectResult: ShapeSelectResult): boolean{
     let bRes = false;
     this.layers.forEach(function (l, i) {
       if (!bRes) {
-        bRes = l.SelectShape(shapeSelectResult);
+        bRes = l.Select(shapeSelectResult);
      }
     });
     return bRes;

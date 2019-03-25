@@ -31,6 +31,10 @@ export class Line implements IContextItem, ILine {
 
   }
 
+  Select(shapeSelectResult: ShapeSelectResult): boolean {
+    return false;
+  }
+
   protected moveToSource(context: any) {
     context.moveTo(this.sourceOffset.X, this.sourceOffset.Y);
   }

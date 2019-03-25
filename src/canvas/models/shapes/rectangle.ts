@@ -4,7 +4,7 @@ import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { Point } from './primitives/point';
 import { ShapeSelectResult } from './shapeSelected';
 
-export class Rectangle extends Shape implements IContextItem {
+export class Rectangle extends Shape {
 
   constructor(id: string,
     top: number,
@@ -19,7 +19,6 @@ export class Rectangle extends Shape implements IContextItem {
       height,
       state);
   }
-
 
   DrawShape(context: any): void {
 
@@ -39,9 +38,9 @@ export class Rectangle extends Shape implements IContextItem {
     context.closePath();
   }
 
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
-    return (this.IsPointInShape(shapeSelectResult.point));
-  }
+  //SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+  //  return (this.SelectShape(shapeSelectResult));
+  //}
 }
 
 export class RoundedRectangle extends Shape implements IContextItem {
@@ -69,12 +68,6 @@ export class RoundedRectangle extends Shape implements IContextItem {
     context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
     context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
     context.stroke();
-  }
-
-
-
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
-    return (this.IsPointInShape(shapeSelectResult.point));
   }
 
   Draw(context: any): void {

@@ -56,6 +56,6 @@ export class Ellipse extends Shape implements IContextItem {
 
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
-    return (this.IsPointInShape(shapeSelectResult.point));
+    return (this.Select(shapeSelectResult));
   }
 }

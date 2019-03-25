@@ -1,15 +1,18 @@
 import { IShape } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
 import { Size } from './primitives/size';
-import {  StateIndex } from '../DisplayValues'
+import { StateIndex } from '../DisplayValues'
 import { Port } from './port';
+import { IContextItem } from '../IContextItem';
+import { ShapeSelectResult } from './shapeSelected';
 
-export abstract class Shape implements IShape {
+export abstract class Shape implements IShape, IContextItem {
 
   _center: Point = new Point();
 
   protected _shapes: Shape[] = [];
   protected _ports: Port[] = [];
+  protected _isSelected = false;
 
   constructor(
     private id: string,
@@ -17,10 +20,10 @@ export abstract class Shape implements IShape {
     private left: number,
     private width: number,
     private height: number,
-    protected state: StateIndex ) {
+    protected state: StateIndex) {
 
     this._center.SetToPosition(this.left, this.top);
-    this._center.Offset(this.width / 2, this.height/2);
+    this._center.Offset(this.width / 2, this.height / 2);
   }
 
   get Id(): string { return this.id; }
@@ -34,18 +37,30 @@ export abstract class Shape implements IShape {
 
   get Center(): Point { return this._center; }
 
+  abstract Draw(context: any): void;
   abstract DrawShape(context: any);
 
-  positionOnTick(x:number,y:number) {
+  Select(shapeSelectResult: ShapeSelectResult) {
+    return this.SelectShape(shapeSelectResult);
+  }
+
+  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+    this._isSelected = this.IsPointInShape(shapeSelectResult.point);
+    return this._isSelected;
+  }
+
+  get IsSelected(): boolean { return this._isSelected };
+
+  positionOnTick(x: number, y: number) {
 
     if (x > 0) { this.left = x; }
     if (y > 0) { this.top = y; }
 
   }
 
-  IsPointInShape(point: Point) {
-    return ( this.top < point.Y && this.Bottom > point.Y
-      && this.left < point.X && this.Right > point.X );
+  private IsPointInShape(point: Point) {
+    return (this.top < point.Y && this.Bottom > point.Y
+      && this.left < point.X && this.Right > point.X);
   }
 }
 

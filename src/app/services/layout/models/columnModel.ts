@@ -110,9 +110,9 @@ export class LayoutManager {
     this.patterns.push(pattern);
 
     pattern = new LayoutPattern('dashboardA', [1, 2, 3], [16, 120, 120]);
-    pattern.AddTile([1, 1, 1], [3, 2, 1], 'chart1', 180, 'red');
-    pattern.AddTile([1, 1, 1], [30, 3, 3], 'chart2', 180, 'green');
-    pattern.AddTile([1, 2, 1], [1, 1, 1], 'chart3', 180, 'blue');
+    pattern.AddTile([1, 1, 1], [3, 2, 1], 'chart1', 180, '#f2ccff');
+    pattern.AddTile([1, 1, 1], [2, 2, 2], 'chart2', 180, '#ffffcc');
+    pattern.AddTile([1, 2, 1], [1, 1, 1], 'chart3', 180, '#996666');
     this.patterns.push(pattern);
   }
 

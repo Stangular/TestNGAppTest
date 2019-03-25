@@ -6,6 +6,8 @@ import { StateIndex } from '../DisplayValues'
 import { Point } from '../shapes/primitives/point';
 import { ShapeSelectResult } from '../shapes/shapeSelected';
 
+
+
 export class Path implements IContextItem {
 
   constructor(private id: string,
@@ -28,7 +30,7 @@ export class Path implements IContextItem {
     context.closePath();
   }
 
-  SelectShape(shapeSelectResult: ShapeSelectResult) {
+  Select(shapeSelectResult: ShapeSelectResult) {
     return false;
   }
 }

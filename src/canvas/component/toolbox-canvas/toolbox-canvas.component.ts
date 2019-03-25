@@ -10,54 +10,50 @@ import {
   OnDestroy,
   HostListener
 } from '@angular/core';
-import { ContextSystem, ContextLayer } from '../models/IContextItem';
-import { ExperimentalLayer } from '../models/custom/layers/experimentalLayer';
+import { ContextSystem, ContextLayer } from '../../models/IContextItem';
+import { ExperimentalLayer } from '../../models/custom/layers/experimentalLayer';
 //import { BarLayer } from '../models/custom/layers/charts/content/bars/verticalbars';
-import { DisplayValues } from '../models/DisplayValues';
-import { ChartLayer } from '../models/custom/layers/charts/chart.layer';
-import { Area } from '../models/shapes/primitives/area';
-import { Margin } from '../models/shapes/primitives/margin';
-import { Size } from '../models/shapes/primitives/size';
-import { Point } from '../models/shapes/primitives/point';
-import { ShapeSelectResult } from '../models/shapes/shapeSelected';
+import { DisplayValues } from '../../models/DisplayValues';
+import { ChartLayer } from '../../models/custom/layers/charts/chart.layer';
+import { Area } from '../../models/shapes/primitives/area';
+import { Margin } from '../../models/shapes/primitives/margin';
+import { Size } from '../../models/shapes/primitives/size';
+import { Point } from '../../models/shapes/primitives/point';
+import { ShapeSelectResult } from '../../models/shapes/shapeSelected';
 import { Records } from 'src/dataManagement/model/records';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
-import { CanvasService } from '../canvas.service';
+import { CanvasService } from '../../canvas.service';
 
 export class CanvasContextModel {
   size: Size = new Size();
   data: any;
 
-  constructor() { }
+  constructor() {
+
+  }
 }
 
 @Component({
-  selector: 'app-canvas',
-  templateUrl: './canvas.component.html',
-  styleUrls: ['./canvas.component.css'],
-  host: {
-    '(window:resize)': 'onResize($event)'
-  }
+  selector: 'app-toolbox-canvas',
+  templateUrl: './toolbox-canvas.component.html',
+  styleUrls: ['./toolbox-canvas.component.css']
 })
-export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
+export class ToolboxCanvasComponent implements OnInit {
 
-  editOn: boolean = false;
+  editOn: boolean = true;
   mouseCaptured: boolean = false;
   subscription: Subscription;
   @Input() width: number = 0;
   @Input() height: number = 0;
   @Input() system: ContextSystem;
-  @Input() editSystem: ContextSystem;
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   @Input() id: string = '';
   @Input() source: Records<string>;
-  @ViewChild('thiscanvas') thisComponent: ElementRef;
-  @ViewChild('actCanvas') aaacanvasComponent: ElementRef;
+  @ViewChild('toolbarcanvas') CanvasComponent: ElementRef;
   @Input() canvasID: string = 'testCanvas';
   @Input() margin: Margin;
-  @Output() select: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
-  @Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
+  @Output() toolselect: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
 
   private point: Point = new Point();
 
@@ -71,30 +67,17 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   ngOnInit() { }
 
   get Canvas() {
-    return <HTMLCanvasElement>this.thisComponent.nativeElement;
-  }
-
-  get ActiveCanvas() {
-    if (!this.editOn || !this.aaacanvasComponent) {
-    //  this.editOn = false;
-      return null;
-    }
-    return <HTMLCanvasElement>this.aaacanvasComponent.nativeElement;
+    return <HTMLCanvasElement>this.CanvasComponent.nativeElement;
   }
 
   get Context2D() {
-    return this.Canvas.getContext('2d');
-  }
-
-  get ActiveContext() {
-    return this.ActiveCanvas.getContext('2d');
+    return (
+      this.Canvas.getContext('2d'));
   }
 
   ngAfterContentInit(): void {
     setTimeout(() =>
-      this.ShowActiveLayer()
-      , 10);
-
+      this.ReDraw(), 10);
   }
 
   PositionFromEvent(e: any) {
@@ -111,35 +94,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     this.PositionFromEvent(e);
     this.shapeSelectResult.id = "";
     if (this.system.Select(this.shapeSelectResult)) {
-      this.select.emit(this.shapeSelectResult);
-      this.Edit();
-      this.ReDraw();
-    }
-  }
-
-  OnActiveClick(e: any) {
-    this.editOn = false;
-  }
-
-  Edit() {
-    this.editOn = this.shapeSelectResult.id.length > 0;
-    if (this.editOn) {
-      this.edit.emit(this.shapeSelectResult);
-    }
-    setTimeout(() =>
-      this.ShowActiveLayer()
-      , 10);
-  }
-
-  ShowActiveLayer() {
-    if (this.ActiveCanvas) {
-      this.ActiveCanvas.width = this.width;
-      this.ActiveCanvas.height = this.height;
-      this.Draw();
-      this.DrawActive();
-    }
-    else{
-      this.ReDraw();
+      this.toolselect.emit(this.shapeSelectResult);
     }
   }
 
@@ -171,10 +126,6 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     this.height = h;
     this.Canvas.width = this.width;
     this.Canvas.height = this.height;
-    if (this.ActiveCanvas) {
-      this.ActiveCanvas.width = this.width;
-      this.ActiveCanvas.height = this.height;
-    }
   }
 
   ReDraw() {
@@ -185,15 +136,6 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     //}
     this.Draw();
 
-  }
-
-  DrawActive() {
-    if (!this.editSystem) {
-      this.editSystem = new ContextSystem();  // TODO: have default layer for this state.
-    }
-    let c = this.ActiveContext;
-    c.clearRect(0, 0, this.width, this.height);
-    this.editSystem.Draw(c);
   }
 
   Draw() {

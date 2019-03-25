@@ -58,9 +58,9 @@ export class ChartLayer extends ContextLayer {
 
   }
 
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+  Select(shapeSelectResult: ShapeSelectResult): boolean {
     if (this.contentLayer) {
-      return this.contentLayer.SelectShape(shapeSelectResult);
+      return this.contentLayer.Select(shapeSelectResult);
     }
     return false;
   }

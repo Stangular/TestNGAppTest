@@ -40,6 +40,11 @@ export class D3ModelContainer extends Records<string> {
     return data;
   }
 
+
+  ChartIDFrom(chartNumber: number) {
+
+  }
+
   ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
     return null;
   }

@@ -37,7 +37,7 @@ export abstract class ContentLayer extends ContextLayer {
     super.Draw(context);
   }
 
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
-    return super.SelectShape(shapeSelectResult);
+  Select(shapeSelectResult: ShapeSelectResult): boolean {
+    return super.Select(shapeSelectResult);
   }
 }

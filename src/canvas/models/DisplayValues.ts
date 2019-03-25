@@ -1,6 +1,7 @@
 import { IShape } from './shapes/IShape';
 import { ILine } from './lines/ILine';
 import { Point } from '../models/shapes/primitives/point';
+
 export class NamedValue<T> {
 
   constructor(private valueName: string = '',
@@ -21,7 +22,7 @@ export enum UIStates {
 }
 
 export class StateIndex {
- 
+
 
   constructor(
     private state: string = '',
@@ -30,13 +31,14 @@ export class StateIndex {
   get State() { return this.state; }
   get Index() { return this.index; }
 
-  setState(index: UIStates, value: number) {
+  setState(index: UIStates, value: number): boolean {
+    if (index >= UIStates.stateCount) { return false; }
     this.index[index] = value;
+    return true;
   }
-
 }
 
-export class DisplayValues{
+export class DisplayValues {
 
   private static color: NamedValue<string>[] = [];
   private static weight: NamedValue<number>[] = [];
@@ -83,11 +85,10 @@ export class DisplayValues{
   static GetFontIndex(name: string) {
     return this.fonts.findIndex(p => p.Name == name);
   }
-  
+
 }
 
 export class TheCanvasState {
-  
 
   constructor() {
 
@@ -101,7 +102,10 @@ export class TheCanvasState {
     DisplayValues.SetWeight('exlyrrect1border', 0.3);
     DisplayValues.SetFont('exlyrtext1font', '9px Verdana');
 
-    
+    DisplayValues.SetColor('toolbar.tool.background', '#d3d3d3');
+    DisplayValues.SetColor('default.rect.background', '#aa00aa');
+    DisplayValues.SetColor('default.edit.background', 'yellow');
+
   }
 
 

@@ -18,7 +18,8 @@ export enum ViewType {
   table = 1,
   card = 2,
   graphic = 3,
-  filter = 4
+  filter = 4,
+  design = 5
 }
 
 export enum PagingMode {
@@ -193,6 +194,7 @@ export class FormComponent implements OnInit, AfterContentInit {
     switch (item) {
       case 0: this.viewChange(ViewType.detail); break;
       case 1: this.viewChange(ViewType.table); break;
+      case 3: this.viewChange(ViewType.design); break;
       default: this.viewChange(ViewType.graphic); break;
     }
   }

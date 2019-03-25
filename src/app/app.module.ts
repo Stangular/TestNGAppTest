@@ -24,6 +24,7 @@ import { PopupContentComponent } from './popup/popup-content.component';
 import { LoginComponent } from './login/login.component';
 import { ContentUtilityComponent } from './common/content-utility/content-utility.component';
 import { MessageService } from './messaging/message.service';
+import { ActiveCanvasComponent } from './active-canvas/active-canvas.component';
 
 //import { UserLoginLibModule } from 'user-login-lib';
 @NgModule({
@@ -45,7 +46,7 @@ import { MessageService } from './messaging/message.service';
     , NavMenuComponent
     , PopupContentComponent
     , LoginComponent
-    , ContentUtilityComponent
+    , ContentUtilityComponent, ActiveCanvasComponent
   ],
 
   exports: [
