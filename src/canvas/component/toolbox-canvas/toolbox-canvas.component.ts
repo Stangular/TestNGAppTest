@@ -157,15 +157,15 @@ export class ToolboxCanvasComponent implements OnInit {
     this.ReDraw();
   }
 
-  @HostListener('document:mousedown', ['$event'])
-  onMouseDown(event) {
-    this.OnCapture(event);
-  }
+  //@HostListener('document:mousedown', ['$event'])
+  //onMouseDown(event) {
+  //  this.OnCapture(event);
+  //}
 
-  @HostListener('document:mouseup', ['$event'])
-  onMouseUp(event) {
-    this.OnRelease(event);
-  }
+  //@HostListener('document:mouseup', ['$event'])
+  //onMouseUp(event) {
+  //  this.OnRelease(event);
+  //}
 
   //@HostListener('mousemove', ['$event'])
   //onMousemove(event: MouseEvent) {

@@ -1,6 +1,7 @@
 import { Point } from "./shapes/primitives/point";
 import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult } from "./shapes/shapeSelected";
+import { Shape } from "./shapes/shape";
 
 
 export interface IContextItem {
@@ -107,6 +108,10 @@ export class ContextSystem implements IContextSystem{
   RemoveContent(): IContextItem {
     return this.layers[0].RemoveContent();
   };
+
+  RemoveContentById(id: string) {
+    return this.layers[0].RemoveContentById(id);
+  }
 
   AddLayer(id: string, displayState: string, content: IContextItem[] = []) {
     this.layers.unshift(new ContextLayer(id, displayState, content));

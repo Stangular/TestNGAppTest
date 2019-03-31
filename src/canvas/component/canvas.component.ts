@@ -24,6 +24,7 @@ import { Records } from 'src/dataManagement/model/records';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
 import { CanvasService } from '../canvas.service';
+import { EditModel } from '../models/designer/base.model';
 
 export class CanvasContextModel {
   size: Size = new Size();
@@ -48,7 +49,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   @Input() width: number = 0;
   @Input() height: number = 0;
   @Input() system: ContextSystem;
-  @Input() editSystem: ContextSystem;
+  @Input() editSystem: EditModel;
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   @Input() id: string = '';
   @Input() source: Records<string>;
@@ -76,7 +77,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
 
   get ActiveCanvas() {
     if (!this.editOn || !this.aaacanvasComponent) {
-    //  this.editOn = false;
+      //  this.editOn = false;
       return null;
     }
     return <HTMLCanvasElement>this.aaacanvasComponent.nativeElement;
@@ -107,23 +108,39 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     this.shapeSelectResult.point.SetToPosition(x, y);
   }
 
-  OnClick(e: any) {
+  OnMousedown(e: any) {
     this.PositionFromEvent(e);
     this.shapeSelectResult.id = "";
+
     if (this.system.Select(this.shapeSelectResult)) {
+
       this.select.emit(this.shapeSelectResult);
       this.Edit();
       this.ReDraw();
+      this.mouseCaptured = true;
+
     }
   }
 
   OnActiveClick(e: any) {
-    this.editOn = false;
+    this.PositionFromEvent(e);
+    this.shapeSelectResult.id = "";
+    this.mouseCaptured = true;
+
+    if (!this.editSystem.Select(this.shapeSelectResult)) {
+
+      this.editOn = false;
+      this.edit.emit(this.shapeSelectResult);
+      this.ReDraw();
+      this.mouseCaptured = false;
+      this.OnMousedown(e);
+   }
   }
 
   Edit() {
     this.editOn = this.shapeSelectResult.id.length > 0;
     if (this.editOn) {
+ //     this.editSystem.Select(this.shapeSelectResult);
       this.edit.emit(this.shapeSelectResult);
     }
     setTimeout(() =>
@@ -138,7 +155,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
       this.Draw();
       this.DrawActive();
     }
-    else{
+    else {
       this.ReDraw();
     }
   }
@@ -154,6 +171,8 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   OnMouseMove(e: any) {
     if (this.mouseCaptured) {
       this.PositionFromEvent(e);
+      this.editSystem.MoveItem(this.shapeSelectResult.point);
+      this.DrawActive();
     }
   }
 
@@ -189,7 +208,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
 
   DrawActive() {
     if (!this.editSystem) {
-      this.editSystem = new ContextSystem();  // TODO: have default layer for this state.
+      this.editSystem = new EditModel();  // TODO: have default layer for this state.
     }
     let c = this.ActiveContext;
     c.clearRect(0, 0, this.width, this.height);
@@ -215,15 +234,54 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     this.ReDraw();
   }
 
-  @HostListener('document:mousedown', ['$event'])
-  onMouseDown(event) {
-    this.OnCapture(event);
-  }
+  //@HostListener('document:mousedown', ['$event'])
+  //onMouseDown(e) {
+  //if (!e) {
+  //  return;
+  //}
+  //let posx = 0;
+  //let posy = 0;
+  //let c = this.Canvas;
+  //if (e.pageX) {
+  //  posx = e.pageX;
+  //} else if (e.clientX) {
+  //  posx = e.clientX + document.body.scrollLeft
+  //    + document.documentElement.scrollLeft;
+  //}
+  //posx = posx - c.offsetLeft;
+  //if (e.pageY) {
+  //  posy = e.pageY;
+  //} else if (e.clientY) {
+  //  posy = e.clientY + document.body.scrollTop
+  //    + document.documentElement.scrollTop;
+  //}
+  //posy = posy - c.offsetTop;
+  //this.shapeSelectResult.id = "";
+  //let rect = this.Canvas.getBoundingClientRect();
+  //let x = posx - rect.left;
+  //let y = posy - rect.top;
+  //if ( x >= 0 && y >= 0 ) {
 
-  @HostListener('document:mouseup', ['$event'])
-  onMouseUp(event) {
-    this.OnRelease(event);
-  }
+
+  //  this.point.SetToPosition(x, y);
+  //  this.shapeSelectResult.point.SetToPosition(x, y);
+
+  //  this.shapeSelectResult.id = "";
+  //  if (this.system.Select(this.shapeSelectResult)) {
+  //    this.select.emit(this.shapeSelectResult);
+  //    this.Edit();
+  //    this.ReDraw();
+  //  }
+  //}
+  //  return posy;
+  //  return posx;
+  //this.OnCapture(event);
+  //}
+
+  //@HostListener('document:mouseup', ['$event'])
+  //onMouseUp(event: any) {
+  //  this.OnRelease(event);
+  //}
 
   //@HostListener('mousemove', ['$event'])
   //onMousemove(event: MouseEvent) {

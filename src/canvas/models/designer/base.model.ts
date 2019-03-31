@@ -11,30 +11,139 @@ class Mover {
 
 }
 
-class Sizer {
+class Sizer extends Rectangle {
+  constructor(id: string,
+    private rangeOfMotion: number,
+    private side: number, // 0=toplft,1=top,2=toprgt, 3=rgt, 4=btmrgt, 5=btm, 6=btmlft,7=lft 
+    top: number,
+    left: number,
+    width: number,
+    height: number,
+    state: StateIndex) {
+    super(id, top, left, width, height, state);
+  }
 
+  MoveByXXX(x: number, y: number, side: number) {
+    switch (this.side) {
+      case 0:
+        if (side == 1 || side == 7 || side == 2 || side == 6) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 1:
+        if (side == 0 || side == 2) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 2:
+        if (side == 1 || side == 3 || side == 4) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 3:
+        if (side == 2 || side == 4) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 4:
+        if (side == 2 || side == 3 || side == 5 || side == 6) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 5:
+        if (side == 4 || side == 6) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 6:
+        if (side == 0 || side == 7 || side == 5 || side == 4) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+      case 7:
+        if (side == 0 || side == 6) {
+          this.MoveBySSS(x, y);
+        }
+        break;
+    }
+  }
+
+  MoveBySSS(x: number, y: number) {
+    switch (this.rangeOfMotion) {
+      case 0: super.MoveBy(x, y); break;
+      case 1: super.MoveBy(0, y); break;
+      case 2: super.MoveBy(x, 0); break;
+    }
+  }
+
+  get Side(): number { return this.side; }
 }
 
-export class EditModel extends ContextLayer  {
-  contactPoint: Point = new Point();
-  tooltype: tooltypes = tooltypes.typecount;
+export class EditModel extends ContextLayer {
+  private contactPoint: Point = new Point();
+  private tooltype: tooltypes = tooltypes.typecount;
   // images
+  selectedId: string = "";
+  activeShapeId: string = "";
+  private _sizer: Sizer[] = [];
   private designerpad = new StateIndex('designerpad');
 
   constructor() {
     super('edit', 'default');
-
     let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
     this.designerpad.setState(UIStates.background, bgNdx);
     this.designerpad.setState(UIStates.foreground, 1);
     this.designerpad.setState(UIStates.color, 4);
     this.designerpad.setState(UIStates.weight, 0);
-    this.AddContent(new Rectangle('test111', 100, 100, 200, 200, this.designerpad);
+    // this.AddContent(new Rectangle('test111', 100, 100, 200, 200, this.designerpad));
+    this._sizer.push(new Sizer('sizerTopLeft', 0, 0, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerTop', 1, 1, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerTopRight', 0, 2, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerRight', 2, 3, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerBottomRight', 0, 4, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerBottom', 1, 5, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerBottomLeft', 0, 6, 0, 0, 9, 9, this.designerpad));
+    this._sizer.push(new Sizer('sizerLeft', 2, 7, 0, 0, 9, 9, this.designerpad));
   }
 
   Draw(context: any) {
     // this.toolbar.Draw(context);
     this.Content.forEach(function (item, i) { item.Draw(context); });
+  }
+
+  MoveItem(newPosition: Point) {
+    let self = this;
+    let dx = newPosition.X - this.contactPoint.X;
+    let dy = newPosition.Y - this.contactPoint.Y;
+    console.info("dx:" + dx + " dy:" + dy)
+    let sid = this._sizer.findIndex(s => s.Id == this.selectedId);
+    if (sid >= 0) {
+      this._sizer[sid].MoveBySSS(dx, dy);
+
+      let shape = this.Content.find(c => c.Id == this.activeShapeId) as Shape;
+      if (shape) {
+        this._sizer.forEach(function (s, i) {
+          s.MoveByXXX(dx, dy, self._sizer[sid].Side);
+        });
+        shape.SizeBy(
+          this._sizer[1].Center.Y,
+          this._sizer[3].Center.X,
+          this._sizer[5].Center.Y,
+          this._sizer[7].Center.X);
+
+        this.ResetSizer(shape);
+      }
+    }
+    else {
+      this.Content.forEach(function (s, i) {
+        (<Shape>s).MoveBy(dx, dy);
+      });
+    }
+
+    this.contactPoint.SetToPosition(
+      newPosition.X,
+      newPosition.Y
+    );
   }
 
   Select(shapeSelectResult: ShapeSelectResult): boolean {
@@ -43,16 +152,26 @@ export class EditModel extends ContextLayer  {
     shapeSelectResult.type = '';
 
     // let tooltype = this.toolbar.SelectTool(shapeSelectResult);
-    if (super.Select(shapeSelectResult)){
-      let shape = this.Content.find(c => (c as Shape).IsSelected);
+
+    if (super.Select(shapeSelectResult)) {
+      let shape = this._sizer.find(s => s.SelectShape(shapeSelectResult)) as Shape;
+      if (!shape) {
+        shape = this.Content.find(c => (c as Shape).IsSelected) as Shape;
+        if (shape) {
+          this.activeShapeId = shape.Id;
+          this.ResetSizer(shape);
+        }
+      }
       if (shape) {
+        this.selectedId = shape.Id;
         shapeSelectResult.id = shape.Id;
         shapeSelectResult.type = 'shape';
+        this.contactPoint.SetToPosition(
+          shapeSelectResult.point.X,
+          shapeSelectResult.point.Y);
       }
-      //   this.content.findIndex()
       return true;
     }
- //   return this.AddNewItem(this.tooltype, shapeSelectResult.point);
     return false;
   }
 
@@ -64,12 +183,37 @@ export class EditModel extends ContextLayer  {
 
   }
 
+  ResetSizer(shape: Shape) {
+    let xhalf = shape.Left + shape.Width / 2;
+    let yhalf = shape.Top + shape.Height / 2;
+
+    this._sizer[0].CenterOn(shape.Left, shape.Top);
+    this._sizer[1].CenterOn(xhalf, shape.Top);
+    this._sizer[2].CenterOn(shape.Right, shape.Top);
+    this._sizer[3].CenterOn(shape.Right, yhalf);
+    this._sizer[4].CenterOn(shape.Right, shape.Bottom);
+    this._sizer[5].CenterOn(xhalf, shape.Bottom);
+    this._sizer[6].CenterOn(shape.Left, shape.Bottom);
+    this._sizer[7].CenterOn(shape.Left, yhalf);
+
+  }
+
   AddEditItem(shape: Shape, point: Point) {
 
-   // this.Content.length = 0;
+    this.Content.length = 0;
     if (shape) {
       this.contactPoint.SetToPosition(point.X, point.Y);
       this.AddContent(shape);
+
+      let self = this;
+
+      this.ResetSizer(shape);
+      this._sizer.forEach(function (r, i) {
+        self.AddContent(r);
+      });
+      this.selectedId = shape.Id;
+      this.activeShapeId = shape.Id;
+      this.MoveItem(point);
       return true;
     }
     return false;
@@ -171,11 +315,11 @@ export class Toolbar extends ContextLayer {
 
     // this.AddNewItem(tooltype, shapeSelectResult.point);
 
-   
+
   }
   SelectTool(shapeSelectResult: ShapeSelectResult) {
 
-     let tooltypeSelected: tooltypes = tooltypes.typecount;
+    let tooltypeSelected: tooltypes = tooltypes.typecount;
     if (super.Select(shapeSelectResult)) {
       let tool = this.Content.find(c => (c as ToolBarTool).IsSelected);
       if (tool && (<ToolBarTool>tool).ToolType < tooltypes.typecount) {
@@ -228,7 +372,7 @@ export class BaseDesignerModel extends ContextLayer {
 
   constructor() {
     super('designer', 'default');
- 
+
     let bgNdx = DisplayValues.GetColorIndex('default.rect.background');
     this.designerpad.setState(UIStates.background, bgNdx);
     this.designerpad.setState(UIStates.foreground, 1);
@@ -237,7 +381,7 @@ export class BaseDesignerModel extends ContextLayer {
   }
 
   Draw(context: any) {
-   // this.toolbar.Draw(context);
+    // this.toolbar.Draw(context);
     this.Content.forEach(function (item, i) { item.Draw(context); });
   }
 
@@ -247,24 +391,24 @@ export class BaseDesignerModel extends ContextLayer {
     shapeSelectResult.type = '';
 
     // let tooltype = this.toolbar.SelectTool(shapeSelectResult);
-    if (super.Select(shapeSelectResult)){
+    if (super.Select(shapeSelectResult)) {
       let shape = this.Content.find(c => (c as Shape).IsSelected);
       if (shape) {
         shapeSelectResult.id = shape.Id;
         shapeSelectResult.type = 'shape';
       }
-   //   this.content.findIndex()
+      //   this.content.findIndex()
       return true;
     }
     return this.AddNewItem(this.tooltype, shapeSelectResult.point);
-   
+
   }
 
   SetTool(tool: tooltypes) {
     this.tooltype = tool;
   }
 
-  Edit(itemId:string) {
+  Edit(itemId: string) {
 
   }
 
@@ -283,10 +427,10 @@ export class BaseDesignerModel extends ContextLayer {
   AddNewItem(tooltype: tooltypes, point: Point) {
 
     let shape: IContextItem = null;
-
+    let cnt = this.Content.length;
     switch (tooltype) {
       case tooltypes.rectangle:
-        shape = new Rectangle('sssx', point.Y, point.X, 30, 30, this.designerpad);
+        shape = new Rectangle('sssx_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
         break;
       case tooltypes.ellipse: break;
       case tooltypes.lineStraight: break;

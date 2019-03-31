@@ -36,7 +36,7 @@ export abstract class Shape implements IShape, IContextItem {
   get Height(): number { return this.height; }
 
   get Center(): Point { return this._center; }
-
+  
   abstract Draw(context: any): void;
   abstract DrawShape(context: any);
 
@@ -49,7 +49,30 @@ export abstract class Shape implements IShape, IContextItem {
     return this._isSelected;
   }
 
+  MoveBy(x: number, y: number) {
+    this.top += y;
+    this.left += x;
+    this._center.SetToPosition(this.left, this.top);
+    this._center.Offset(this.width / 2, this.height / 2);
+  }
+
+  SizeBy(top: number, right: number, bottom: number, left: number) {
+    this.top = top;
+    this.left = left;
+    
+    this.width = right - this.left;
+    this.height = bottom - this.top;
+    this._center.SetToPosition(this.left, this.top);
+    this._center.Offset(this.width / 2, this.height / 2);
+
+  }
+
   get IsSelected(): boolean { return this._isSelected };
+
+  CenterOn(x: number, y: number) {
+    this.top = y - (this.height / 2);
+    this.left = x - (this.width / 2);
+  }
 
   positionOnTick(x: number, y: number) {
 

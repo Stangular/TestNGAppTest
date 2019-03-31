@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BaseDesignerModel, Toolbar, EditModel } from '../base.model';
 import { StateIndex, UIStates, DisplayValues } from '../../DisplayValues';
 import { ShapeSelectResult } from '../../shapes/shapeSelected';
+import { Shape } from '../../shapes/shape';
 
 @Component({
   selector: 'app-designer-page',
@@ -11,6 +12,7 @@ import { ShapeSelectResult } from '../../shapes/shapeSelected';
 export class DesignerPageComponent implements OnInit {
 
   id: string = 'designer';
+  selectedId: string = '';
   private designer: BaseDesignerModel;
   private toolbar: Toolbar;
   private editor : EditModel;
@@ -31,11 +33,18 @@ export class DesignerPageComponent implements OnInit {
   ngOnInit() {}
 
   onSelect(item: any) { }
-
-  ItemSelected(e: ShapeSelectResult) {
-    let s = this.designer.RemoveShapeForEdit(e.id);
-    this.editor.AddEditItem(s, e.point);
-   // this.designer.SetTool(e.type);
+  
+    ItemSelected(e: ShapeSelectResult) {
+    if (this.selectedId.length > 0) {
+      let s = this.editor.RemoveContentById(this.selectedId);
+      this.designer.AddContent(s);
+      this.selectedId = '';
+    }
+    else {
+      let s = this.designer.RemoveContentById(e.id);
+      this.selectedId = e.id;
+      this.editor.AddEditItem(s as Shape, e.point);
+    }
   }
 
   SelectTool(e: ShapeSelectResult) {
