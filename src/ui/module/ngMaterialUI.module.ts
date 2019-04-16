@@ -20,6 +20,10 @@ import {
   , MatSnackBarModule
   , MatProgressSpinnerModule
   , MatPaginatorModule
+  , MatSliderModule
+  , MatSlideToggleModule
+  , MatRadioModule
+  , MatAutocompleteModule
 } from '@angular/material';
 
 @NgModule({
@@ -44,6 +48,10 @@ import {
     , MatSnackBarModule
     , MatProgressSpinnerModule
     , MatPaginatorModule
+    , MatSliderModule
+    , MatSlideToggleModule
+    , MatRadioModule
+    , MatAutocompleteModule
   ],
 
   declarations: [],
@@ -65,6 +73,10 @@ import {
     , MatSnackBarModule
     , MatProgressSpinnerModule
     , MatPaginatorModule
+    , MatSliderModule
+    , MatSlideToggleModule
+    , MatRadioModule
+    , MatAutocompleteModule
   ],
 
   providers: []

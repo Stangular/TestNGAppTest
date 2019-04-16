@@ -3,9 +3,11 @@ import { Point } from "../shapes/primitives/point";
 import { StateIndex, UIStates, DisplayValues } from "../DisplayValues";
 import { Rectangle } from "../shapes/rectangle";
 import { Shape } from "../shapes/shape";
-import { Text } from "../shapes/content/text/text";
+import { Text, TextCenter } from "../shapes/content/text/text";
 import { ContextLayer, IContextItem } from "../IContextItem";
 import { ShapeSelectResult } from "../shapes/shapeSelected";
+import { ContentImage } from "../shapes/content/image/image";
+import { Ellipse } from "../shapes/ellipse";
 
 class Mover {
 
@@ -111,11 +113,14 @@ export class EditModel extends ContextLayer {
     this.Content.forEach(function (item, i) { item.Draw(context); });
   }
 
+  get ActiveShapeId() {
+    return this.activeShapeId;
+  }
+
   MoveItem(newPosition: Point) {
     let self = this;
     let dx = newPosition.X - this.contactPoint.X;
     let dy = newPosition.Y - this.contactPoint.Y;
-    console.info("dx:" + dx + " dy:" + dy)
     let sid = this._sizer.findIndex(s => s.Id == this.selectedId);
     if (sid >= 0) {
       this._sizer[sid].MoveBySSS(dx, dy);
@@ -150,8 +155,6 @@ export class EditModel extends ContextLayer {
 
     shapeSelectResult.id = '';
     shapeSelectResult.type = '';
-
-    // let tooltype = this.toolbar.SelectTool(shapeSelectResult);
 
     if (super.Select(shapeSelectResult)) {
       let shape = this._sizer.find(s => s.SelectShape(shapeSelectResult)) as Shape;
@@ -220,7 +223,7 @@ export class EditModel extends ContextLayer {
   }
 }
 
-enum tooltypes {
+export enum tooltypes {
   rectangle = 0,
   ellipse = 1,
   lineStraight = 2,
@@ -229,23 +232,35 @@ enum tooltypes {
   typecount = 5
 }
 
-class ToolBarTool extends Rectangle {
+class ToolBarTool extends ContentImage {
+  private toolState = new StateIndex('toolbartool');
 
   private selected: boolean = false;
-
   constructor(private type: tooltypes,
     id: string,
     top: number,
     left: number,
     width: number,
     height: number,
-    state: StateIndex) {
+    state: StateIndex,
+    text: string,
+    angle: number = 0) {
     super(id,
       top,
       left,
       width,
       height,
-      state);
+      state,
+      text,
+      angle);
+
+    let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background');
+    this.toolState.setState(UIStates.background, bgNdx);
+    this.toolState.setState(UIStates.foreground, 1);
+    this.toolState.setState(UIStates.color, 4);
+    this.toolState.setState(UIStates.weight, 0);
+
+    // this.SetContainerState(this.toolState);
   }
 
   get IsSelected() {
@@ -257,7 +272,22 @@ class ToolBarTool extends Rectangle {
   }
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+
+    let wasSelected = this.selected;
     this.selected = super.SelectShape(shapeSelectResult);
+    if (this.selected) {
+      if (!wasSelected) {
+        let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background_selected');
+        this.toolState.setState(UIStates.background, bgNdx);
+      }
+      else {
+        this.selected = false;
+      }
+    }
+    if (!this.selected) {
+      let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background');
+      this.toolState.setState(UIStates.background, bgNdx);
+    }
 
     return this.selected;
   }
@@ -292,6 +322,8 @@ export class Toolbar extends ContextLayer {
     this.designState.setState(UIStates.background, bgNdx);
     this.designState.setState(UIStates.foreground, 1);
     this.designState.setState(UIStates.color, 4);
+    let fontNdx = DisplayValues.GetFontIndex('toolbarfont');
+    this.designState.setState(UIStates.fontFace, fontNdx);
     this.designState.setState(UIStates.weight, 0);
     this.Build();
   }
@@ -309,33 +341,32 @@ export class Toolbar extends ContextLayer {
 
   Select(shapeSelectResult: ShapeSelectResult): boolean {
 
+    let previousTool = this.selectedTool;
     this.SelectTool(shapeSelectResult);
     shapeSelectResult.type = this.selectedTool;
-    return this.selectedTool < tooltypes.typecount;
+    return this.selectedTool != previousTool;
 
     // this.AddNewItem(tooltype, shapeSelectResult.point);
 
 
   }
+
+  get SelectedToolType() {
+    let tool = this.Content.find(c => (c as ToolBarTool).IsSelected);
+    if (!tool) { return tooltypes.typecount; }
+    return (<ToolBarTool>tool).ToolType;
+  }
+
   SelectTool(shapeSelectResult: ShapeSelectResult) {
 
-    let tooltypeSelected: tooltypes = tooltypes.typecount;
+    let newtooltype = this.selectedTool;
+    this.selectedTool = tooltypes.typecount;
     if (super.Select(shapeSelectResult)) {
-      let tool = this.Content.find(c => (c as ToolBarTool).IsSelected);
-      if (tool && (<ToolBarTool>tool).ToolType < tooltypes.typecount) {
-        this.selectedTool = (<ToolBarTool>tool).ToolType;
+      newtooltype = this.SelectedToolType;
+      if (newtooltype != this.selectedTool) {
+        this.selectedTool = newtooltype;
       }
-      //this.Content.forEach(function (c, i) {
-      //  let tool: ToolBarTool = c as ToolBarTool;
-      //  if (tool.IsSelected) {
-      //    tooltypeSelected = tool.ToolType;
-      //  }
-      //});
     }
-    //let tool = this.Content.find(c => (c as ToolBarTool).IsSelected);
-    //if (tool && (<ToolBarTool>tool).ToolType < tooltypes.typecount) {
-    //  this.selectedTool = (<ToolBarTool>tool).ToolType;
-    //}
     return this.selectedTool;
   }
 
@@ -345,19 +376,29 @@ export class Toolbar extends ContextLayer {
 
   BuildTools(
     size: number = 45,
-    w: number = 40,
-    h: number = 40,
+    w: number = 30,
+    h: number = 30,
     t: number = 10,
     l: number = 10) {
 
-    for (let i = 0; i < tooltypes.typecount; i++) {
-      //   this.tools
-      this.AddContent(
-        new ToolBarTool(i,
-          'tool_' + i.toString(),
-          t, l, w, h, this.designState));
-      t += w + 10;
-    }
+    //
+    //   this.tools
+    this.AddContent(
+      new ToolBarTool(0,
+        'tool_rect',
+        t, l, w, h, this.designState, '/images/myRectangle.png', 0));
+    l += h + 10;
+    this.AddContent(
+      new ToolBarTool(1,
+        'tool_ellipse',
+        t, l, w, h, this.designState, '/images/myEllipse.png', 0));
+    //t += w + 10;
+    //this.AddContent(
+    //  new ToolBarTool(2,
+    //    'tool_line',
+    //    t, l, w, h,this.designState,'C', 0));
+    //t += w + 10;
+    //  }
   }
 }
 
@@ -381,7 +422,6 @@ export class BaseDesignerModel extends ContextLayer {
   }
 
   Draw(context: any) {
-    // this.toolbar.Draw(context);
     this.Content.forEach(function (item, i) { item.Draw(context); });
   }
 
@@ -390,14 +430,12 @@ export class BaseDesignerModel extends ContextLayer {
     shapeSelectResult.id = '';
     shapeSelectResult.type = '';
 
-    // let tooltype = this.toolbar.SelectTool(shapeSelectResult);
     if (super.Select(shapeSelectResult)) {
       let shape = this.Content.find(c => (c as Shape).IsSelected);
       if (shape) {
         shapeSelectResult.id = shape.Id;
         shapeSelectResult.type = 'shape';
       }
-      //   this.content.findIndex()
       return true;
     }
     return this.AddNewItem(this.tooltype, shapeSelectResult.point);
@@ -412,6 +450,21 @@ export class BaseDesignerModel extends ContextLayer {
 
   }
 
+  RemoveShape(id: String) {
+    let ndx = this.Content.findIndex(c => c.Id == id);
+    if (ndx < 0) { return false; }
+    this.Content.splice(ndx, 1);
+    return true;
+  }
+
+  CopyShape(id: string) {
+    let ndx = this.Content.findIndex(c => c.Id == id);
+    if (ndx < 0) { return false; }
+    let shape: Shape = null;
+    shape = this.Content[ndx] as Shape;
+    this.AddContent(shape.CopyShape(id) as IContextItem);
+    return true;
+  }
 
   RemoveShapeForEdit(id: String) {
     let shape: Shape = null;
@@ -430,12 +483,14 @@ export class BaseDesignerModel extends ContextLayer {
     let cnt = this.Content.length;
     switch (tooltype) {
       case tooltypes.rectangle:
-        shape = new Rectangle('sssx_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
+        shape = new Rectangle('rect_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
         break;
-      case tooltypes.ellipse: break;
-      case tooltypes.lineStraight: break;
-      case tooltypes.lineGradient: break;
-      case tooltypes.lineBezier: break;
+      case tooltypes.ellipse:
+        shape = new Ellipse('ellipse_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
+        break;
+      //case tooltypes.lineStraight: break;
+      //case tooltypes.lineGradient: break;
+      //case tooltypes.lineBezier: break;
     }
     if (shape) {
       this.AddContent(shape);

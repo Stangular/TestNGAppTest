@@ -31,6 +31,7 @@
     "fontawesome": "^4.7.2",
     "moment": "^2.22.2",
     "ng4-loading-spinner": "^1.2.3",
+    "ngx-color-picker": "^7.5.0",
     "ol": "^5.1.3",
     "rxjs": "^6.0.0",
     "zone.js": "~0.8.26"

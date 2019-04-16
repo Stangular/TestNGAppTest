@@ -17,9 +17,7 @@ import '../styles/styles.scss';
 import '../styles/headings.css';
 import { TokenService } from './user/token/token.service';
 import { UserService } from './user/service/app-user.service';
-
 import { LayoutService } from './services/layout/layout-service.service';
-
 import { PopupContentComponent } from './popup/popup-content.component';
 import { LoginComponent } from './login/login.component';
 import { ContentUtilityComponent } from './common/content-utility/content-utility.component';
@@ -46,7 +44,8 @@ import { ActiveCanvasComponent } from './active-canvas/active-canvas.component';
     , NavMenuComponent
     , PopupContentComponent
     , LoginComponent
-    , ContentUtilityComponent, ActiveCanvasComponent
+    , ContentUtilityComponent
+    , ActiveCanvasComponent
   ],
 
   exports: [

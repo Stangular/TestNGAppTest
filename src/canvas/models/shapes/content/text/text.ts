@@ -65,6 +65,11 @@ export class Text extends Shape implements IContextItem {
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
     return (this.Select(shapeSelectResult));
   }
+
+  CopyShape(newID: string): Shape {
+
+    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+  }
 }
 
 export class TextCenter extends Text {
@@ -91,6 +96,11 @@ export class TextCenter extends Text {
     context.textAlign = 'center';
     context.fillText(this.text, this.Width/2, this.Height);
   }
+
+  CopyShape(newID: string): Shape {
+
+    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+  }
 }
 
 export class TextRight extends Text {
@@ -116,5 +126,14 @@ export class TextRight extends Text {
   align(context: any) {
     context.textAlign = 'right';
     context.fillText(this.text, this.Width, this.Height);
+  }
+
+  CopyShape(newID: string): Shape {
+
+    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+  }
+
+  CopyItem(newID: string) {
+    return this.CopyShape(newID);
   }
 }

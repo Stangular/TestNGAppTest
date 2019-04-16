@@ -23,8 +23,9 @@ import { ShapeSelectResult } from '../models/shapes/shapeSelected';
 import { Records } from 'src/dataManagement/model/records';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
-import { CanvasService } from '../canvas.service';
 import { EditModel } from '../models/designer/base.model';
+import { CanvasService } from '../service/canvas.service';
+
 
 export class CanvasContextModel {
   size: Size = new Size();
@@ -50,7 +51,6 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   @Input() height: number = 0;
   @Input() system: ContextSystem;
   @Input() editSystem: EditModel;
-  shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   @Input() id: string = '';
   @Input() source: Records<string>;
   @ViewChild('thiscanvas') thisComponent: ElementRef;
@@ -103,50 +103,62 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
 
-    console.log("x: " + x + " y: " + y);
     this.point.SetToPosition(x, y);
-    this.shapeSelectResult.point.SetToPosition(x, y);
+    this.canvasService.shapeSelectResult.point.SetToPosition(x, y);
   }
 
   OnMousedown(e: any) {
     this.PositionFromEvent(e);
-    this.shapeSelectResult.id = "";
+    this.canvasService.shapeSelectResult.id = "";
 
-    if (this.system.Select(this.shapeSelectResult)) {
+    if (this.system.Select(this.canvasService.shapeSelectResult)) {
 
-      this.select.emit(this.shapeSelectResult);
+      this.select.emit(this.canvasService.shapeSelectResult);
       this.Edit();
       this.ReDraw();
       this.mouseCaptured = true;
-
     }
+  }
+
+  CopySelectedContent() {
+    let itemId = this.canvasService.shapeSelectResult.id;
+    this.system.CopyItem(itemId);
+  }
+
+  RemoveSelectedContent() {
+    this.system.RemoveContentById(this.canvasService.shapeSelectResult.id);
+    this.canvasService.shapeSelectResult.id = "";
+    this.Edit();
+    this.ReDraw();
+    this.mouseCaptured = false;
+
   }
 
   OnActiveClick(e: any) {
     this.PositionFromEvent(e);
-    this.shapeSelectResult.id = "";
+    this.canvasService.shapeSelectResult.id = "";
     this.mouseCaptured = true;
 
-    if (!this.editSystem.Select(this.shapeSelectResult)) {
+    if (!this.editSystem.Select(this.canvasService.shapeSelectResult)) {
 
       this.editOn = false;
-      this.edit.emit(this.shapeSelectResult);
+      this.edit.emit(this.canvasService.shapeSelectResult);
       this.ReDraw();
       this.mouseCaptured = false;
       this.OnMousedown(e);
-   }
+    }
   }
 
   Edit() {
-    this.editOn = this.shapeSelectResult.id.length > 0;
+    this.editOn = this.canvasService.shapeSelectResult.id.length > 0;
     if (this.editOn) {
- //     this.editSystem.Select(this.shapeSelectResult);
-      this.edit.emit(this.shapeSelectResult);
+      this.edit.emit(this.canvasService.shapeSelectResult);
     }
     setTimeout(() =>
       this.ShowActiveLayer()
       , 10);
   }
+
 
   ShowActiveLayer() {
     if (this.ActiveCanvas) {
@@ -171,7 +183,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   OnMouseMove(e: any) {
     if (this.mouseCaptured) {
       this.PositionFromEvent(e);
-      this.editSystem.MoveItem(this.shapeSelectResult.point);
+      this.editSystem.MoveItem(this.canvasService.shapeSelectResult.point);
       this.DrawActive();
     }
   }

@@ -94,17 +94,20 @@ export class TheCanvasState {
 
     DisplayValues.Clear();
     DisplayValues.SetColor('exlyrrect1bg', 'red');
-    DisplayValues.SetColor('exlyrrect1border', 'pink');
+    DisplayValues.SetColor('exlyrrect1border', 'black');
     DisplayValues.SetColor('exlyrrect2bg', 'blue');
     DisplayValues.SetColor('exlyrtext1bg', 'black');
     DisplayValues.SetColor('exlyrtext1color', '#a0120c');
-    DisplayValues.SetColor('transparent', 'transparent');
-    DisplayValues.SetWeight('exlyrrect1border', 0.3);
-    DisplayValues.SetFont('exlyrtext1font', '9px Verdana');
+    DisplayValues.SetColor('transparent', 'red');
+    DisplayValues.SetWeight('exlyrrect1border', 1.0);
+    DisplayValues.SetFont('exlyrtext1font', '9px FontAwesome');
 
     DisplayValues.SetColor('toolbar.tool.background', '#d3d3d3');
+    DisplayValues.SetColor('toolbar.tool.background_selected', '#708090');
+
     DisplayValues.SetColor('default.rect.background', '#aa00aa');
     DisplayValues.SetColor('default.edit.background', 'yellow');
+    DisplayValues.SetFont('toolbarfont', '14px FontAwesome');
 
   }
 

@@ -18,6 +18,7 @@ import { faCoffee, faFilter, faChevronDown, faSort, } from '@fortawesome/free-so
 import { SaveFormSuccessSnackComponent } from '../snacks/success/save/form/save-form-success-snack.component'
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { SelectListComponent } from '../select/form-list-select.component';
+import { CanvasShapePropertyDialogComponent } from './form/dialogs/canvas-shape-property-dialog/canvas-shape-property-dialog.component';
 
 library.add(
   faCoffee
@@ -47,6 +48,7 @@ library.add(
     , SaveFormSuccessSnackComponent
     , SelectListComponent
     , AcknowlegeDeleteDialog
+    , CanvasShapePropertyDialogComponent
   ],
   exports: [
     DetailViewComponent
@@ -55,7 +57,8 @@ library.add(
     , FormComponent
     , FormFilteringComponent
     , SaveFormSuccessSnackComponent
-    , AcknowlegeDeleteDialog],
+    , AcknowlegeDeleteDialog
+    , CanvasShapePropertyDialogComponent],
   entryComponents: [
     AcknowlegeDeleteDialog
     , FormFilteringComponent],

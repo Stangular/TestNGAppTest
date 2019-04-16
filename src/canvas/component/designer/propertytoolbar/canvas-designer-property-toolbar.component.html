@@ -1,0 +1,143 @@
+<form class="example-form">
+  <div class="toolbar-container">
+    <mat-grid-list cols="32" rowHeight="40px">
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <button mat-button [class]="selectedTypeClass" [matMenuTriggerFor]="objectType"></button>
+        <mat-menu #objectType="matMenu" overlapTrigger="false">
+          <div id="rectType" mat-button class="designer_rect_image" (click)="SelectObject($event)"></div>
+          <div id="ellipseType" mat-button class="designer_ellipse_image" (click)="SelectObject($event)"></div>
+          <div id="portType" mat-button class="designer_port_image" (click)="SelectObject($event)"></div>
+          <div id="lineType" mat-button class="designer_line_image" (click)="SelectObject($event)"></div>
+          <div id="gradientType" mat-button class="designer_gradient_line_image" (click)="SelectObject($event)"></div>
+          <div id="bezierType" mat-button class="designer_bezier_line_image" (click)="SelectObject($event)"></div>
+        </mat-menu>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <div mat-button class="designer_copy_image" (click)="CopyObject($event)"></div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <div mat-button class="designer_delete_image" (click)="DeleteObject($event)"></div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
+        <mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">
+          <input matInput
+                 placeholder="Class"
+                 aria-label="State"
+                 [matAutocomplete]="shapeClass"
+                 [formControl]="shapeClassControl">
+          <mat-autocomplete #shapeClass="matAutocomplete">
+            <mat-option *ngFor="let class of filteredshapeClassList  | async"
+                        [value]="class">{{class}}</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
+        <button mat-button [matMenuTriggerFor]="line">Lines</button>
+    <mat-menu #line="matMenu" overlapTrigger="false">
+      <mat-form-field class="shapeClassInput"
+                      [floatLabel]="'never'">
+        <input matInput
+               placeholder="State"
+               aria-label="State"
+               [matAutocomplete]="stateName"
+               [formControl]="stateControl">
+        <mat-autocomplete #stateName="matAutocomplete">
+          <mat-option *ngFor="let state of filteredStateList  | async"
+                      [value]="state">{{line}}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </mat-menu>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" >
+  
+        <mat-form-field [floatLabel]="'never'">
+          <div style="width:40px; background-color:transparent; padding-left:135px; text-align:right">
+            <input type="number" class="widthInput" min="1" max="10" matInput placeholder="1" [formControl]="widthControl">
+          </div>
+        </mat-form-field>
+        <!--<mat-form-field class="shapeClassInput"
+                  [floatLabel]="'never'">
+    <input matInput
+           placeholder="Port"
+           aria-label="State"
+           [matAutocomplete]="portName"
+           [formControl]="portControl">
+    <mat-autocomplete #portName="matAutocomplete">
+      <mat-option *ngFor="let port of filteredPortList  | async"
+                  [value]="port">{{port}}</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>-->
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <button mat-button [matMenuTriggerFor]="color">Color</button>
+        <mat-menu #color="matMenu" overlapTrigger="false">
+          <span [style.background]="arrayColors[currentColor]"
+                [cpToggle]="true" [cpDialogDisplay]="'inline'"
+                [cpCancelButton]="true"
+                [cpCancelButtonClass]="'btn btn-primary btn-xs'"
+                [(colorPicker)]="arrayColors[currentColor]"></span>
+          <input [style.background]="arrayColors[currentColor]"
+                 value="Select Here"
+                 name="shapeColor"
+                 style="width:100%; text-align:center">
+        </mat-menu>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
+          <button mat-button [matMenuTriggerFor]="area">Area Options</button>
+          <mat-menu #area="matMenu" overlapTrigger="false">
+            <div class="toolbar-options-menu-group">
+              <div>
+                <mat-slide-toggle [disabled]="constantArea" name="constantArea" [(ngModel)]="lockedRatio">Locked Ratio</mat-slide-toggle>
+              </div>
+              <div>
+                <mat-slide-toggle [disabled]="lockedRatio" name="lockRatio" [(ngModel)]="constantArea">Constant Area</mat-slide-toggle>
+              </div>
+            </div>
+          </mat-menu>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
+          <button mat-button [matMenuTriggerFor]="motion">Motion Range</button>
+          <mat-menu #motion="matMenu" overlapTrigger="false">
+            <mat-radio-group name="freedomOfMotion" [(ngModel)]="freedomOfMotion" class="toolbar-radio-group">
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="freedomOfMotion==fom.full"
+                                [value]="fom.full">Full</mat-radio-button>
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="freedomOfMotion==fom.horizontal"
+                                [value]="fom.horizontal">Horizontal</mat-radio-button>
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="freedomOfMotion==fom.vertical"
+                                [value]="fom.vertical">Vertical</mat-radio-button>
+            </mat-radio-group>
+          </mat-menu>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
+          <button mat-button [matMenuTriggerFor]="sizing">Sizing</button>
+          <mat-menu #sizing="matMenu" class="toolbar-menu" overlapTrigger="false" role="menuitemradio">
+            <mat-radio-group name="freedomOfSizing" [(ngModel)]="freedomOfSizing" class="toolbar-radio-group">
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="freedomOfSizing==fom.full"
+                                [value]="fom.full">Full</mat-radio-button>
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="freedomOfSizing==fom.horizontal"
+                                [value]="fom.horizontal">Horizontal</mat-radio-button>
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="freedomOfSizing==fom.vertical"
+                                [value]="fom.vertical">Vertical</mat-radio-button>
+            </mat-radio-group>
+          </mat-menu>
+        </div>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </div>
+
+</form>
+

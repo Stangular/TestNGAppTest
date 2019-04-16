@@ -6,9 +6,35 @@ import { Port } from './port';
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 
+export enum FreedomOfMotion {
+  full = 0,
+  horizontal = 1,
+  vertical = 2
+}
+
+export enum OffsetStyle {
+  constane = 0,   // Does not change position as parent shape is resized
+  absolute = 1,   // Remains at defined position from nearest corner.
+  constantPercent = 2 // Remains at the same percentage offset form top/left.
+}
+export class ContainedShape {
+  _shape: Shape;
+  _offset: Point;
+  _offsetStyle: OffsetStyle;
+
+}
+
+export class ShapeProperties {
+  _lockedRatio: boolean = false;
+  _constantArea: boolean = false;
+  _freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
+  _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
+}
+
 export abstract class Shape implements IShape, IContextItem {
 
   _center: Point = new Point();
+  properties: ShapeProperties;
 
   protected _shapes: Shape[] = [];
   protected _ports: Port[] = [];
@@ -20,7 +46,7 @@ export abstract class Shape implements IShape, IContextItem {
     private left: number,
     private width: number,
     private height: number,
-    protected state: StateIndex) {
+    protected state: StateIndex = null) {
 
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
@@ -39,6 +65,8 @@ export abstract class Shape implements IShape, IContextItem {
   
   abstract Draw(context: any): void;
   abstract DrawShape(context: any);
+  abstract CopyShape(newID: string): Shape;
+  abstract CopyItem(newID: string): IContextItem;
 
   Select(shapeSelectResult: ShapeSelectResult) {
     return this.SelectShape(shapeSelectResult);
@@ -79,6 +107,10 @@ export abstract class Shape implements IShape, IContextItem {
     if (x > 0) { this.left = x; }
     if (y > 0) { this.top = y; }
 
+  }
+
+  public SetState(state: StateIndex) {
+    this.state = state;
   }
 
   private IsPointInShape(point: Point) {

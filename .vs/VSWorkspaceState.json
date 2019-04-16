@@ -2,15 +2,24 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\dataManagement",
-    "\\src\\dataManagement\\model",
-    "\\src\\dataManagement\\model\\definitions",
+    "\\src\\app\\newcomponent",
+    "\\src\\canvas\\models",
+    "\\src\\canvas\\models\\custom",
+    "\\src\\canvas\\models\\custom\\shapes",
+    "\\src\\canvas\\models\\designer",
+    "\\src\\canvas\\models\\designer\\propertyDialog",
     "\\src\\ui",
     "\\src\\ui\\components",
-    "\\src\\ui\\components\\edit",
     "\\src\\ui\\components\\views",
-    "\\src\\ui\\components\\views\\detail"
+    "\\src\\ui\\components\\views\\form",
+    "\\src\\ui\\components\\views\\form\\dialogs",
+    "\\src\\ui\\components\\views\\form\\dialogs\\acknowledgeDelete",
+    "\\src\\ui\\components\\views\\form\\dialogs\\canvas-shape-property-dialog",
+    "\\src\\ui\\components\\views\\form\\filtering",
+    "\\src\\ui\\components\\views\\form\\paging",
+    "\\src\\ui\\components\\views\\table",
+    "\\src\\ui\\module"
   ],
-  "SelectedNode": "\\src",
+  "SelectedNode": "\\src\\ui\\components\\views\\form\\dialogs\\canvas-shape-property-dialog\\canvas-shape-property-dialog.component.ts",
   "PreviewInSolutionExplorer": false
 }

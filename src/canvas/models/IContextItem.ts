@@ -9,14 +9,16 @@ export interface IContextItem {
   Id: string;
   Draw(context: any): void;
   Select(criteria: any): boolean;
+  CopyItem(newId: string): IContextItem;
 }
 
-export interface IContextSystem extends IContextItem {
+export interface IContextSystem {
   Content: IContextItem[];
   AddContent(content: IContextItem);
   RemoveContent(): IContextItem;
-  RemoveContentById(id:string): IContextItem;
-
+  RemoveContentById(id: string): IContextItem;
+  Draw(context: any): void;
+  CopyItem(itemId: string, newId: string) : string;
 }
 
 export class ContextLayer implements IContextSystem {
@@ -74,12 +76,18 @@ export class ContextLayer implements IContextSystem {
     return item;
   };
 
-
+  CopyItem(itemId: string, newId: string = '') : string {
+    let ndx = this.content.findIndex(c => c.Id == itemId);
+    if (ndx < 0) { return ''; }
+    if (newId.length <= 0) { newId = itemId + '_' + this.content.length; }
+    this.AddContent(this.content[ndx].CopyItem(newId));
+    return newId;
+  }
   //RemoveContentById(contentId: string): boolean {
   //  return (this.SelectContentById(contentId)) ? this.RemoveContent() : false;
   //}
 
-  Select(shapeSelectResult: ShapeSelectResult): boolean{
+  Select(shapeSelectResult: ShapeSelectResult): boolean {
     let bRes = false;
     this.content.forEach(function (item, i) {
       if (!bRes) {
@@ -90,14 +98,14 @@ export class ContextLayer implements IContextSystem {
   }
 }
 
-export class ContextSystem implements IContextSystem{
+export class ContextSystem implements IContextSystem {
 
 
-  constructor( private layers: ContextLayer [] = []) { }
+  constructor(private layers: ContextLayer[] = []) { }
 
   get Id() { return this.layers[0].Id; }
 
-  Draw(context: any ) {
+  Draw(context: any) {
     this.layers.reverse().forEach(l => l.Draw(context));
   }
 
@@ -113,9 +121,13 @@ export class ContextSystem implements IContextSystem{
     return this.layers[0].RemoveContentById(id);
   }
 
+  CopyItem(itemId: string, newId: string = '') : string {
+    return this.layers[0].CopyItem(itemId, newId);
+  }
+
   AddLayer(id: string, displayState: string, content: IContextItem[] = []) {
     this.layers.unshift(new ContextLayer(id, displayState, content));
- //   this.Draw();
+    //   this.Draw();
   }
 
   SelectLayer(index: number) {
@@ -132,19 +144,19 @@ export class ContextSystem implements IContextSystem{
   }
 
   Clear() {
-    this.layers.forEach(function (l, i) { l.RemoveAllContent(); });   
+    this.layers.forEach(function (l, i) { l.RemoveAllContent(); });
   }
 
   SelectLayerById(layerId: string) {
     return this.SelectLayer(this.layers.findIndex(l => l.Id === layerId));
   }
 
-  Select(shapeSelectResult: ShapeSelectResult): boolean{
+  Select(shapeSelectResult: ShapeSelectResult): boolean {
     let bRes = false;
     this.layers.forEach(function (l, i) {
       if (!bRes) {
         bRes = l.Select(shapeSelectResult);
-     }
+      }
     });
     return bRes;
   }

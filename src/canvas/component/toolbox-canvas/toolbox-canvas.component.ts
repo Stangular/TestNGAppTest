@@ -23,7 +23,6 @@ import { ShapeSelectResult } from '../../models/shapes/shapeSelected';
 import { Records } from 'src/dataManagement/model/records';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
-import { CanvasService } from '../../canvas.service';
 
 export class CanvasContextModel {
   size: Size = new Size();
@@ -43,7 +42,7 @@ export class ToolboxCanvasComponent implements OnInit {
 
   editOn: boolean = true;
   mouseCaptured: boolean = false;
-  subscription: Subscription;
+  messageSubscription: Subscription;
   @Input() width: number = 0;
   @Input() height: number = 0;
   @Input() system: ContextSystem;
@@ -57,11 +56,11 @@ export class ToolboxCanvasComponent implements OnInit {
 
   private point: Point = new Point();
 
-  constructor(private messageService: MessageService, private canvasService: CanvasService) {
+  constructor(private messageService: MessageService) {
 
     this.width = 1200; //rect.width;
     this.height = 600; //rect.height;
-    this.subscription = this.messageService.getMessage().subscribe(message => { this.ReDraw(); });
+    this.messageSubscription = this.messageService.getMessage().subscribe(message => { this.ReDraw(); });
   }
 
   ngOnInit() { }
@@ -85,7 +84,6 @@ export class ToolboxCanvasComponent implements OnInit {
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
 
-    console.log("x: " + x + " y: " + y);
     this.point.SetToPosition(x, y);
     this.shapeSelectResult.point.SetToPosition(x, y);
   }
@@ -96,6 +94,9 @@ export class ToolboxCanvasComponent implements OnInit {
     if (this.system.Select(this.shapeSelectResult)) {
       this.toolselect.emit(this.shapeSelectResult);
     }
+    setTimeout(() =>
+      this.Draw()
+      , 10);
   }
 
   OnCapture(e: any) {
@@ -144,12 +145,13 @@ export class ToolboxCanvasComponent implements OnInit {
     }
     let c = this.Context2D;
     c.clearRect(0, 0, this.width, this.height);
+    c
     this.system.Draw(c);
   }
 
   ngOnDestroy() {
     // unsubscribe to ensure no memory leaks
-    this.subscription.unsubscribe();
+    this.messageSubscription.unsubscribe();
   }
 
   @HostListener('window:resize', ['$event'])

@@ -38,6 +38,14 @@ export class Rectangle extends Shape {
     context.closePath();
   }
 
+  CopyShape(newID: string ) : Shape {
+
+    return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state );
+  }
+
+  CopyItem(newID: string) {
+    return this.CopyShape(newID);
+  }
   //SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
   //  return (this.SelectShape(shapeSelectResult));
   //}
@@ -68,6 +76,15 @@ export class RoundedRectangle extends Shape implements IContextItem {
     context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
     context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
     context.stroke();
+  }
+
+  CopyShape(newID: string): Shape {
+
+    return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state);
+  }
+
+  CopyItem(newID: string) {
+    return this.CopyShape(newID);
   }
 
   Draw(context: any): void {

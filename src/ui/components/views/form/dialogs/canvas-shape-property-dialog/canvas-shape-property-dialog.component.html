@@ -1,0 +1,44 @@
+
+<form class="example-form">
+  <mat-grid-list cols="16" rowHeight="30px">
+  <!--  <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">-->
+      <!--<div style="text-align:left">{{element.FilterDescription}}</div>-->
+  <!--  </mat-grid-tile>-->
+    <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+      <div *ngIf="element.FilterApplied" class="header-filter_remove">-->
+        <!--   <mat-icon (click)="removeFilter(element)" aria-label="Remove Filter">not_interested</mat-icon>-->
+      <!--</div>
+    </mat-grid-tile>-->
+    <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+      <mat-form-field class="example-full-width">
+        <label class="example-margin">Locked Ratio:</label>
+        <input matInput #lockedRatio maxlength="3" placeholder="Height to Width" value="1">
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="6" [rowspan]="1" style="text-align:left">
+      <mat-slide-toggle [(ngModel)]="constantArea">Constant Area</mat-slide-toggle>
+    </mat-grid-tile>
+    <!--<mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
+      <section class="example-section">
+        <label class="example-margin">Motion Freedom:</label>
+        <mat-radio-group [(ngModel)]="freedomOfMotion">
+          <mat-radio-button class="example-margin" value="fullMotionFreedom">Full</mat-radio-button>
+          <mat-radio-button class="example-margin" value="horzMotionFreedom">Horizontal Only</mat-radio-button>
+          <mat-radio-button class="example-margin" value="vertMotionFreedom">Vertical Only</mat-radio-button>
+        </mat-radio-group>
+      </section>
+    </mat-grid-tile>-->
+    <mat-grid-tile [colspan]="6" [rowspan]="1" style="text-align:left">
+      <section class="example-section">
+        <label class="example-margin">Sizing Freedom:</label>
+        <mat-radio-group [(ngModel)]="freedomOfSizing">
+          <mat-radio-button class="example-margin" value="fullSizingFreedom">Full</mat-radio-button>
+          <mat-radio-button class="example-margin" value="horzSizingFreedom">Horizontal Only</mat-radio-button>
+          <mat-radio-button class="example-margin" value="vertSizingFreedom">Vertical Only</mat-radio-button>
+        </mat-radio-group>
+      </section>
+    </mat-grid-tile>
+  </mat-grid-list>
+</form>

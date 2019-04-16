@@ -59,8 +59,7 @@ export class FormComponent implements OnInit, AfterContentInit {
     this.view = this.viewType.detail;
   }
 
-  ngAfterContentInit() {
-  }
+  ngAfterContentInit() {}
 
   ngOnInit() {
     
@@ -279,7 +278,6 @@ export class FormComponent implements OnInit, AfterContentInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The delete dialog was closed');
       if ('remove' == result.result) {
         let model = new EntityRemoveModel();
         model.Id = this.source.GetFieldValue('id');

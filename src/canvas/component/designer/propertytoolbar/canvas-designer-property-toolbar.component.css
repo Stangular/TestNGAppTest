@@ -1,0 +1,97 @@
+.toolbar-menu {
+  background-color: steelblue;
+}
+.toolbar-container{
+  width: 99%;
+  background-color:steelblue;
+  padding-left:10px;
+  padding-right:10px;
+  border-radius:10px;
+
+}
+.toolbar-options-menu-group {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 5px;
+  font-family: Verdana;
+  font-size: 12px;
+  background-color: steelblue;
+}
+
+.shapeClassInput {
+   margin-top: 2px;
+   margin-bottom: 2px;
+}
+
+.toolbar-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin: 5px 0;
+  font-family: Verdana;
+  font-size: 12px;
+  background-color: steelblue;
+}
+
+.toolbar-radio-button {
+  margin: 5px;
+}
+
+.designer_rect_image {
+  background: URL('/images/vector-rectangle.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.designer_ellipse_image {
+  background: URL('/images/vector-circle.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.designer_port_image {
+  background: URL('/images/vector-point.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.designer_line_image {
+  background: URL('/images/vector-line.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+  border: none;
+}
+
+.designer_gradient_line_image {
+  background: URL('/images/vector-radius.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.designer_bezier_line_image {
+  background: URL('/images/vector-bezier.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.designer_copy_image {
+  background: URL('/images/vector-arrange-below.png');
+  width: 24px;
+  height: 24px;
+}
+
+.designer_delete_image {
+  background: URL('/images/close-circle.png');
+  width: 24px;
+  height: 24px;
+}
+
+.widthInput {
+  text-align:right;
+  background-color: deepskyblue;
+}

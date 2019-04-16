@@ -87,7 +87,6 @@ export class TableViewComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The Filter Dialog closed...');
       elm.setFilter(result.value, result.operation.type);
       this.applyFilter.emit();
     });

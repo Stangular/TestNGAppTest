@@ -37,7 +37,7 @@ export class ExperimentalLayer extends ContextLayer {
     this.state3.setState(UIStates.fontFace, 0);
 
     super.AddContent(new Rectangle('exc1', 10, 10, 50, 50, this.state1));
-    super.AddContent(new Ellipse('exc2', 70, 70, 50, 50, this.state2));
+ //   super.AddContent(new Ellipse('exc2', 70, 70, 50, 50, this.state2));
     const a = 315 * anglefactor;
     super.AddContent(new Text('text1a', 220, 10, 100, 16, this.state3, "text1a",  a ));
     super.AddContent(new TextRight('text1b', 220, 50, 100, 16, this.state3, "text1b",  a));
