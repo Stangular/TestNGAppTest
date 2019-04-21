@@ -44,6 +44,10 @@ export class Bar implements IContextItem{
     this.area.Draw(context);
   }
 
+  CopyItem(newId: string) {
+    return null;
+  }
+
   Select(shapeSelectResult: ShapeSelectResult): boolean{
     if (this.area.Select(shapeSelectResult)) {
       shapeSelectResult.id = this.sourceID;

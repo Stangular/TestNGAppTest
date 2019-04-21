@@ -1,7 +1,7 @@
 import { IShape } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
 import { Size } from './primitives/size';
-import { StateIndex } from '../DisplayValues'
+import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
 import { Port } from './port';
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
@@ -33,7 +33,9 @@ export class ShapeProperties {
 
 export abstract class Shape implements IShape, IContextItem {
 
+  _bgNdx: number = 0;
   _center: Point = new Point();
+  _class: string = '';
   properties: ShapeProperties;
 
   protected _shapes: Shape[] = [];
@@ -50,7 +52,32 @@ export abstract class Shape implements IShape, IContextItem {
 
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
+
+    this.UpdateContextState();
   }
+
+  get Class(): string {
+    return this._class;
+  }
+
+  AssignToClass(clss: string): void {
+    this._class = clss;
+  }
+
+  UpdateContextState() {
+    let bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + 'bg');
+    if (bgNdx <= 0) {
+      bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + this.Class + "_" + 'bg');
+    }
+    if (bgNdx >= 0) {
+      this._bgNdx = bgNdx;
+      this.state.setState(UIStates.background, bgNdx);
+    }
+    else {
+      this._bgNdx = this.state.Index[UIStates.background];
+    }
+  }
+  get BackgroundColorIndex() { return this._bgNdx; }
 
   get Id(): string { return this.id; }
   get Top(): number { return this.top; }

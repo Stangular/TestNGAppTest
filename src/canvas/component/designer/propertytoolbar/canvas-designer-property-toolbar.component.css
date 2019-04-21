@@ -95,3 +95,8 @@
   text-align:right;
   background-color: deepskyblue;
 }
+
+.colorButton{
+  font-size:12px;
+  width:100%
+}

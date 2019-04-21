@@ -147,6 +147,16 @@ export class FormComponent implements OnInit, AfterContentInit {
       this.messageService.sendMessage(0), 0);
   }
 
+  OnStateChange() {
+  setTimeout(() =>
+    this.messageService.sendMessage(10), 0);
+  }
+
+  OnDeleteItem() {
+    setTimeout(() =>
+      this.messageService.sendMessage(1), 0);
+  }
+
   initFail(data: any) {
     this.spinnerService.hide();
     console.error(JSON.stringify(data));

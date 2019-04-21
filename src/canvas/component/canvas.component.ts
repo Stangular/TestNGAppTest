@@ -23,7 +23,7 @@ import { ShapeSelectResult } from '../models/shapes/shapeSelected';
 import { Records } from 'src/dataManagement/model/records';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
-import { EditModel } from '../models/designer/base.model';
+import { EditModel, BaseDesignerModel } from '../models/designer/base.model';
 import { CanvasService } from '../service/canvas.service';
 
 
@@ -66,9 +66,17 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
 
     this.width = 1200; //rect.width;
     this.height = 600; //rect.height;
-    this.subscription = this.messageService.getMessage().subscribe(message => { this.ReDraw(); });
+    this.subscription = this.messageService.getMessage().subscribe(
+      message => { this.AcceptMessage(message) });
   }
 
+  AcceptMessage(message: any) {
+    switch (message.text) {
+      case 10: this.editSystem.Draw(this.ActiveContext);
+        break;
+      default: this.ReDraw(); break;
+    }
+  }
   ngOnInit() { }
 
   get Canvas() {
@@ -118,6 +126,24 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
       this.ReDraw();
       this.mouseCaptured = true;
     }
+    else if (!this.editOn) {
+      this.system.AddContent(null);
+      this.ReDraw();
+
+    }
+    else {
+      this.canvasService.shapeSelectResult.id = "";
+      this.editOn = false;
+      this.ReDraw();
+      this.mouseCaptured = false;
+      if (this.system.Select(this.canvasService.shapeSelectResult)) {
+
+        this.select.emit(this.canvasService.shapeSelectResult);
+        this.Edit();
+        this.ReDraw();
+        this.mouseCaptured = true;
+      }
+    }
   }
 
   CopySelectedContent() {
@@ -145,7 +171,15 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
       this.edit.emit(this.canvasService.shapeSelectResult);
       this.ReDraw();
       this.mouseCaptured = false;
-      this.OnMousedown(e);
+ 
+  //    this.OnMousedown(e);
+    }
+    if (this.system.Select(this.canvasService.shapeSelectResult)) {
+
+      this.select.emit(this.canvasService.shapeSelectResult);
+      this.Edit();
+      this.ReDraw();
+      this.mouseCaptured = true;
     }
   }
 
@@ -158,7 +192,6 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
       this.ShowActiveLayer()
       , 10);
   }
-
 
   ShowActiveLayer() {
     if (this.ActiveCanvas) {

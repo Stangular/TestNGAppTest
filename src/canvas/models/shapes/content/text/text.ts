@@ -16,7 +16,7 @@ export class Text extends Shape implements IContextItem {
     height: number,
     state: StateIndex,
     protected text: string,
-    private angle: number = 0) {
+    protected angle: number = 0) {
     super(id,
       top,
       left,
@@ -70,6 +70,10 @@ export class Text extends Shape implements IContextItem {
 
     return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
   }
+
+  CopyItem(newID: string) {
+    return this.CopyShape(newID);
+  }
 }
 
 export class TextCenter extends Text {
@@ -100,6 +104,10 @@ export class TextCenter extends Text {
   CopyShape(newID: string): Shape {
 
     return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+  }
+
+  CopyItem(newID: string) {
+    return this.CopyShape(newID);
   }
 }
 

@@ -9,6 +9,8 @@ import { ShapeSelectResult } from '../shapes/shapeSelected';
 
 export class Line implements IContextItem, ILine {
 
+  _class: string = '';
+
   constructor(private id: string,
     protected sourceOffset: Point,
     protected targetOffset: Point,
@@ -21,6 +23,16 @@ export class Line implements IContextItem, ILine {
     this.targetOffset = target.Offset;
   }
 
+  get Class(): string {
+    return this._class;
+  }
+
+  AssignToClass(clss: string): void {
+    this._class = clss;
+  }
+
+  UpdateContextState() { }
+
   public DrawLine(context: any) {
 
     context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.color]);
@@ -29,6 +41,10 @@ export class Line implements IContextItem, ILine {
     this.moveToSource(context);
     this.lineToTarget(context);
 
+  }
+
+  CopyItem(newId: string) {
+    return null;
   }
 
   Select(shapeSelectResult: ShapeSelectResult): boolean {

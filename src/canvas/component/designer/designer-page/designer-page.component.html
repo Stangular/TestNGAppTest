@@ -5,8 +5,10 @@
                  [style.background]="yellow">
     <div style="width:100%; text-align:center">
       <app-canvas-designer-property-toolbar
+        [PropertyId]="selectedId"
         (selectedType)="TypeSelected($event)"
         (copySelectedItem)="CopySelectedItem()"
+        (colorSelected)="ColorSelected($event)"
         (deleteSelectedItem)="DeleteSelectedItem()"></app-canvas-designer-property-toolbar>
     </div>
   </mat-grid-tile>

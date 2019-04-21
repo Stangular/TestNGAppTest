@@ -3,11 +3,8 @@ import { ShapeProperties } from '../models/shapes/shape';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult } from '../models/shapes/shapeSelected';
 
-@Injectable({
-  providedIn: 'root'
-})
 
-  export enum objectTypes {
+export enum objectTypes {
   rectangle = 0,
   ellipse = 1,
   port = 2,
@@ -16,6 +13,8 @@ import { ShapeSelectResult } from '../models/shapes/shapeSelected';
   bezierLine = 5
 }
 
+
+@Injectable()  
 export class CanvasService {
 
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();

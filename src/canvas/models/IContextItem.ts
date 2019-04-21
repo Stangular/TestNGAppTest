@@ -2,14 +2,18 @@ import { Point } from "./shapes/primitives/point";
 import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult } from "./shapes/shapeSelected";
 import { Shape } from "./shapes/shape";
+import { forEach } from "@angular/router/src/utils/collection";
 
 
 export interface IContextItem {
 
   Id: string;
+  Class: string;
+  AssignToClass(clss: string): void;
   Draw(context: any): void;
   Select(criteria: any): boolean;
   CopyItem(newId: string): IContextItem;
+  UpdateContextState(): void;
 }
 
 export interface IContextSystem {
@@ -34,6 +38,12 @@ export class ContextLayer implements IContextSystem {
   }
 
   get Content(): IContextItem[] { return this.content; }
+
+  UpdateContextState() {
+    this.content.forEach(function (c, i) {
+      c.UpdateContextState();
+    });
+  }
 
   SelectContent(index: number) {
     if (index > 0) {

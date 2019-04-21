@@ -9,6 +9,7 @@ export class NamedValue<T> {
 
   get Name() { return this.valueName; }
   get Value() { return this.value; }
+
 }
 
 export enum UIStates {
@@ -50,16 +51,42 @@ export class DisplayValues {
     this.fonts.length = 0;
   }
 
+  static ColorIndex(name: string) {
+    return this.color.findIndex(c => c.Name == name);
+  }
+
   static SetColor(name: string, color: string) {
-    this.color.push(new NamedValue(name, color));
+    let ndx = this.ColorIndex(name);
+    if (ndx >= 0) {
+      this.color.splice(ndx, 1, new NamedValue(name, color));
+    }
+    else {
+      this.color.push(new NamedValue(name, color));
+    }
   }
 
   static SetWeight(name: string, weight: number) {
+    let ndx = this.weight.findIndex(c => c.Name == name);
+    if (ndx >= 0) {
+      this.weight.splice(ndx, 1);
+    }
     this.weight.push(new NamedValue(name, weight));
   }
 
   static SetFont(name: string, font: string) {
+    let ndx = this.fonts.findIndex(c => c.Name == name);
+    if (ndx >= 0) {
+      this.fonts.splice(ndx, 1);
+    }
     this.fonts.push(new NamedValue(name, font));
+  }
+
+  static GetColorByName(name: string) : string {
+    let ndx = this.ColorIndex(name);
+    if (ndx < 0) {
+      ndx = this.ColorIndex('default.rect.background');
+    }
+    return this.GetColor(ndx);
   }
 
   static GetColor(index: number) {

@@ -404,6 +404,7 @@ export class Toolbar extends ContextLayer {
 
 export class BaseDesignerModel extends ContextLayer {
 
+  point: Point;
   shapes: Shape[] = [];
   lines: Line[] = [];
   text: Text[] = [];
@@ -429,7 +430,7 @@ export class BaseDesignerModel extends ContextLayer {
 
     shapeSelectResult.id = '';
     shapeSelectResult.type = '';
-
+    this.point = shapeSelectResult.point;
     if (super.Select(shapeSelectResult)) {
       let shape = this.Content.find(c => (c as Shape).IsSelected);
       if (shape) {
@@ -438,7 +439,7 @@ export class BaseDesignerModel extends ContextLayer {
       }
       return true;
     }
-    return this.AddNewItem(this.tooltype, shapeSelectResult.point);
+    return false; // this.AddNewItem(this.tooltype, shapeSelectResult.point);
 
   }
 
@@ -462,7 +463,7 @@ export class BaseDesignerModel extends ContextLayer {
     if (ndx < 0) { return false; }
     let shape: Shape = null;
     shape = this.Content[ndx] as Shape;
-    this.AddContent(shape.CopyShape(id) as IContextItem);
+    super.AddContent(shape.CopyShape(id) as IContextItem);
     return true;
   }
 
@@ -476,12 +477,20 @@ export class BaseDesignerModel extends ContextLayer {
     return shape;
   }
 
+  AddContent(content: IContextItem) {
+    if (!content) {
+      this.AddNewItem(this.point);
+    }
+    else {
+      super.AddContent(content);
+    }
+  }
 
-  AddNewItem(tooltype: tooltypes, point: Point) {
+  AddNewItem( point: Point) {
 
     let shape: IContextItem = null;
     let cnt = this.Content.length;
-    switch (tooltype) {
+    switch (this.tooltype) {
       case tooltypes.rectangle:
         shape = new Rectangle('rect_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
         break;
@@ -493,7 +502,7 @@ export class BaseDesignerModel extends ContextLayer {
       //case tooltypes.lineBezier: break;
     }
     if (shape) {
-      this.AddContent(shape);
+      super.AddContent(shape);
       return true;
     }
     return false;

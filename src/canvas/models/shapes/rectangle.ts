@@ -23,7 +23,7 @@ export class Rectangle extends Shape {
   DrawShape(context: any): void {
 
     context.rect(this.Left, this.Top, this.Width, this.Height);
-    context.fillStyle = DisplayValues.GetColor(this.state.Index[UIStates.background]);
+    context.fillStyle = DisplayValues.GetColor(this.BackgroundColorIndex);
     context.fill();
     context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
     context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);

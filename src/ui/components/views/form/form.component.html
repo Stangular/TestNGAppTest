@@ -92,7 +92,10 @@
                     [layoutName]="'dashboardA'"
                     [source]="source"
                     (select)="onSelect($event)"></app-dashboard-page>
-        <app-designer-page *ngIf="view == viewType.design"></app-designer-page>
+        <app-designer-page *ngIf="view == viewType.design"
+                    (deleteItem)="OnDeleteItem()"
+                    (stateChange)="OnStateChange()">
+        </app-designer-page>
       </div>
 
     </form>

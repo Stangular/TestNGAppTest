@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewContainerRef,Output,EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { CanvasService, objectTypes} from 'src/canvas/service/canvas.service';
+import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
 import { FreedomOfMotion } from 'src/canvas/models/shapes/shape';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 import { map, startWith } from 'rxjs/operators';
+import { DisplayValues } from 'src/canvas/models/DisplayValues';
 
 
 @Component({
@@ -14,9 +15,12 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class CanvasDesignerPropertyToolbarComponent implements OnInit {
 
+  selectedColor: string = '';
+  @Input() PropertyId: string = '';
   @Output() selectedType = new EventEmitter<objectTypes>();
   @Output() deleteSelectedItem = new EventEmitter<void>();
   @Output() copySelectedItem = new EventEmitter<void>();
+  @Output() colorSelected = new EventEmitter<{ type: string, color: string }>();
   ot = objectTypes;
   width: number = 1;
 
@@ -38,22 +42,23 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit {
   freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
   freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
   fom = FreedomOfMotion;
-  public arrayColors: any = {
-    color1: '#2883e9',
-    color2: '#e920e9',
-    color3: 'rgb(255,245,0)',
-    color4: 'rgb(236,64,64)',
-    color5: 'rgba(45,208,45,1)'
-  };
+  //public arrayColors: any = {
+  //  color1: '#2883e9',
+  //  color2: '#e920e9',
+  //  color3: 'rgb(255,245,0)',
+  //  color4: 'rgb(236,64,64)',
+  //  color5: 'rgba(45,208,45,1)'
+  //};
   shapeColor: string = '';
   public cmykColor: Cmyk = new Cmyk(0, 0, 0, 0);
-  private currentColor: string = 'color1';
+  //private currentColor: string = 'color1';
   constructor(
-    public vcRef: ViewContainerRef,
-    private canvasService: CanvasService
-    , private cpService: ColorPickerService
-  ) {
+    public vcRef: ViewContainerRef
+    , private canvasService: CanvasService
+    , private cpService: ColorPickerService) {
+
     this.constantArea = this.CanvasService.ShapeProperties._constantArea;
+
   }
 
   ngOnInit() {
@@ -61,19 +66,21 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit {
       .pipe(
         startWith(''),
         map(value => this._filter(value))
-    );
+      );
 
     this.filteredPortList = this.portControl.valueChanges
       .pipe(
         startWith(''),
-      map(value => this._filterPorts(value))
-    );
+        map(value => this._filterPorts(value))
+      );
 
     this.filteredStateList = this.stateControl.valueChanges
       .pipe(
         startWith(''),
-      map(value => this._filterstates(value))
+        map(value => this._filterstates(value))
       );
+
+    this.selectedColor = this.BGColor;
   }
 
   get CanvasService() {
@@ -97,6 +104,17 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit {
     console.log(event, data);
   }
 
+  SetProperties() {
+    let propID = this.PropertyId + '_bg';
+    this.selectedColor = DisplayValues.GetColorByName(propID);
+    return this.selectedColor;
+  }
+
+  public get BGColor() {
+    let propID = this.PropertyId + '_bg';
+    this.selectedColor = DisplayValues.GetColorByName(propID);
+    return this.selectedColor;
+  }
   public onChangeColorCmyk(color: string): Cmyk {
     const hsva = this.cpService.stringToHsva(color);
 
@@ -107,6 +125,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit {
     }
 
     return new Cmyk(0, 0, 0, 0);
+  }
+
+  ApplyColor(type: string) {
+    this.colorSelected.emit({ type: type, color: this.selectedColor });
   }
 
   public onChangeColorHex8(color: string): string {

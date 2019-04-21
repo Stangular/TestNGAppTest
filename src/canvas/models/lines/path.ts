@@ -10,6 +10,8 @@ import { ShapeSelectResult } from '../shapes/shapeSelected';
 
 export class Path implements IContextItem {
 
+  _class: string = '';
+
   constructor(private id: string,
     private segments: ILine [] = []) { }
 
@@ -18,7 +20,16 @@ export class Path implements IContextItem {
   Add(line: ILine) {
     this.segments.push(line);
   }
-   
+  get Class(): string {
+    return this._class;
+  }
+
+  AssignToClass(clss: string): void {
+    this._class = clss;
+  }
+
+  UpdateContextState() { }
+
   Draw(context: any): void {
 
     context.beginPath();
@@ -28,6 +39,10 @@ export class Path implements IContextItem {
     context.stroke();
 
     context.closePath();
+  }
+
+  CopyItem(newId: string) {
+    return null;
   }
 
   Select(shapeSelectResult: ShapeSelectResult) {
