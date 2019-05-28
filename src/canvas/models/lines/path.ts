@@ -34,7 +34,7 @@ export class Path implements IContextItem {
 
     context.beginPath();
 
-    this.segments.forEach(function (s, i) { s.DrawLine( context ) });
+   // this.segments.forEach(function (s, i) { s.DrawLine( context ) });
 
     context.stroke();
 

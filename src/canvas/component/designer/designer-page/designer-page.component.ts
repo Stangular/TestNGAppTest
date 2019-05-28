@@ -4,6 +4,9 @@ import { StateIndex, DisplayValues } from 'src/canvas/models/DisplayValues';
 import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 import { Shape } from 'src/canvas/models/shapes/shape';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
+import { MessageService } from 'src/app/messaging/message.service';
+import { LineService } from 'src/canvas/models/lines/service/line.service';
+import { PortService } from 'src/canvas/models/shapes/service/port.service';
 
 
 @Component({
@@ -13,16 +16,23 @@ import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
 })
 export class DesignerPageComponent implements OnInit {
 
+  editTop: number = 0;
+  editLeft: number = 0;
+  editWidth: number = 0;
+  editHeight: number = 0;
   id: string = 'designer';
   selectedId: string = '';
-  private designer: BaseDesignerModel;
+  //private designer: BaseDesignerModel;
   // private toolbar: Toolbar;
-  private editor: EditModel;
+  //private editor: EditModel;
   private designState = new StateIndex('barsss');
   @Output() deleteItem = new EventEmitter<null>();
   @Output() stateChange = new EventEmitter<null>();
   constructor(
+    private portService: PortService,
+    private lineService: LineService,
     private canvasService: CanvasService
+    , private messageService: MessageService
   ) {
 
     //this.designState.setState(UIStates.background, );
@@ -30,9 +40,9 @@ export class DesignerPageComponent implements OnInit {
     //this.designState.setState(UIStates.color, 4);
     //this.designState.setState(UIStates.weight, 0);
 
-    this.designer = new BaseDesignerModel();
+    //this.designer = new BaseDesignerModel();
     // this.toolbar = new Toolbar();
-    this.editor = new EditModel();
+    // this.editor = new EditModel();
   }
 
   ngOnInit() { }
@@ -41,33 +51,48 @@ export class DesignerPageComponent implements OnInit {
     let sss = 0;
   }
 
+  ItemMoved(e: ShapeSelectResult) {
+
+    let shp : Shape = this.canvasService.Editor.CurrentShape;
+    if (shp) {
+      this.editTop = shp.Top;
+      this.editLeft = shp.Left;
+      this.editWidth = shp.Width;
+      this.editHeight = shp.Height;
+      setTimeout(() =>
+        this.messageService.sendMessage(11), 0);
+    }
+
+
+  }
+
   ItemSelected(e: ShapeSelectResult) {
     if (this.selectedId.length > 0) {
-      let s = this.editor.RemoveContentById(this.selectedId);
-      this.designer.AddContent(s);
+      let s = this.canvasService.Editor.RemoveContentById(this.selectedId);
+      this.canvasService.Designer.AddContent(s);
       this.selectedId = ''; ``
     }
     else {
-      let s = this.designer.RemoveContentById(e.id);
+      let s = this.canvasService.Designer.RemoveContentById(e.id);
       this.selectedId = e.id;
-      this.editor.AddEditItem(s as Shape, e.point);
+      this.canvasService.Editor.AddEditItem(s as Shape, e.point);
     }
   }
 
   TypeSelected(type: objectTypes) {
     switch (type) {
-      case objectTypes.rectangle: this.designer.SetTool(tooltypes.rectangle); break;
-      case objectTypes.ellipse: this.designer.SetTool(tooltypes.ellipse); break;
-      default: this.designer.SetTool(tooltypes.typecount); break;
+      case objectTypes.rectangle: this.canvasService.Designer.SetTool(tooltypes.rectangle); break;
+      case objectTypes.ellipse: this.canvasService.Designer.SetTool(tooltypes.ellipse); break;
+      default: this.canvasService.Designer.SetTool(tooltypes.typecount); break;
     }
   }
 
   CopySelectedItem() {
-   // this.designer
+    // this.designer
   }
 
   DeleteSelectedItem() {
-    this.editor.RemoveContentById(this.selectedId);
+    this.canvasService.Editor.RemoveContentById(this.selectedId);
     this.deleteItem.emit();
   }
 
@@ -76,11 +101,26 @@ export class DesignerPageComponent implements OnInit {
     switch (value.type) {
       case 'bg': DisplayValues.SetColor(this.selectedId + '_' + value.type, value.color); break;
     }
-    this.editor.UpdateContextState();
+    this.canvasService.Editor.UpdateContextState();
     this.stateChange.emit();
   }
 
   SelectTool(e: ShapeSelectResult) {
-    this.designer.SetTool(e.type);
+    this.canvasService.Designer.SetTool(e.type);
+  }
+
+  UpdatePort(portData: any) {
+    let shp = this.canvasService.Editor.CurrentShape;
+    let portIndex = this.portService
+      .AddPort(
+      portData.name,
+      portData.offsetX,
+      portData.offsetY,
+      shp);
+    this.lineService
+      .AddPortToLine(
+      portData.line,
+      portData.path,
+      portIndex);
   }
 }

@@ -4,12 +4,16 @@
                  [rowspan]="1"
                  [style.background]="yellow">
     <div style="width:100%; text-align:center">
-      <app-canvas-designer-property-toolbar
-        [PropertyId]="selectedId"
-        (selectedType)="TypeSelected($event)"
-        (copySelectedItem)="CopySelectedItem()"
-        (colorSelected)="ColorSelected($event)"
-        (deleteSelectedItem)="DeleteSelectedItem()"></app-canvas-designer-property-toolbar>
+      <app-canvas-designer-property-toolbar [PropertyId]="selectedId"
+                                            [selectedItemTop]="editTop"
+                                            [selectedItemLeft]="editLeft"
+                                            [selectedItemWidth]="editWidth"
+                                            [selectedItemHeight]="editHeight"
+                                            (updatePort)="UpdatePort($event)"
+                                            (selectedType)="TypeSelected($event)"
+                                            (copySelectedItem)="CopySelectedItem()"
+                                            (colorSelected)="ColorSelected($event)"
+                                            (deleteSelectedItem)="DeleteSelectedItem()"></app-canvas-designer-property-toolbar>
     </div>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="32"
@@ -18,8 +22,9 @@
     <app-canvas [canvasID]="designerCanvas"
                 width="100%"
                 height="100%"
+                (move)="ItemMoved($event)"
                 (edit)="ItemSelected($event)"
-                [editSystem]="editor"
-                [system]="designer"></app-canvas>
+                [editSystem]="canvasService.Editor"
+                [system]="canvasService.Designer"></app-canvas>
   </mat-grid-tile>
 </mat-grid-list>

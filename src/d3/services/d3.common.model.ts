@@ -1,6 +1,6 @@
 export class Size {
-  constructor(private _width: number,
-    private _height) { }
+  constructor(private _width: number = 0,
+    private _height = 0) { }
 
   get Width(): number {
     return this._width;

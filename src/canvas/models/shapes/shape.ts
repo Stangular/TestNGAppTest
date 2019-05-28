@@ -1,10 +1,9 @@
 import { IShape } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
-import { Size } from './primitives/size';
 import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
-import { Port } from './port';
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
+import { Line } from '../lines/line';
 
 export enum FreedomOfMotion {
   full = 0,
@@ -39,7 +38,6 @@ export abstract class Shape implements IShape, IContextItem {
   properties: ShapeProperties;
 
   protected _shapes: Shape[] = [];
-  protected _ports: Port[] = [];
   protected _isSelected = false;
 
   constructor(
@@ -109,6 +107,9 @@ export abstract class Shape implements IShape, IContextItem {
     this.left += x;
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
+    //this._ports.forEach(function (p, i) {
+    //  p.MoveBy(x, y);
+    //});
   }
 
   SizeBy(top: number, right: number, bottom: number, left: number) {
@@ -119,7 +120,9 @@ export abstract class Shape implements IShape, IContextItem {
     this.height = bottom - this.top;
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-
+    //this._ports.forEach(function (p, i) {
+    //  p.SizeBy(top,right,bottom,left);
+    //});
   }
 
   get IsSelected(): boolean { return this._isSelected };
@@ -143,6 +146,10 @@ export abstract class Shape implements IShape, IContextItem {
   private IsPointInShape(point: Point) {
     return (this.top < point.Y && this.Bottom > point.Y
       && this.left < point.X && this.Right > point.X);
+  }
+
+  get Ports() {
+    return this._ports;
   }
 }
 

@@ -1,0 +1,55 @@
+<div class="dialog-form">
+  <h1 mat-dialog-title>Update Ports</h1>
+  <!--<div mat-dialog-content>
+    <p>{{deleteQuestion}}</p>
+  </div>-->
+  <div>
+    <mat-grid-list cols="16" rowHeight="30px">
+      <mat-grid-tile [colspan]="16" [rowspan]="1">
+        <mat-form-field class="full-width" [floatLabel]="'never'">
+          <input matInput placeholder="Name" [(ngModel)]="data.name">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="8" [rowspan]="1">
+        <mat-form-field class="full-width" [floatLabel]="'never'">
+          <input type="number" min="0" max="110" style="text-align:right" matInput placeholder="Offset X (%)" [(ngModel)]="data.offsetX">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="8" [rowspan]="1">
+        <mat-form-field class="full-width" [floatLabel]="'never'">
+          <input type="number" min="0" max="110" style="text-align:right" matInput placeholder="Offset Y (%)" [(ngModel)]="data.offsetY">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="16" [rowspan]="2">
+        <mat-form-field [floatLabel]="'never'">
+          <mat-label>Select Line</mat-label>
+          <mat-select placeholder="Select Line" [(ngModel)]="selectedLine" (selectionChange)="LineSelected($event)">
+            <mat-option *ngFor="let line of this.lineService._lines" [value]="line.Id">
+              {{line.Id}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="8" [rowspan]="1">
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="16" [rowspan]="2">
+        <div *ngIf="selectedLine">
+          <input matInput
+                 [matAutocomplete]="pathnames"
+                 placeholder="path name"
+                 [formControl]="pathName">
+          <mat-autocomplete #pathnames="matAutocomplete">
+            <mat-option *ngFor="let path of paths | async" [value]="state">
+              <span>{{path.Id}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>{{okMessage}}</button>
+  </div>
+</div>
+

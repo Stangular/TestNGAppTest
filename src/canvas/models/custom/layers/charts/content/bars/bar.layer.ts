@@ -39,6 +39,15 @@ export class Bar implements IContextItem{
   }
 
   get Id(): string { return this.area.Id; }
+  get Class(): string { return ""; }
+
+  AssignToClass(clss: string) : void {
+
+  }
+
+  UpdateContextState(): void {
+
+  }
 
   Draw(context: any): void {
     this.area.Draw(context);

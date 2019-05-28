@@ -8,6 +8,8 @@ import { ContextLayer, IContextItem } from "../IContextItem";
 import { ShapeSelectResult } from "../shapes/shapeSelected";
 import { ContentImage } from "../shapes/content/image/image";
 import { Ellipse } from "../shapes/ellipse";
+import { Port } from "../shapes/port";
+import { Size } from "src/d3/services/d3.common.model";
 
 class Mover {
 
@@ -117,14 +119,20 @@ export class EditModel extends ContextLayer {
     return this.activeShapeId;
   }
 
-  MoveItem(newPosition: Point) {
-    let self = this;
-    let dx = newPosition.X - this.contactPoint.X;
-    let dy = newPosition.Y - this.contactPoint.Y;
-    let sid = this._sizer.findIndex(s => s.Id == this.selectedId);
-    if (sid >= 0) {
-      this._sizer[sid].MoveBySSS(dx, dy);
+  get CurrentShape(): Shape {
+    let shape = this.Content.find(s => s.Id == this.activeShapeId);
 
+    return shape as Shape;
+  }
+
+  MoveItem(shapeSelectResult: ShapeSelectResult, ports: Port[]) {
+    let self = this;
+    let shpPorts = ports.filter(p => p.ParentShapeId == s.Id);
+    let dx = shapeSelectResult.point.X - this.contactPoint.X;
+    let dy = shapeSelectResult.point.Y - this.contactPoint.Y;
+    let sid = this._sizer.findIndex(s => s.Id == this.selectedId);
+    if (sid >= 0) {// A sizer node is selected...
+      this._sizer[sid].MoveBySSS(dx, dy);
       let shape = this.Content.find(c => c.Id == this.activeShapeId) as Shape;
       if (shape) {
         this._sizer.forEach(function (s, i) {
@@ -135,19 +143,24 @@ export class EditModel extends ContextLayer {
           this._sizer[3].Center.X,
           this._sizer[5].Center.Y,
           this._sizer[7].Center.X);
-
         this.ResetSizer(shape);
+        shpPorts.forEach(function (p, i) {
+          p.SizeBy(shape.Top, shape.Right, shape.Bottom, shape.Left);
+        });
       }
     }
     else {
       this.Content.forEach(function (s, i) {
-        (<Shape>s).MoveBy(dx, dy);
+        let shp: Shape = s as Shape;
+        shp.MoveBy(dx, dy);
+        shpPorts.forEach(function (p, i) {
+          p.MoveBy(dx, dy);
+        });
       });
     }
-
     this.contactPoint.SetToPosition(
-      newPosition.X,
-      newPosition.Y
+      shapeSelectResult.point.X,
+      shapeSelectResult.point.Y
     );
   }
 
@@ -182,9 +195,7 @@ export class EditModel extends ContextLayer {
     this.tooltype = tool;
   }
 
-  Edit(itemId: string) {
-
-  }
+  Edit(itemId: string) { }
 
   ResetSizer(shape: Shape) {
     let xhalf = shape.Left + shape.Width / 2;
@@ -216,7 +227,7 @@ export class EditModel extends ContextLayer {
       });
       this.selectedId = shape.Id;
       this.activeShapeId = shape.Id;
-      this.MoveItem(point);
+      //    this.MoveItem(point);
       return true;
     }
     return false;
@@ -232,175 +243,7 @@ export enum tooltypes {
   typecount = 5
 }
 
-class ToolBarTool extends ContentImage {
-  private toolState = new StateIndex('toolbartool');
 
-  private selected: boolean = false;
-  constructor(private type: tooltypes,
-    id: string,
-    top: number,
-    left: number,
-    width: number,
-    height: number,
-    state: StateIndex,
-    text: string,
-    angle: number = 0) {
-    super(id,
-      top,
-      left,
-      width,
-      height,
-      state,
-      text,
-      angle);
-
-    let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background');
-    this.toolState.setState(UIStates.background, bgNdx);
-    this.toolState.setState(UIStates.foreground, 1);
-    this.toolState.setState(UIStates.color, 4);
-    this.toolState.setState(UIStates.weight, 0);
-
-    // this.SetContainerState(this.toolState);
-  }
-
-  get IsSelected() {
-    return this.selected;
-  }
-
-  get ToolType(): tooltypes {
-    return this.type;
-  }
-
-  SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
-
-    let wasSelected = this.selected;
-    this.selected = super.SelectShape(shapeSelectResult);
-    if (this.selected) {
-      if (!wasSelected) {
-        let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background_selected');
-        this.toolState.setState(UIStates.background, bgNdx);
-      }
-      else {
-        this.selected = false;
-      }
-    }
-    if (!this.selected) {
-      let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background');
-      this.toolState.setState(UIStates.background, bgNdx);
-    }
-
-    return this.selected;
-  }
-}
-
-class RectangleTool extends ToolBarTool {
-
-
-
-}
-
-class EllispeTool extends ToolBarTool {
-
-}
-
-class LineTool extends ToolBarTool {
-
-}
-
-class ImageTool extends ToolBarTool {
-
-}
-
-export class Toolbar extends ContextLayer {
-
-  private designState = new StateIndex('designertoolbar');
-  private selectedTool = tooltypes.typecount;
-
-  constructor() {
-    super("toolbar", "default");
-    let bgNdx = DisplayValues.GetColorIndex('toolbar.tool.background');
-    this.designState.setState(UIStates.background, bgNdx);
-    this.designState.setState(UIStates.foreground, 1);
-    this.designState.setState(UIStates.color, 4);
-    let fontNdx = DisplayValues.GetFontIndex('toolbarfont');
-    this.designState.setState(UIStates.fontFace, fontNdx);
-    this.designState.setState(UIStates.weight, 0);
-    this.Build();
-  }
-
-  //Draw(context: any) {
-  //  this.rightBorder.Draw(context);
-  //  this.tools.forEach(function (t, i) {
-  //    t.Draw(context);
-  //  });
-  //}
-
-  Build() {
-    this.BuildTools();
-  }
-
-  Select(shapeSelectResult: ShapeSelectResult): boolean {
-
-    let previousTool = this.selectedTool;
-    this.SelectTool(shapeSelectResult);
-    shapeSelectResult.type = this.selectedTool;
-    return this.selectedTool != previousTool;
-
-    // this.AddNewItem(tooltype, shapeSelectResult.point);
-
-
-  }
-
-  get SelectedToolType() {
-    let tool = this.Content.find(c => (c as ToolBarTool).IsSelected);
-    if (!tool) { return tooltypes.typecount; }
-    return (<ToolBarTool>tool).ToolType;
-  }
-
-  SelectTool(shapeSelectResult: ShapeSelectResult) {
-
-    let newtooltype = this.selectedTool;
-    this.selectedTool = tooltypes.typecount;
-    if (super.Select(shapeSelectResult)) {
-      newtooltype = this.SelectedToolType;
-      if (newtooltype != this.selectedTool) {
-        this.selectedTool = newtooltype;
-      }
-    }
-    return this.selectedTool;
-  }
-
-  get SelectedType(): tooltypes {
-    return this.selectedTool;
-  }
-
-  BuildTools(
-    size: number = 45,
-    w: number = 30,
-    h: number = 30,
-    t: number = 10,
-    l: number = 10) {
-
-    //
-    //   this.tools
-    this.AddContent(
-      new ToolBarTool(0,
-        'tool_rect',
-        t, l, w, h, this.designState, '/images/myRectangle.png', 0));
-    l += h + 10;
-    this.AddContent(
-      new ToolBarTool(1,
-        'tool_ellipse',
-        t, l, w, h, this.designState, '/images/myEllipse.png', 0));
-    //t += w + 10;
-    //this.AddContent(
-    //  new ToolBarTool(2,
-    //    'tool_line',
-    //    t, l, w, h,this.designState,'C', 0));
-    //t += w + 10;
-    //  }
-  }
-}
 
 export class BaseDesignerModel extends ContextLayer {
 
@@ -486,7 +329,7 @@ export class BaseDesignerModel extends ContextLayer {
     }
   }
 
-  AddNewItem( point: Point) {
+  AddNewItem(point: Point) {
 
     let shape: IContextItem = null;
     let cnt = this.Content.length;

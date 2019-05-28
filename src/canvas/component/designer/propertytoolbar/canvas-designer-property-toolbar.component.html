@@ -1,4 +1,4 @@
-<form class="example-form">
+<form [formGroup]="ShapeDetailsForm" class="example-form">
   <div class="toolbar-container">
     <mat-grid-list cols="32" rowHeight="40px">
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
@@ -18,7 +18,7 @@
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <div mat-button class="designer_delete_image" (click)="DeleteObject($event)"></div>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
         <mat-form-field class="shapeClassInput"
                         [floatLabel]="'never'">
           <input matInput
@@ -32,70 +32,114 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
+      <mat-grid-tile [colspan]="6" [rowspan]="1" style="text-align:left">
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <button mat-flat-button color="accent" style="width:20px"
+                name="shapeColor"
+                (click)="UpdatePort()">
+          Add Port
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <button mat-flat-button color="accent" style="width:20px"
+                name="shapeColor"
+                (click)="UpdateLine()">
+          Add Line
+        </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
-        <button mat-button [matMenuTriggerFor]="line">Lines</button>
-    <mat-menu #line="matMenu" overlapTrigger="false">
-      <mat-form-field class="shapeClassInput"
-                      [floatLabel]="'never'">
-        <input matInput
-               placeholder="State"
-               aria-label="State"
-               [matAutocomplete]="stateName"
-               [formControl]="stateControl">
-        <mat-autocomplete #stateName="matAutocomplete">
-          <mat-option *ngFor="let state of filteredStateList  | async"
-                      [value]="state">{{line}}</mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-    </mat-menu>
+        <button mat-flat-button color="accent"
+                style="width:100%"
+                name="shapeColor"
+                (click)="UpdateState()">
+          Update Graphic State
+        </button>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" >
-  
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">
+          <input matInput
+                 placeholder="X"
+                 aria-label="locx"
+                 formControlName="locX">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">
+          <input matInput
+                 placeholder="Y"
+                 aria-label="locy"
+                 formControlName="locY">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">
+          <input matInput
+                 style="width:100%"
+                 placeholder="W"
+                 aria-label="width"
+                 formControlName="sizeX">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">
+          <input matInput
+                 placeholder="H"
+                 aria-label="height"
+                 formControlName="sizeY">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+
         <mat-form-field [floatLabel]="'never'">
           <div style="width:40px; background-color:transparent; padding-left:135px; text-align:right">
-            <input type="number" class="widthInput" min="1" max="10" matInput placeholder="1" [formControl]="widthControl">
+            <input type="number" class="widthInput" min="1" max="10" matInput placeholder="1" [formControl]="lineWidthControl">
           </div>
         </mat-form-field>
         <!--<mat-form-field class="shapeClassInput"
-                  [floatLabel]="'never'">
-    <input matInput
-           placeholder="Port"
-           aria-label="State"
-           [matAutocomplete]="portName"
-           [formControl]="portControl">
-    <mat-autocomplete #portName="matAutocomplete">
-      <mat-option *ngFor="let port of filteredPortList  | async"
-                  [value]="port">{{port}}</mat-option>
-    </mat-autocomplete>
-  </mat-form-field>-->
+                    [floatLabel]="'never'">
+      <input matInput
+             placeholder="Port"
+             aria-label="State"
+             [matAutocomplete]="portName"
+             [formControl]="portControl">
+      <mat-autocomplete #portName="matAutocomplete">
+        <mat-option *ngFor="let port of filteredPortList  | async"
+                    [value]="port">{{port}}</mat-option>
+      </mat-autocomplete>
+    </mat-form-field>-->
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <button mat-button [matMenuTriggerFor]="color" (menuOpened)="SetProperties()">Color</button>
         <mat-menu #color="matMenu" overlapTrigger="false"
                   style="background-color:steelblue;">
-          <div   style="background-color:steelblue; padding-left:25px">
+          <div style="background-color:steelblue; padding-left:25px">
             <span [style.background]="selectedColor"
                   [cpToggle]="true" [cpDialogDisplay]="'inline'"
                   [cpCancelButton]="true"
                   [cpCancelButtonClass]="'btn btn-primary btn-xs'"
                   [(colorPicker)]="selectedColor"></span>
             <div style="width:90%">
+              <mat-form-field class="shapeClassInput"
+                              [floatLabel]="'never'">
+                <input matInput
+                       placeholder="Class"
+                       aria-label="State"
+                       [matAutocomplete]="shapeClass"
+                       [formControl]="colorSSSControl">
+                <!--<mat-autocomplete #shapeClass="matAutocomplete">
+              <mat-option *ngFor="let class of filteredshapeClassList  | async"
+                          [value]="class">{{class}}</mat-option>
+            </mat-autocomplete>-->
+              </mat-form-field>
               <button mat-flat-button color="accent"
                       name="shapeColor" class="colorButton"
                       (click)="ApplyColor('bg')">
-                Background
-              </button>
-              <button mat-flat-button color="accent"
-                      name="shapeColor" class="colorButton"
-                      (click)="ApplyColor('fg')">
-                Foreground
-              </button>
-              <button mat-flat-button color="accent"
-                      name="shapeColor" class="colorButton"
-                      (click)="ApplyColor('fg')">
-                Border
+                Select
               </button>
             </div>
           </div>

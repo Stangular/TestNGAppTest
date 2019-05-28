@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ShapeProperties } from '../models/shapes/shape';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult } from '../models/shapes/shapeSelected';
+import { BaseDesignerModel, EditModel } from '../models/designer/base.model';
 
 
 export enum objectTypes {
@@ -14,15 +15,20 @@ export enum objectTypes {
 }
 
 
-@Injectable()  
+@Injectable()
 export class CanvasService {
 
+  private designer: BaseDesignerModel;
+  private editor: EditModel;
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   selectedType: objectTypes = objectTypes.rectangle;
   private shapeProperties: ShapeProperties = new ShapeProperties();
   chartContent: ChartContentModel[] = [];
 
-  constructor() { }
+  constructor() {
+    this.designer = new BaseDesignerModel();
+    this.editor = new EditModel();
+  }
 
   AddNewChartContent(id: string,
     minValue: number,
@@ -36,11 +42,19 @@ export class CanvasService {
         minValue,
         maxValue,
         value,
-        dataCount ));
+        dataCount));
+  }
+
+  get Designer() {
+    return this.designer;
+  }
+
+  get Editor() {
+    return this.editor;
   }
 
   getChartModel(id: string) {
-    return 
+    return
   }
 
   get ShapeProperties() {

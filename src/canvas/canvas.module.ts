@@ -11,6 +11,10 @@ import { CanvasDesignerPropertyToolbarComponent } from './component/designer/pro
 import { DesignerPageComponent } from './component/designer/designer-page/designer-page.component';
 import { CanvasService } from './service/canvas.service';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { UpdatePortDialog } from 'src/ui/components/views/form/dialogs/addport/update-port-dialog.component';
+import { CanvasGraphicStateDialogComponent } from 'src/ui/components/views/form/dialogs/canvas-graphic-state-dialog/canvas-graphic-state-dialog.component';
+import { UpdateLineDialog } from 'src/ui/components/views/form/dialogs/addline/update-line-dialog.component';
+import { LineService } from './models/lines/service/line.service';
 
 library.add(
    faFilter
@@ -31,13 +35,24 @@ library.add(
     , DashboardPageComponent
     , DesignerPageComponent
     , CanvasDesignerPropertyToolbarComponent
+    , UpdatePortDialog
+    , CanvasGraphicStateDialogComponent
+    , UpdateLineDialog
     , ToolboxCanvasComponent],
 
   exports: [CanvasComponent
     , DashboardPageComponent
     , DesignerPageComponent
     , CanvasDesignerPropertyToolbarComponent
+    , UpdatePortDialog
+    , CanvasGraphicStateDialogComponent
+    , UpdateLineDialog
     , ToolboxCanvasComponent],
-  providers: [CanvasService]
+  entryComponents: [
+    UpdatePortDialog
+    , UpdateLineDialog
+    , CanvasGraphicStateDialogComponent],
+  providers: [CanvasService
+      , LineService]
 })
 export class CanvasModule { }

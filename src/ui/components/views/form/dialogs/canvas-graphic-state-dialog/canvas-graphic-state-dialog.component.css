@@ -1,0 +1,11 @@
+.mat-slider-vertical {
+  height: 300px;
+}
+
+.button-row {
+  padding-left: 180px;
+}
+
+.button-row button{
+  margin-right: 8px;
+}

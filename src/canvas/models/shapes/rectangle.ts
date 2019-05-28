@@ -33,9 +33,9 @@ export class Rectangle extends Shape {
   Draw(context: any): void {
     context.beginPath();
     this.DrawShape(context);
-    this._shapes.forEach(s => s.DrawShape(context));
-    this._ports.forEach(p => p.DrawShape(context));
     context.closePath();
+    this._shapes.forEach(s => s.Draw(context));
+   // this._ports.forEach(p => p.DrawShape(context));
   }
 
   CopyShape(newID: string ) : Shape {

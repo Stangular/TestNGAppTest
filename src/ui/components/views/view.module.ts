@@ -19,6 +19,7 @@ import { SaveFormSuccessSnackComponent } from '../snacks/success/save/form/save-
 import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { SelectListComponent } from '../select/form-list-select.component';
 import { CanvasShapePropertyDialogComponent } from './form/dialogs/canvas-shape-property-dialog/canvas-shape-property-dialog.component';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 library.add(
   faCoffee
@@ -34,6 +35,7 @@ library.add(
     , CanvasModule
     , ngMaterialModule
     , FontAwesomeModule
+    , ColorPickerModule
     , Ng4LoadingSpinnerModule.forRoot()
   ],
 

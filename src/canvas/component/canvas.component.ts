@@ -59,7 +59,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   @Input() margin: Margin;
   @Output() select: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   @Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
-
+  @Output() move: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   private point: Point = new Point();
 
   constructor(private messageService: MessageService, private canvasService: CanvasService) {
@@ -72,6 +72,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
 
   AcceptMessage(message: any) {
     switch (message.text) {
+      case 11: break;
       case 10: this.editSystem.Draw(this.ActiveContext);
         break;
       default: this.ReDraw(); break;
@@ -129,7 +130,6 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     else if (!this.editOn) {
       this.system.AddContent(null);
       this.ReDraw();
-
     }
     else {
       this.canvasService.shapeSelectResult.id = "";
@@ -216,8 +216,9 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   OnMouseMove(e: any) {
     if (this.mouseCaptured) {
       this.PositionFromEvent(e);
-      this.editSystem.MoveItem(this.canvasService.shapeSelectResult.point);
+      this.editSystem.MoveItem(this.canvasService.shapeSelectResult);
       this.DrawActive();
+      this.move.emit(this.canvasService.shapeSelectResult);
     }
   }
 
@@ -259,7 +260,7 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
     c.clearRect(0, 0, this.width, this.height);
     this.editSystem.Draw(c);
   }
-
+  /// 
   Draw() {
     if (!this.system) {
       this.system = new ContextSystem();  // TODO: have default layer for this state.

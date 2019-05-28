@@ -1,0 +1,33 @@
+.dialog-form {
+  width: 280px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.number {
+  text-align: right;
+}
+
+.designer_line_image {
+  background: URL('/images/vector-line.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+  border: none;
+}
+
+.designer_gradient_line_image {
+  background: URL('/images/vector-radius.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}
+
+.designer_bezier_line_image {
+  background: URL('/images/vector-bezier.png');
+  width: 24px;
+  height: 24px;
+  border: none;
+}

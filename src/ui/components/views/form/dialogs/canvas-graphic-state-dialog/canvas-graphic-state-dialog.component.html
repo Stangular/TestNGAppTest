@@ -1,0 +1,58 @@
+<div class="dialog-form">
+  <div style="width:100%; background-color:lightgray; padding-left:10px">
+    <h1 mat-dialog-title>Update Graphic State</h1>
+  </div>
+  <mat-dialog-content>
+    <mat-grid-list cols="16" rowHeight="40px">
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <div style="text-align:left">Name:</div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="14" [rowspan]="1" style="text-align:left">
+        <mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">
+          <input matInput placeholder="name"
+                 [matAutocomplete]="auto"
+                 [formControl]="stateName">
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let state of states | async" [value]="state">
+              <span>{{state}}</span> |
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
+        <div style="text-align:right">Weight:{{data.weight}}</div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="13" [rowspan]="1">
+          <div style="width:40px; background-color:transparent;text-align:center">
+            Color:
+          </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="3" [rowspan]="8" style="text-align:left">
+        <mat-slider class="mat-slider-vertical"
+                    [disabled]="false"
+                    [invert]="false"
+                    [max]="10"
+                    [min]="1"
+                    [step]="1"
+                    [thumbLabel]="false"
+                    [tickInterval]="1"
+                    [(ngModel)]="data.weight"
+                    [vertical]="true">
+        </mat-slider>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="13" [rowspan]="8" style="text-align:left">
+        <span [style.background]="data.color"
+              [cpToggle]="true" [cpDialogDisplay]="'inline'"
+              [cpCancelButton]="true"
+              [cpCancelButtonClass]="'btn btn-primary btn-xs'"
+              [(colorPicker)]="data.color"></span>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </mat-dialog-content>
+  <div mat-dialog-actions class="button-row">
+    <button mat-stroked-button color="primary" (click)="onNoClick()">Cancel</button>
+    <button mat-stroked-button color="primary" [mat-dialog-close]="data" cdkFocusInitial>Save</button>
+  </div>
+</div>
+

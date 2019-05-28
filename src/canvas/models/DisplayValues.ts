@@ -37,6 +37,19 @@ export class StateIndex {
     this.index[index] = value;
     return true;
   }
+
+  get color() {
+    return this.getState(UIStates.color);
+  }
+
+  get weight() {
+    return this.getState(UIStates.weight);
+  }
+  getState(state: UIStates) {
+    return this.Index[state];
+  }
+
+
 }
 
 export class DisplayValues {
@@ -44,11 +57,19 @@ export class DisplayValues {
   private static color: NamedValue<string>[] = [];
   private static weight: NamedValue<number>[] = [];
   private static fonts: NamedValue<string>[] = [];
-  private static ports: {}[] = [];
+
   static Clear() {
     this.color.length = 0;
     this.weight.length = 0;
     this.fonts.length = 0;
+  }
+
+  static get StateNames() {
+    let names: string [] = [];
+    this.color.forEach(function (v, i) {
+      names.push(v.Name);
+    });
+    return names;
   }
 
   static ColorIndex(name: string) {
@@ -113,6 +134,23 @@ export class DisplayValues {
     return this.fonts.findIndex(p => p.Name == name);
   }
 
+  static GetLineIndex(name: string, state: string): StateIndex {
+    let stateIndex = new StateIndex(name);
+    let ndx = this.ColorIndex(state);
+    stateIndex.setState(UIStates.color, ndx);
+    stateIndex.setState(UIStates.weight, ndx);
+    return stateIndex;
+  }
+
+  static GetPortIndex(name: string,background:string, border:string): StateIndex {
+    let stateIndex = new StateIndex(name);
+    let ndx = this.ColorIndex(background);
+    stateIndex.setState(UIStates.color, ndx);
+    ndx = this.ColorIndex(border);
+    stateIndex.setState(UIStates.weight, ndx);
+    stateIndex.setState(UIStates.color, ndx);
+   return stateIndex;
+  }
 }
 
 export class TheCanvasState {
@@ -128,6 +166,8 @@ export class TheCanvasState {
     DisplayValues.SetColor('transparent', 'red');
     DisplayValues.SetWeight('exlyrrect1border', 1.0);
     DisplayValues.SetFont('exlyrtext1font', '9px FontAwesome');
+    DisplayValues.SetColor('basic', 'black');
+    DisplayValues.SetWeight('basic', 2.0);
 
     DisplayValues.SetColor('toolbar.tool.background', '#d3d3d3');
     DisplayValues.SetColor('toolbar.tool.background_selected', '#708090');
@@ -135,6 +175,10 @@ export class TheCanvasState {
     DisplayValues.SetColor('default.rect.background', '#aa00aa');
     DisplayValues.SetColor('default.edit.background', 'yellow');
     DisplayValues.SetFont('toolbarfont', '14px FontAwesome');
+
+    DisplayValues.SetColor('base_port_bg', '#aaaaaa');
+    DisplayValues.SetColor('base_port_border', 'black');
+    DisplayValues.SetWeight('base_port_border', 0.3);
 
   }
 

@@ -38,7 +38,7 @@ export class CanvasContextModel {
   templateUrl: './toolbox-canvas.component.html',
   styleUrls: ['./toolbox-canvas.component.css']
 })
-export class ToolboxCanvasComponent implements OnInit {
+export class ToolboxCanvasComponent implements OnInit, OnDestroy{
 
   editOn: boolean = true;
   mouseCaptured: boolean = false;
@@ -131,11 +131,11 @@ export class ToolboxCanvasComponent implements OnInit {
 
   ReDraw() {
 
-    this.setSize();
+   // this.setSize();
     //if (!this.system) {
     //  this.system = this.source.ChartGraphic(this.canvasID, this.width, this.height, 'bar');
     //}
-    this.Draw();
+  //  this.Draw();
 
   }
 
