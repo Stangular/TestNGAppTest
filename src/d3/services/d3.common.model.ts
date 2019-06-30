@@ -78,14 +78,11 @@ export class D3ChartSectionModel {
   }
 
   FieldValue(fldID: string = ''): number {
-    console.error(fldID);
     let v = this._values.find(x => x._fieldID == fldID);
     if (!v) {
       if (fldID.length > 0) { return 0; }
-      console.error("C1:" + this._values[0]._value);
       return this._values[0]._value;
     }
-    console.error("C2:" + v._value);
 
     return v._value;
   }

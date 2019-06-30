@@ -1,16 +1,14 @@
-<canvas #thiscanvas
-        class="chart"
-        [id]="canvasID"
+<canvas #staticcanvas
+        class="staticCanvas"
+        [id]="'staticCanvas'"
         (mousedown)="OnMousedown($event)"
-        (mouseup)="OnRelease($event)"
-        style="border:1px solid #000000; background-color:transparent"></canvas>
-<div *ngIf="editOn" style="position:absolute; top:0; left:0; width:100%; height:100%; background-color:transparent">
-  <canvas #actCanvas
-          class="chart"
-          (mousedown)="OnActiveClick($event)"
+        (mouseup)="OnRelease($event)">
+</canvas>
+  <canvas #activeCanvas
+          class="activeCanvas"
+          (mousedown)="OnMousedown($event)"
           (mouseup)="OnRelease($event)"
           (mousemove)="OnMouseMove($event)"
-          [id]="'canvasIDsss'"
-          style="border:1px solid #00ff00; background-color:#eeeeee; opacity:0.75"></canvas>
-</div>
+          [id]="'activeCanvas'">
+  </canvas>
 

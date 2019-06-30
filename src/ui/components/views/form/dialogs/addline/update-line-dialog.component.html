@@ -3,14 +3,14 @@
   <mat-dialog-content>
     <mat-grid-list cols="16" rowHeight="40px">
       <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
-        <mat-radio-group aria-label="Select an option" (change)="SelectLineType($event)">
-          <mat-radio-button value="straight" name="lineType" [checked]="true">
+        <mat-radio-group aria-label="Select an option" [(ngModel)]="data.type">
+          <mat-radio-button value="straight" name="lineType" [value]="lt.straight" >
             <div id="lineType" mat-button class="designer_line_image"></div>
           </mat-radio-button>
-          <mat-radio-button value="gradient" name="lineType">
+          <mat-radio-button value="gradient" name="lineType" [value]="lt.gradient">
             <div id="gradientType" mat-button class="designer_gradient_line_image"></div>
           </mat-radio-button>
-          <mat-radio-button value="bezier" name="lineType">
+          <mat-radio-button value="bezier" name="lineType" [value]="lt.bezier">
             <div id="bezierType" mat-button class="designer_bezier_line_image"></div>
           </mat-radio-button>
         </mat-radio-group>
@@ -19,18 +19,15 @@
         <div style="text-align:right">Line Name:</div>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
-        <mat-form-field [floatLabel]="'never'">
           <input matInput
-                 [disabled]="selectedState.length > 0"
                  [matAutocomplete]="linenames"
                  placeholder="name"
                  [formControl]="lineName">
           <mat-autocomplete #linenames="matAutocomplete">
-            <mat-option *ngFor="let line of lines | async" [value]="state">
+            <mat-option *ngFor="let line of lines | async" [value]="line.Id">
               <span>{{line.Id}}</span>
             </mat-option>
           </mat-autocomplete>
-        </mat-form-field>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
         <mat-label>Select state</mat-label>
@@ -43,6 +40,22 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">Path</label>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="12" [rowspan]="1">
+        <input matInput
+               [matAutocomplete]="pathnames"
+                 placeholder="name"
+                 [formControl]="pathName">
+        <mat-autocomplete #pathnames="matAutocomplete">
+          <mat-option *ngFor="let path of paths | async" [value]="path.Id">
+            <span>{{path.Id}}</span>
+          </mat-option>
+        </mat-autocomplete>
       </mat-grid-tile>
     </mat-grid-list>
   </mat-dialog-content>

@@ -4,6 +4,7 @@ import { Point } from '../../shapes/primitives/point';
 import { StateIndex, UIStates, DisplayValues } from '../../DisplayValues';
 import { Port } from '../../shapes/port';
 
+
 @Injectable()
 export class LineService {
 
@@ -16,7 +17,7 @@ export class LineService {
     this.linepad.setState(UIStates.color, 4);
     this.linepad.setState(UIStates.weight, 0);
 
-    this.AddLine('basic_line_A', 'basic')
+    this.AddLine('basic_line_A', 'basic');
 
   }
 
@@ -32,7 +33,7 @@ export class LineService {
   AddPortToLine(lineName:string,pathName:string,portIndex:number) {
     let line = this._lines.find(l => l.Id == lineName);
     if (line) {
-      return line.AddPortToLine(pathName,portIndex);
+     // return line.AddPortToLine(pathName,portIndex);
     }
     return false;
   }
@@ -46,10 +47,10 @@ export class LineService {
   }
 
   public DrawLines(context: any, port: Port): void {
-    let lines = this._lines.filter(l => l.Id == port.SourcePort);
-    lines.forEach(function (l, i) {
+    //let lines = this._lines.filter(l => l.Id == port.SourcePort);
+    //lines.forEach(function (l, i) {
       
-    });
+    //});
   }
 
  

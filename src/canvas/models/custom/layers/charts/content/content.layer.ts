@@ -15,10 +15,10 @@ import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 // data{ value:0,fieldId:''}[]
 // 
 
-export abstract class ContentLayer extends ContextLayer {
+export abstract class ContentLayer { // extends ContextLayer {
 
   constructor(protected margins: Margin, protected size: Size, layerId: string) {
-    super(layerId, 'default');
+   // super(layerId, 'default');
   }
 
   abstract XScale(): IScale;
@@ -34,10 +34,10 @@ export abstract class ContentLayer extends ContextLayer {
   }
 
   Draw(context: any) {
-    super.Draw(context);
+ //   super.Draw(context);
   }
 
   Select(shapeSelectResult: ShapeSelectResult): boolean {
-    return super.Select(shapeSelectResult);
+    return false; //super.Select(shapeSelectResult);
   }
 }

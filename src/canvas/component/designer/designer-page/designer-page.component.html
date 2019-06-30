@@ -20,8 +20,8 @@
                  [rowspan]="11"
                  [style.background]="transparent">
     <app-canvas [canvasID]="designerCanvas"
-                width="100%"
-                height="100%"
+                [width]="1000"
+                [height]="800"
                 (move)="ItemMoved($event)"
                 (edit)="ItemSelected($event)"
                 [editSystem]="canvasService.Editor"

@@ -127,7 +127,7 @@ export class EditModel extends ContextLayer {
 
   MoveItem(shapeSelectResult: ShapeSelectResult, ports: Port[]) {
     let self = this;
-    let shpPorts = ports.filter(p => p.ParentShapeId == s.Id);
+    let shpPorts = ports.filter(p => p.ParentShapeId == shapeSelectResult.id);
     let dx = shapeSelectResult.point.X - this.contactPoint.X;
     let dy = shapeSelectResult.point.Y - this.contactPoint.Y;
     let sid = this._sizer.findIndex(s => s.Id == this.selectedId);
@@ -249,7 +249,6 @@ export class BaseDesignerModel extends ContextLayer {
 
   point: Point;
   shapes: Shape[] = [];
-  lines: Line[] = [];
   text: Text[] = [];
   tooltype: tooltypes = tooltypes.typecount;
   // images

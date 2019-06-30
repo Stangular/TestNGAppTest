@@ -10,40 +10,75 @@
           <input matInput placeholder="Name" [(ngModel)]="data.name">
         </mat-form-field>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="8" [rowspan]="1">
-        <mat-form-field class="full-width" [floatLabel]="'never'">
-          <input type="number" min="0" max="110" style="text-align:right" matInput placeholder="Offset X (%)" [(ngModel)]="data.offsetX">
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="8" [rowspan]="1">
-        <mat-form-field class="full-width" [floatLabel]="'never'">
-          <input type="number" min="0" max="110" style="text-align:right" matInput placeholder="Offset Y (%)" [(ngModel)]="data.offsetY">
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="16" [rowspan]="2">
-        <mat-form-field [floatLabel]="'never'">
-          <mat-label>Select Line</mat-label>
-          <mat-select placeholder="Select Line" [(ngModel)]="selectedLine" (selectionChange)="LineSelected($event)">
-            <mat-option *ngFor="let line of this.lineService._lines" [value]="line.Id">
-              {{line.Id}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="8" [rowspan]="1">
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="16" [rowspan]="2">
-        <div *ngIf="selectedLine">
-          <input matInput
-                 [matAutocomplete]="pathnames"
-                 placeholder="path name"
-                 [formControl]="pathName">
-          <mat-autocomplete #pathnames="matAutocomplete">
-            <mat-option *ngFor="let path of paths | async" [value]="state">
-              <span>{{path.Id}}</span>
-            </mat-option>
-          </mat-autocomplete>
+      <mat-grid-tile [colspan]="5" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">Offset X</label>
         </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1">
+        <mat-form-field class="full-width" [floatLabel]="'never'">
+          <input type="number" min="0" max="110" style="text-align:right" matInput placeholder="0" [(ngModel)]="data.offsetX">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="7" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">%</label>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="5" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">Offset Y</label>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1">
+        <mat-form-field class="full-width" [floatLabel]="'never'">
+          <input type="number" min="0" max="110" style="text-align:right" matInput placeholder="0" [(ngModel)]="data.offsetY">
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="7" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">%</label>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">Type</label>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="12" [rowspan]="1">
+        <section class="example-section">
+          <mat-radio-group [(ngModel)]="data.type">
+            <mat-radio-button class="xradioButton" [value]="ept.source">
+              Source
+            </mat-radio-button>
+            <mat-radio-button class="xradioButton" [value]="ept.target">
+              Target
+            </mat-radio-button>
+          </mat-radio-group>
+        </section>
+        <!--<mat-form-field [floatLabel]="'never'">
+      <mat-label>Select Line</mat-label>
+      <mat-select placeholder="Select Line" [(ngModel)]="selectedLine" (selectionChange)="LineSelected($event)">
+        <mat-option *ngFor="let line of this.lineService._lines" [value]="line.Id">
+          {{line.Id}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>-->
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="4" [rowspan]="1">
+        <div style="width:100%; text-align:left">
+          <label class="xLabel">Path</label>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="12" [rowspan]="1">
+        <input matInput
+               [matAutocomplete]="pathnames"
+                 [formControl]="pathName">
+        <mat-autocomplete #pathnames="matAutocomplete">
+          <mat-option *ngFor="let path of paths | async" [value]="path.Id">
+            <span>{{path.Id}}</span>
+          </mat-option>
+        </mat-autocomplete>
       </mat-grid-tile>
     </mat-grid-list>
   </div>

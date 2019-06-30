@@ -151,6 +151,16 @@ export class DisplayValues {
     stateIndex.setState(UIStates.color, ndx);
    return stateIndex;
   }
+
+  static GetShapeIndex(name: string, background: string, border: string): StateIndex {
+    let stateIndex = new StateIndex(name);
+    let ndx = this.ColorIndex(background);
+    stateIndex.setState(UIStates.background, ndx);
+    ndx = this.ColorIndex(border);
+    stateIndex.setState(UIStates.weight, ndx);
+    stateIndex.setState(UIStates.foreground, ndx);
+    return stateIndex;
+  }
 }
 
 export class TheCanvasState {

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Point } from '../../shapes/primitives/point';
 import { StateIndex, UIStates, DisplayValues } from '../../DisplayValues';
-import { Port } from '../port';
+import { Port, ePortType } from '../port';
 import { Shape } from '../shape';
 import { Line } from '../../lines/line';
+import { Path } from '../../lines/path';
 
 @Injectable()
 export class PortService {
 
-  _ports: Port[] = [];
   _currentPort: number = -1;
   private portpad = new StateIndex('portpad');
 
@@ -22,11 +22,14 @@ export class PortService {
     id: string,
     offsetX: number,
     offsetY: number,
+    type: ePortType,
+    path:string,
     parent: Shape) {
     if (!parent) { return -1; }
     let state = DisplayValues.GetPortIndex(id + "_state", "base_port_bg", "base_port_border");
-    this._ports.push(new Port(id, offsetX,offsetY, parent, state));
-    return this._ports.length - 1;
+    //  this._ports.push(new Port(id, offsetX,offsetY, parent, type,  state));
+  //  parent.AddPort(id, offsetX, offsetY, type, state, "pathid");
+    return 0;//this._ports.length - 1;
   }
 
   get CurrentPort() {
@@ -34,7 +37,7 @@ export class PortService {
   }
 
   SelectPort(id: string): boolean {
-    this._currentPort = this._ports.findIndex(l => l.Id == id);
+   // this._currentPort = this._ports.findIndex(l => l.Id == id);
     return this._currentPort >= 0;
   }
 

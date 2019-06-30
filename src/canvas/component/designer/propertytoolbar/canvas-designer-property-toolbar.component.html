@@ -130,7 +130,7 @@
                        placeholder="Class"
                        aria-label="State"
                        [matAutocomplete]="shapeClass"
-                       [formControl]="colorSSSControl">
+                       [formControl]="colorControl">
                 <!--<mat-autocomplete #shapeClass="matAutocomplete">
               <mat-option *ngFor="let class of filteredshapeClassList  | async"
                           [value]="class">{{class}}</mat-option>
@@ -139,7 +139,7 @@
               <button mat-flat-button color="accent"
                       name="shapeColor" class="colorButton"
                       (click)="ApplyColor('bg')">
-                Select
+                Select
               </button>
             </div>
           </div>

@@ -2,3 +2,16 @@
   font-family: Verdana;
   font-size: 9pt;
 }
+
+.staticCanvas {
+  border: 1px solid #000000;
+  background-color: transparent;
+}
+
+.activeCanvas {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  border: 0;
+  background-color: rgba(254, 254, 254, 0.7);
+}

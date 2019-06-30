@@ -12,10 +12,12 @@ export interface IShape {
   Height: number;
 
   Center: Point;
-
+  Class: string;
+  AssignToClass(clss: string): void;
   DrawShape(context: any);
   MoveBy(x: number, y: number);
   SizeBy(top: number, right: number, bottom: number, left: number);
+  CenterOn(x: number, y: number);
  // Track(point: TrackingPoint);
 //  SetToPosition(point: TrackingPoint);
 }

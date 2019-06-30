@@ -6,23 +6,21 @@ import { ILine } from './Iline';
 import { Line } from './line';
 import { DisplayValues, StateIndex } from '../DisplayValues';
 
-export class BezierLine extends Line implements IContextItem, ILine {
+export class BezierLine extends Line implements IContextItem {
 
 
   constructor(id: string,
-    protected sourceOffset: Point,
-    protected targetOffset: Point,
     protected bezierport: Port,
     protected gradientPort: Port,
     state: StateIndex) {
-    super(id, sourceOffset, targetOffset, state);
+    super(id, state);
   }
   
   lineToTarget(context: any) {
 
-    context.bezierCurveTo(
-      this.bezierport.Offset.X, this.bezierport.Offset.Y,
-      this.gradientPort.Offset.X, this.gradientPort.Offset.Y,
-      this.targetOffset.X, this.targetOffset.Y);
+   // context.bezierCurveTo(
+   //   this.bezierport.Offset.X, this.bezierport.Offset.Y,
+   //   this.gradientPort.Offset.X, this.gradientPort.Offset.Y,
+ //     this.targetOffset.X, this.targetOffset.Y);
   }
 }

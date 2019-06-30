@@ -95,7 +95,7 @@ export class BarLayer extends ContentLayer {
     let chartSize = new Size(size.Width - margins.Right, size.Height - margins.Bottom);
     data.forEach(function (d, i) {
       let bar = new Bar(idData[i],'barchart' + i, minValue, maxValue, d, chartSize, offset, barwidth, barState);
-      self.AddContent(bar);
+   //   self.AddContent(bar);
     });
     
   }
@@ -107,13 +107,13 @@ export class BarLayer extends ContentLayer {
 
   positionOnAxis(axis: AxisLayer) {
 
-    this.content.forEach(function (c, i) {
-      let bar = (<Bar>c);
-      let tick = axis.XTicks.find(t => t.id == bar.sourceID);
-      if (tick) {
-        bar.area.positionOnTick(tick.point.X - (bar.area.Width / 2), 0);
-      }
-    });
+    //this.content.forEach(function (c, i) {
+    //  let bar = (<Bar>c);
+    //  let tick = axis.XTicks.find(t => t.id == bar.sourceID);
+    //  if (tick) {
+    //    bar.area.positionOnTick(tick.point.X - (bar.area.Width / 2), 0);
+    //  }
+    //});
   }
 
   XScale(): IScale {

@@ -7,3 +7,11 @@
 .full-width {
   width: 100%;
 }
+
+.xLabel {
+  margin-right:5px;
+  text-align:left;
+}
+.xradioButton {
+  margin-right: 5px;
+}

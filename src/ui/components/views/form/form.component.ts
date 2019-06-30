@@ -159,7 +159,6 @@ export class FormComponent implements OnInit, AfterContentInit {
 
   initFail(data: any) {
     this.spinnerService.hide();
-    console.error(JSON.stringify(data));
     this.Snack('Form failed to initialize');
   }
 
@@ -170,7 +169,6 @@ export class FormComponent implements OnInit, AfterContentInit {
   }
 
   saveFail(data: any) {
-    console.error(JSON.stringify(data));
     this.saveing = false;
     this.Snack(data.error || 'Form save Failed for unknown reason');
   }
@@ -189,7 +187,6 @@ export class FormComponent implements OnInit, AfterContentInit {
   }
 
   deleteFail(data: any) {
-    console.error(JSON.stringify(data));
     this.saveing = false;
     this.Snack('Form removal failed');
   }

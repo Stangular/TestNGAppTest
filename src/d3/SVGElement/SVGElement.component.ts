@@ -34,7 +34,6 @@ export class D3SVGElementComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked() {
     if (!this.drawn) {
-      console.error('B:' + this.chartID);
       this.size.Set(this.chartWidth, this.chartHeight);
       this.margin.Set(this.marginTop, this.marginRight, this.marginBottom, this.marginLeft);
       this.d3Service.SetViewParameters(this.chartID

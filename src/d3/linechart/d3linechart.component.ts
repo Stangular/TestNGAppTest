@@ -28,7 +28,6 @@ export class D3LinechartComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked() {
     if (!this.drawn) {
-      console.error('B:' + this.chartID);
    //   this.d3Service.DrawComponent(this.chartID, "line", this.chartWidth, this.chartHeight);
       this.drawn = true;
     }

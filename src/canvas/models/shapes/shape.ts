@@ -3,7 +3,9 @@ import { Point, TrackingPoint } from './primitives/point';
 import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
-import { Line } from '../lines/line';
+import { Line, PortPath } from '../lines/line';
+import { Path } from '../lines/path';
+import { ePortType, Port } from './port';
 
 export enum FreedomOfMotion {
   full = 0,
@@ -16,6 +18,7 @@ export enum OffsetStyle {
   absolute = 1,   // Remains at defined position from nearest corner.
   constantPercent = 2 // Remains at the same percentage offset form top/left.
 }
+
 export class ContainedShape {
   _shape: Shape;
   _offset: Point;
@@ -36,7 +39,7 @@ export abstract class Shape implements IShape, IContextItem {
   _center: Point = new Point();
   _class: string = '';
   properties: ShapeProperties;
-
+  protected _ports: Port[] = [];
   protected _shapes: Shape[] = [];
   protected _isSelected = false;
 
@@ -93,13 +96,21 @@ export abstract class Shape implements IShape, IContextItem {
   abstract CopyShape(newID: string): Shape;
   abstract CopyItem(newID: string): IContextItem;
 
+  LinePath(path: PortPath) {
+    this._ports.forEach(p => path.AddPortPoint(p.Center));
+  }
+
   Select(shapeSelectResult: ShapeSelectResult) {
-    return this.SelectShape(shapeSelectResult);
+    if (this.SelectShape(shapeSelectResult)) {
+      shapeSelectResult.itemCaptured = true;
+      shapeSelectResult.id = this.Id;
+      return true;
+    }
+    return false;
   }
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
-    this._isSelected = this.IsPointInShape(shapeSelectResult.point);
-    return this._isSelected;
+    return this.IsPointInShape(shapeSelectResult.point);
   }
 
   MoveBy(x: number, y: number) {
@@ -107,22 +118,23 @@ export abstract class Shape implements IShape, IContextItem {
     this.left += x;
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-    //this._ports.forEach(function (p, i) {
-    //  p.MoveBy(x, y);
-    //});
+    this._ports.forEach(function (p, i) {
+      p.MoveBy(x, y);
+    });
   }
 
   SizeBy(top: number, right: number, bottom: number, left: number) {
-    this.top = top;
+   this.top = top;
     this.left = left;
-    
+ 
     this.width = right - this.left;
     this.height = bottom - this.top;
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-    //this._ports.forEach(function (p, i) {
-    //  p.SizeBy(top,right,bottom,left);
-    //});
+    console.error('Center Size:' + this.Id + ' : ' + JSON.stringify(this._center));
+   this._ports.forEach(function (p, i) {
+      p.SizeBy(top,right,bottom,left);
+    });
   }
 
   get IsSelected(): boolean { return this._isSelected };
@@ -130,6 +142,8 @@ export abstract class Shape implements IShape, IContextItem {
   CenterOn(x: number, y: number) {
     this.top = y - (this.height / 2);
     this.left = x - (this.width / 2);
+    this._center.SetToPosition(this.left, this.top);
+    this._center.Offset(this.width / 2, this.height / 2);
   }
 
   positionOnTick(x: number, y: number) {
@@ -146,6 +160,19 @@ export abstract class Shape implements IShape, IContextItem {
   private IsPointInShape(point: Point) {
     return (this.top < point.Y && this.Bottom > point.Y
       && this.left < point.X && this.Right > point.X);
+  }
+
+  //AddPort( id: string,
+  //  offsetX: number,
+  //  offsetY: number,
+  //   pathId: string,
+  //   type: ePortType,
+  //  state: StateIndex) {
+  //  this._ports.push(new Port(id, offsetX, offsetY, this, type, state, pathId));
+  //}
+
+  AddPort(port: Port) {
+    this._ports.push(port);
   }
 
   get Ports() {

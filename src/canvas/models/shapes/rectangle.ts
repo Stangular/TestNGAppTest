@@ -3,6 +3,8 @@ import { IContextItem, ContextSystem } from '../IContextItem';
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { Point } from './primitives/point';
 import { ShapeSelectResult } from './shapeSelected';
+import { Port } from './port';
+import { Path } from '../lines/path';
 
 export class Rectangle extends Shape {
 
@@ -35,7 +37,7 @@ export class Rectangle extends Shape {
     this.DrawShape(context);
     context.closePath();
     this._shapes.forEach(s => s.Draw(context));
-   // this._ports.forEach(p => p.DrawShape(context));
+    this._ports.forEach(p => p.DrawShape(context));
   }
 
   CopyShape(newID: string ) : Shape {

@@ -20,7 +20,6 @@ export class D3PiechartComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked() {
     if (!this.drawn) {
-      console.error('B:' + this.chartID);
    //   this.d3Service.DrawComponent(this.chartID, "pie", this.chartWidth, this.chartHeight);
       this.drawn = true;
     }

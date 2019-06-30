@@ -5,14 +5,18 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { IPortPath, Line } from 'src/canvas/models/lines/line';
 import { map, startWith } from 'rxjs/operators';
+import { ePortType } from 'src/canvas/models/shapes/port';
+import { PortService } from 'src/canvas/models/shapes/service/port.service';
+import { PathService } from 'src/canvas/models/shapes/service/path.service';
+import { Path } from 'src/canvas/models/lines/path';
 
 export interface PortData {
   result: string;
   offsetX: string;
   offsetY: string;
-  line: string;
   path: string;
   name: string;
+  type: ePortType;
 }
 
 @Component({
@@ -21,16 +25,20 @@ export interface PortData {
   styleUrls: ['update-port-dialog.component.css']
 })
 export class UpdatePortDialog implements OnInit {
-  selectedLine: string = "";
-  paths: Observable<IPortPath[]>;
+  ept = ePortType;
+  portType = this.ept.source;
+  paths: Observable<Path[]>;
+  pathName = new FormControl();
   @Input() cancelMessage: string = 'No';
   @Input() okMessage: string = 'Ok';
-  pathName = new FormControl();
-
   constructor(
-    public lineService : LineService,
+    public portService: PortService,
+    public pathService: PathService,
+    public lineService: LineService,
     public dialogRef: MatDialogRef<UpdatePortDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: PortData) {}
+    @Inject(MAT_DIALOG_DATA) public data: PortData) {
+
+  }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -42,20 +50,16 @@ export class UpdatePortDialog implements OnInit {
 
   ngOnInit() {
     this.paths = this.pathName.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(value))
+      .pipe(startWith(''),
+        map(value => this.PathFilter(value))
       );
+    this.pathName.setValue(this.data.path);
   }
 
-  private _filter(value: string): IPortPath[] {
-    const v = value.toLowerCase();
-    if (v.length <= 0) { return []; }
-    this.data.path = value;
-    this.data.line = this.selectedLine;
-    let line = this.lineService._lines.find(l => l.Id == this.data.line);
-    if (!line) { return []; }
-    return line.Paths
-      .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
+  private PathFilter(value: string) {
+    let res = this.pathService.Filter(value);
+    this.data.path = this.pathService._selectedPathName;
+    return res;
   }
+  
 }

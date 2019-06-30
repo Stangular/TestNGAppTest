@@ -32,5 +32,5 @@ export class SimplePortRectangle extends Rectangle implements IContextItem {
    // this._ports.push(new SimplePort(this.Id + '_portA', this.Top, this.Left, state, c));
   }
 
-  PortOffset(index: number = 0) { return this._ports[index].Center; }
+ // PortOffset(index: number = 0) { return this._ports[index].Center; }
 }

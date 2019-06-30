@@ -145,7 +145,6 @@ export class ToolboxCanvasComponent implements OnInit, OnDestroy{
     }
     let c = this.Context2D;
     c.clearRect(0, 0, this.width, this.height);
-    c
     this.system.Draw(c);
   }
 

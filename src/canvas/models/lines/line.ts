@@ -25,22 +25,35 @@ export interface IPortPath {
 }
 export class PortPath implements IPortPath {
 
-  constructor(protected id: string, protected ports: number[] = []) { }
+  constructor(protected id: string, protected ports: Point[] = []) { }
 
   get Id(): string {
     return this.id;
   }
 
-  AddPort(portIndex: number) {
-    this.ports.push(portIndex);
+  get Length(): number {
+    return this.ports.length;
   }
 
-  DrawLine(context: any, ports: Port[]) {
-    if (this.ports.length <= 1) { return; }
-    ports[this.ports[0]].DrawSource(context);
-    for (let j = 1; j < this.ports.length; j++) {
-      ports[this.ports[j]].DrawTarget(context);
+  AddPortPoint(pt: Point): number {
+    this.ports.push(pt);
+    return this.ports.length - 1;
+  }
+
+  Clear() {
+    this.ports = [];
+  }
+
+  DrawLine(context: any) {
+    if (this.ports.length < 2) { return; }
+    context.moveTo(this.ports[0]);
+    for (let j = 1; j < this.ports.length; j = j  + 1 ) {
+      context.lineTo(this.ports[j]);
     }
+  }
+
+  ResetToPort(port: Port) {
+    this.ports[port.PathPosition] = port.Center;
   }
 }
 
@@ -133,11 +146,11 @@ export class OrthogonalPortPath implements IPortPath {
 
 
   DrawLine(context: any, ports: Port[]) {
-    if (this.ports.length <= 1) { return; }
-    ports[this.ports[0]].DrawSource(context);
-    for (let j = 1; j < this.ports.length; j++) {
-      ports[this.ports[j]].DrawTarget(context);
-    }
+    //if (this.ports.length <= 1) { return; }
+    //ports[this.ports[0]].DrawSource(context);
+    //for (let j = 1; j < this.ports.length; j++) {
+    //  ports[this.ports[j]].DrawTarget(context);
+    //}
   }
 }
 
@@ -156,16 +169,19 @@ export class Line implements IContextItem, ILine {
     return this._class;
   }
 
-  AssignPath(path: PortPath) {
-    this._paths.push(path);
-  }
-
-  AddPortToLine(pathName: string, portIndex: number) {
+  AssignPathPoint(pathName: string, position: Point) {
     let path = this._paths.find(p => p.Id == pathName);
     if (!path) {
       path = new PortPath(pathName);
+      this._paths.push(path);
     }
-    path.AddPort(portIndex);
+    return path.AddPortPoint(position);
+  }
+
+  PathLength(pathName: string) {
+    let path = this._paths.find(p => p.Id == pathName);
+    if (!path) { return 0; }
+    return path.Length;
   }
 
   get Paths() {
@@ -178,11 +194,36 @@ export class Line implements IContextItem, ILine {
 
   UpdateContextState() { }
 
-  public DrawLine(context: any, ports: Port[]) {
+  public DrawPortPath(context: any, path: PortPath) {
+    if (!path) { return; }
+    path.DrawLine(context);
+    this.Draw(context);
+  }
+
+  public DrawPath(context: any, pathId: string) {
+    let p = this._paths.find(p => p.Id == pathId);
+    this.DrawPortPath(context,p);
+  }
+
+  public DrawAllPaths(context: any) {
     let self = this;
     this._paths.forEach(function (p, i) {
-      p.DrawLine(context, ports);
-      self.Draw(context);
+      self.DrawPortPath(context,p);
+    });
+  }
+
+  public DrawToContent(context: any, ports: Port[]) {
+    let self = this;
+    ports.forEach(function (p, i) {
+      self.DrawPath(context, p.PathId);
+    });
+  }
+
+  ResetPath(ports: Port[]) {
+    let self = this;
+    ports.forEach(function (p, i) {
+      let path = self.Paths.find(pp => pp.Id == p.PathId);
+      path.ResetToPort(p);
     });
   }
 
@@ -198,7 +239,7 @@ export class Line implements IContextItem, ILine {
 
     context.beginPath();
     context.strokeStyle = this.state.color;
-    context.linewidth = this.state.weight;
+    context.lineWidth = this.state.weight;
     context.stroke();
     context.closePath();
 

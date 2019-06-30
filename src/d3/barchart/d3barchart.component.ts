@@ -20,7 +20,6 @@ export class D3BarchartComponent implements OnInit, AfterViewChecked {
 
   ngAfterViewChecked() {
     if (!this.drawn) {
-      console.error('B:' + this.chartID);
    //   this.d3Service.DrawComponent(this.chartID, "bar", this.chartWidth, this.chartHeight, this.offsetX, this.offsetY);
       this.drawn = true;
     }

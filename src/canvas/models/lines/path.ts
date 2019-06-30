@@ -5,23 +5,54 @@ import { Line } from './line'
 import { StateIndex } from '../DisplayValues'
 import { Point } from '../shapes/primitives/point';
 import { ShapeSelectResult } from '../shapes/shapeSelected';
+import { Port } from '../shapes/port';
 
+
+//export class Path {
+//  private portNames: string[] = [];
+//  constructor(private id: string, private line: string) { }
+
+//  get Id() { return this.id; }
+//  get Line() { return this.line; }
+//  AddPort(port: string) {
+//    this.portNames.push(port);
+//  }
+//}
 
 
 export class Path implements IContextItem {
 
   _class: string = '';
-
-  constructor(private id: string,
-    private segments: ILine [] = []) { }
+  nodeCount: number = 0;
+  private portNames: string[] = [];
+  constructor(private id: string
+    , private line: string) { }
 
   get Id() { return this.id; }
 
-  Add(line: ILine) {
-    this.segments.push(line);
-  }
   get Class(): string {
     return this._class;
+  }
+
+  get Line() { return this.line; }
+
+  AddPort(port: string) {
+    this.portNames.push(port);
+  }
+
+  get Ports() {
+    return this.portNames;
+  }
+
+  DrawLine(context: any, ports: Port[], line: Line) {
+    //if (this.portNames.length < 2) { return; }
+    //let port = ports.find(p => p.Id == this.portNames[0]);
+    //port.DrawSource(context);
+    //for (let i = 1; i < this.portNames.length; i += 1) {
+    //  port = ports.find(p => p.Id == this.portNames[i]);
+    //  port.DrawTarget(context);
+    //}
+    //line.Draw(context);
   }
 
   AssignToClass(clss: string): void {

@@ -12,7 +12,7 @@ import { Point } from 'src/canvas/models/shapes/primitives/point';
 import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 
 
-export class ChartLayer extends ContextLayer {
+export class ChartLayer { //extends ContextLayer {
 
   axisLayer: AxisLayer;
   linestate: StateIndex;
@@ -25,7 +25,7 @@ export class ChartLayer extends ContextLayer {
     private contentLayer: ContentLayer = null ) {
 
 
-    super(chartId, 'default');
+   // super(chartId, 'default');
    
     let size = new Size(width - margins.Right, height - margins.Bottom);
    // this.contentLayer = ContentFactory.getContent(chartId, margins, size);
@@ -66,9 +66,9 @@ export class ChartLayer extends ContextLayer {
   }
 
   Draw(context: any) {
-    this.axisLayer.Draw(context);
-    if (this.contentLayer) {
-      this.contentLayer.Draw(context);
-    }
+    //this.axisLayer.Draw(context);
+    //if (this.contentLayer) {
+    //  this.contentLayer.Draw(context);
+    //}
   }
 }

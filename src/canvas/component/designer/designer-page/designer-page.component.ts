@@ -53,38 +53,39 @@ export class DesignerPageComponent implements OnInit {
 
   ItemMoved(e: ShapeSelectResult) {
 
-    let shp : Shape = this.canvasService.Editor.CurrentShape;
-    if (shp) {
-      this.editTop = shp.Top;
-      this.editLeft = shp.Left;
-      this.editWidth = shp.Width;
-      this.editHeight = shp.Height;
-      setTimeout(() =>
-        this.messageService.sendMessage(11), 0);
-    }
+    //let shp : Shape = this.canvasService.Editor.CurrentShape;
+    //if (shp) {
+    //  this.editTop = shp.Top;
+    //  this.editLeft = shp.Left;
+    //  this.editWidth = shp.Width;
+    //  this.editHeight = shp.Height;
+    //  setTimeout(() =>
+    //    this.messageService.sendMessage(11), 0);
+    //}
 
 
   }
 
   ItemSelected(e: ShapeSelectResult) {
     if (this.selectedId.length > 0) {
-      let s = this.canvasService.Editor.RemoveContentById(this.selectedId);
-      this.canvasService.Designer.AddContent(s);
+     // let s = this.canvasService.Editor.RemoveContentById(this.selectedId);
+  //    this.canvasService.Designer.AddContent(s);
       this.selectedId = ''; ``
     }
     else {
-      let s = this.canvasService.Designer.RemoveContentById(e.id);
+   //   let s = this.canvasService.Designer.RemoveContentById(e.id);
       this.selectedId = e.id;
-      this.canvasService.Editor.AddEditItem(s as Shape, e.point);
+   //   this.canvasService.Editor.AddEditItem(s as Shape, e.point);
     }
   }
 
   TypeSelected(type: objectTypes) {
-    switch (type) {
-      case objectTypes.rectangle: this.canvasService.Designer.SetTool(tooltypes.rectangle); break;
-      case objectTypes.ellipse: this.canvasService.Designer.SetTool(tooltypes.ellipse); break;
-      default: this.canvasService.Designer.SetTool(tooltypes.typecount); break;
-    }
+    //switch (type) {
+    //  case objectTypes.rectangle: this.canvasService.Designer.SetTool(tooltypes.rectangle); break;
+    //  case objectTypes.ellipse: this.canvasService.Designer.SetTool(tooltypes.ellipse); break;
+    //  default: this.canvasService.Designer.SetTool(tooltypes.typecount); break;
+    //}
+
   }
 
   CopySelectedItem() {
@@ -92,7 +93,7 @@ export class DesignerPageComponent implements OnInit {
   }
 
   DeleteSelectedItem() {
-    this.canvasService.Editor.RemoveContentById(this.selectedId);
+  //  this.canvasService.Editor.RemoveContentById(this.selectedId);
     this.deleteItem.emit();
   }
 
@@ -101,26 +102,19 @@ export class DesignerPageComponent implements OnInit {
     switch (value.type) {
       case 'bg': DisplayValues.SetColor(this.selectedId + '_' + value.type, value.color); break;
     }
-    this.canvasService.Editor.UpdateContextState();
+ //   this.canvasService.Editor.UpdateContextState();
     this.stateChange.emit();
   }
 
   SelectTool(e: ShapeSelectResult) {
-    this.canvasService.Designer.SetTool(e.type);
+ //   this.canvasService.Designer.SetTool(e.type);
+  }
+
+  UpdateLine(lineData: any) {
+    
   }
 
   UpdatePort(portData: any) {
-    let shp = this.canvasService.Editor.CurrentShape;
-    let portIndex = this.portService
-      .AddPort(
-      portData.name,
-      portData.offsetX,
-      portData.offsetY,
-      shp);
-    this.lineService
-      .AddPortToLine(
-      portData.line,
-      portData.path,
-      portIndex);
+    this.canvasService.AddPort(portData);
   }
 }

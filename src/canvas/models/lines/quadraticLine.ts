@@ -13,14 +13,14 @@ export class QuadraticLine extends Line implements IContextItem, ILine {
     protected targetOffset: Point,
     protected gradientPort: Port,
     state: StateIndex) {
-    super(id, sourceOffset, targetOffset, state);
+    super(id, state);
   }
 
   lineToTarget(context: any) {
 
-    context.quadraticCurveTo(
-      this.gradientPort.Offset.X, this.gradientPort.Offset.Y,
-      this.targetOffset.X, this.targetOffset.Y)
+   // context.quadraticCurveTo(
+    //  this.gradientPort.Offset.X, this.gradientPort.Offset.Y,
+    //  this.targetOffset.X, this.targetOffset.Y)
   }
 
 }

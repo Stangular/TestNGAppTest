@@ -6,7 +6,7 @@ import {
   Input,
   Output,
   ViewChild,
-  AfterContentInit,
+  AfterViewInit,
   OnDestroy,
   HostListener
 } from '@angular/core';
@@ -42,9 +42,9 @@ export class CanvasContextModel {
     '(window:resize)': 'onResize($event)'
   }
 })
-export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
+export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  editOn: boolean = false;
+  editOn: boolean = true;
   mouseCaptured: boolean = false;
   subscription: Subscription;
   @Input() width: number = 0;
@@ -53,8 +53,8 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   @Input() editSystem: EditModel;
   @Input() id: string = '';
   @Input() source: Records<string>;
-  @ViewChild('thiscanvas') thisComponent: ElementRef;
-  @ViewChild('actCanvas') aaacanvasComponent: ElementRef;
+  @ViewChild('staticcanvas') staticCanvas: ElementRef;
+  @ViewChild('activeCanvas') activeCanvas: ElementRef;
   @Input() canvasID: string = 'testCanvas';
   @Input() margin: Margin;
   @Output() select: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
@@ -64,87 +64,70 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
 
   constructor(private messageService: MessageService, private canvasService: CanvasService) {
 
-    this.width = 1200; //rect.width;
-    this.height = 600; //rect.height;
     this.subscription = this.messageService.getMessage().subscribe(
       message => { this.AcceptMessage(message) });
   }
 
   AcceptMessage(message: any) {
-    switch (message.text) {
-      case 11: break;
-      case 10: this.editSystem.Draw(this.ActiveContext);
-        break;
-      default: this.ReDraw(); break;
-    }
+   // switch (message.text) {
+   //   case 11: break;
+   //   case 10: this.editSystem.Draw(this.ActiveContext);
+   //     break;
+   ////   default: this.ReDraw(); break;
+   // }
   }
-  ngOnInit() { }
+  ngOnInit() {}
 
-  get Canvas() {
-    return <HTMLCanvasElement>this.thisComponent.nativeElement;
+  get StaticCanvas() {
+    return <HTMLCanvasElement>this.staticCanvas.nativeElement;
   }
 
   get ActiveCanvas() {
-    if (!this.editOn || !this.aaacanvasComponent) {
+    if (!this.editOn || !this.activeCanvas) {
       //  this.editOn = false;
       return null;
     }
-    return <HTMLCanvasElement>this.aaacanvasComponent.nativeElement;
+    return <HTMLCanvasElement>this.activeCanvas.nativeElement;
   }
 
-  get Context2D() {
-    return this.Canvas.getContext('2d');
+  ngAfterViewInit(): void {
+    setTimeout(() =>
+      this.SetActiveLayer()
+      , 10);
+
+  }
+
+  get StaticContext() {
+    return this.StaticCanvas.getContext('2d');
   }
 
   get ActiveContext() {
     return this.ActiveCanvas.getContext('2d');
   }
 
-  ngAfterContentInit(): void {
-    setTimeout(() =>
-      this.ShowActiveLayer()
-      , 10);
-
+  get ClientArea() {
+    return this.StaticCanvas.getBoundingClientRect();
   }
 
   PositionFromEvent(e: any) {
-    let rect = this.Canvas.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
+    let rect = this.StaticCanvas.getBoundingClientRect();
+    this.canvasService.SSR.PositionFromEvent(e,rect);
+  }
 
-    this.point.SetToPosition(x, y);
-    this.canvasService.shapeSelectResult.point.SetToPosition(x, y);
+  private Clear() {
+    this.StaticContext.clearRect(0,0,this.StaticCanvas.width, this.StaticCanvas.height);
+    this.ActiveContext.clearRect(0,0,this.ActiveCanvas.width, this.ActiveCanvas.height);
   }
 
   OnMousedown(e: any) {
     this.PositionFromEvent(e);
-    this.canvasService.shapeSelectResult.id = "";
-
-    if (this.system.Select(this.canvasService.shapeSelectResult)) {
-
-      this.select.emit(this.canvasService.shapeSelectResult);
-      this.Edit();
-      this.ReDraw();
-      this.mouseCaptured = true;
-    }
-    else if (!this.editOn) {
-      this.system.AddContent(null);
-      this.ReDraw();
-    }
-    else {
-      this.canvasService.shapeSelectResult.id = "";
-      this.editOn = false;
-      this.ReDraw();
-      this.mouseCaptured = false;
-      if (this.system.Select(this.canvasService.shapeSelectResult)) {
-
-        this.select.emit(this.canvasService.shapeSelectResult);
-        this.Edit();
-        this.ReDraw();
-        this.mouseCaptured = true;
-      }
-    }
-  }
+    this.canvasService.Select();
+    this.Clear();
+    this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+    
+  //  this.canvasService.BaseSystem.RedrawStatic(this.StaticCanvas.width, this.StaticCanvas.height);
+  //  this.canvasService.BaseSystem.RedrawActive(this.ActiveCanvas.width, this.ActiveCanvas.height);
+ }
 
   CopySelectedContent() {
     let itemId = this.canvasService.shapeSelectResult.id;
@@ -154,121 +137,94 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
   RemoveSelectedContent() {
     this.system.RemoveContentById(this.canvasService.shapeSelectResult.id);
     this.canvasService.shapeSelectResult.id = "";
-    this.Edit();
-    this.ReDraw();
+   // this.Edit();
+    //this.ReDraw();
     this.mouseCaptured = false;
 
   }
 
-  OnActiveClick(e: any) {
-    this.PositionFromEvent(e);
-    this.canvasService.shapeSelectResult.id = "";
-    this.mouseCaptured = true;
+  //Edit() {
+  // // this.editOn = this.canvasService.shapeSelectResult.id.length > 0;
+  //  if (this.editOn) {
+  //    this.edit.emit(this.canvasService.shapeSelectResult);
+  //  }
+  //  setTimeout(() =>
+  //    this.ShowActiveLayer()
+  //    , 10);
+  //}
 
-    if (!this.editSystem.Select(this.canvasService.shapeSelectResult)) {
-
-      this.editOn = false;
-      this.edit.emit(this.canvasService.shapeSelectResult);
-      this.ReDraw();
-      this.mouseCaptured = false;
- 
-  //    this.OnMousedown(e);
-    }
-    if (this.system.Select(this.canvasService.shapeSelectResult)) {
-
-      this.select.emit(this.canvasService.shapeSelectResult);
-      this.Edit();
-      this.ReDraw();
-      this.mouseCaptured = true;
-    }
-  }
-
-  Edit() {
-    this.editOn = this.canvasService.shapeSelectResult.id.length > 0;
-    if (this.editOn) {
-      this.edit.emit(this.canvasService.shapeSelectResult);
-    }
-    setTimeout(() =>
-      this.ShowActiveLayer()
-      , 10);
-  }
-
-  ShowActiveLayer() {
+  SetActiveLayer() {
+    this.setSize();
     if (this.ActiveCanvas) {
-      this.ActiveCanvas.width = this.width;
-      this.ActiveCanvas.height = this.height;
-      this.Draw();
-      this.DrawActive();
+      this.canvasService.AddLayer();
+   
+
     }
     else {
-      this.ReDraw();
+      this.canvasService.AddLayer();
     }
-  }
-
-  OnCapture(e: any) {
-    this.mouseCaptured = true;
   }
 
   OnRelease(e: any) {
-    this.mouseCaptured = false
+    this.canvasService.SSR.itemCaptured = false;
   }
 
   OnMouseMove(e: any) {
-    if (this.mouseCaptured) {
+    if (this.canvasService.SSR.itemCaptured) {
+
       this.PositionFromEvent(e);
-      this.editSystem.MoveItem(this.canvasService.shapeSelectResult);
-      this.DrawActive();
+      this.canvasService.BaseSystem.Move(this.canvasService.shapeSelectResult);
+      this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
       this.move.emit(this.canvasService.shapeSelectResult);
     }
   }
 
   setSize() {
-    let parent: any = (<Element>this.Canvas.parentNode);
+    let parent: any = (<Element>this.StaticCanvas.parentNode);
     parent = parent.parentElement;
     while (parent.localName != 'mat-grid-tile') {
       parent = parent.parentElement;
     }
+
     let styles = getComputedStyle(parent);
     let w = parent.offsetWidth || parent.clientWidth; // bug in typescript?  They do exist...
     let h = parent.offsetHeight || parent.clientHeight;
 
-    this.width = w;
-    this.height = h;
-    this.Canvas.width = this.width;
-    this.Canvas.height = this.height;
+    this.StaticCanvas.width = w - 2;
+    this.StaticCanvas.height = h - 5;
     if (this.ActiveCanvas) {
-      this.ActiveCanvas.width = this.width;
-      this.ActiveCanvas.height = this.height;
+      this.ActiveCanvas.width = this.StaticCanvas.width;
+      this.ActiveCanvas.height = this.StaticCanvas.height;
     }
   }
 
-  ReDraw() {
+  //ReDraw() {
 
-    this.setSize();
-    //if (!this.system) {
-    //  this.system = this.source.ChartGraphic(this.canvasID, this.width, this.height, 'bar');
-    //}
-    this.Draw();
+  //  this.setSize();
+  //  //if (!this.system) {
+  //  //  this.system = this.source.ChartGraphic(this.canvasID, this.width, this.height, 'bar');
+  //  //}
+  //  this.Draw();
 
-  }
+  //}
 
-  DrawActive() {
-    if (!this.editSystem) {
-      this.editSystem = new EditModel();  // TODO: have default layer for this state.
-    }
-    let c = this.ActiveContext;
-    c.clearRect(0, 0, this.width, this.height);
-    this.editSystem.Draw(c);
-  }
-  /// 
-  Draw() {
-    if (!this.system) {
-      this.system = new ContextSystem();  // TODO: have default layer for this state.
-    }
-    let c = this.Context2D;
-    c.clearRect(0, 0, this.width, this.height);
-    this.system.Draw(c);
-  }
+  //DrawActive() {
+  //  if (!this.editSystem) {
+  //    this.editSystem = new EditModel();  // TODO: have default layer for this state.
+  //  }
+  //  let c = this.ActiveContext;
+  //  c.clearRect(0, 0, this.width, this.height);
+  //  this.editSystem.Draw(c);
+  //}
+  ///// 
+  //Draw() {StaticContext
+  //  if (!this.system) {
+  //    this.system = new ContextSystem();  // TODO: have default layer for this state.
+  //  }
+  //  let c = this.StaticContext;
+  //  c.clearRect(0, 0, this.width, this.height);
+  //  this.system.Draw(c);
+  //}
 
   ngOnDestroy() {
     // unsubscribe to ensure no memory leaks
@@ -277,7 +233,8 @@ export class CanvasComponent implements OnInit, AfterContentInit, OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    this.ReDraw();
+    this.setSize();
+  //  this.ReDraw();
   }
 
   //@HostListener('document:mousedown', ['$event'])

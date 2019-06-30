@@ -15,6 +15,8 @@ import { UpdatePortDialog } from 'src/ui/components/views/form/dialogs/addport/u
 import { CanvasGraphicStateDialogComponent } from 'src/ui/components/views/form/dialogs/canvas-graphic-state-dialog/canvas-graphic-state-dialog.component';
 import { UpdateLineDialog } from 'src/ui/components/views/form/dialogs/addline/update-line-dialog.component';
 import { LineService } from './models/lines/service/line.service';
+import { PortService } from './models/shapes/service/port.service';
+import { PathService } from './models/shapes/service/path.service';
 
 library.add(
    faFilter
@@ -53,6 +55,8 @@ library.add(
     , UpdateLineDialog
     , CanvasGraphicStateDialogComponent],
   providers: [CanvasService
-      , LineService]
+    , LineService
+    , PortService
+    , PathService]
 })
 export class CanvasModule { }

@@ -17,6 +17,10 @@ import { CanvasGraphicStateDialogComponent } from 'src/ui/components/views/form/
 import { UpdateLineDialog } from 'src/ui/components/views/form/dialogs/addline/update-line-dialog.component';
 import { LineService } from 'src/canvas/models/lines/service/line.service';
 import { PortService } from 'src/canvas/models/shapes/service/port.service';
+import { eContentType } from 'src/canvas/models/shapes/shapeSelected';
+import { ePortType } from 'src/canvas/models/shapes/port';
+import { lineTypes } from 'src/canvas/models/lines/line';
+import { PathService } from 'src/canvas/models/shapes/service/path.service';
 
 
 
@@ -58,6 +62,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   lineWidthControl = new FormControl();
   widthControl = new FormControl();
   heightControl = new FormControl();
+  colorControl = new FormControl();
   locxControl = new FormControl();
   locyControl = new FormControl();
   lockedRatio: boolean = false;
@@ -77,15 +82,16 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   //private currentColor: string = 'color1';
   constructor(
     public portService: PortService,
+    public pathService: PathService,
     public vcRef: ViewContainerRef
     , private canvasService: CanvasService
     , private cpService: ColorPickerService
     , public dialog: MatDialog
     , fb: FormBuilder
-    , private lines: LineService
+    , private lineService: LineService
     , private messageService: MessageService) {
 
-    this.constantArea = this.CanvasService.ShapeProperties._constantArea;
+    this.constantArea = this.canvasService.ShapeProperties._constantArea;
     this.ShapeDetailsForm = fb.group({
       locX: this.selectedItemLeft,
       locY: this.selectedItemTop,
@@ -149,12 +155,12 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   get selectedTypeClass() {
     let typeClass: String = '';
     switch (this.canvasService.selectedType) {
-      case objectTypes.rectangle: typeClass = 'designer_rect_image'; break;
-      case objectTypes.ellipse: typeClass = 'designer_ellipse_image'; break;
-      case objectTypes.port: typeClass = 'designer_port_image'; break;
-      case objectTypes.line: typeClass = 'designer_line_image'; break;
-      case objectTypes.gradientLine: typeClass = 'designer_gradient_line_image'; break;
-      case objectTypes.bezierLine: typeClass = 'designer_bezier_line_image'; break;
+      case eContentType.rectangle: typeClass = 'designer_rect_image'; break;
+      case eContentType.ellipse: typeClass = 'designer_ellipse_image'; break;
+      //case eContentType.port: typeClass = 'designer_port_image'; break;
+      //case eContentType.line: typeClass = 'designer_line_image'; break;
+      //case eContentType.gradientLine: typeClass = 'designer_gradient_line_image'; break;
+      //case eContentType.bezierLine: typeClass = 'designer_bezier_line_image'; break;
     }
     return typeClass;
   }
@@ -221,14 +227,14 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
 
   SelectObject(objectType: any) {
     switch (objectType.target.id) {
-      case 'rectType': this.canvasService.selectedType = objectTypes.rectangle; break;
-      case 'ellipseType': this.canvasService.selectedType = objectTypes.ellipse; break;
-      case 'portType': this.canvasService.selectedType = objectTypes.port; break;
-      case 'lineType': this.canvasService.selectedType = objectTypes.line; break;
-      case 'gradientType': this.canvasService.selectedType = objectTypes.gradientLine; break;
-      case 'bezierType': this.canvasService.selectedType = objectTypes.bezierLine; break;
+      case 'rectType': this.canvasService.selectedType = eContentType.rectangle; break;
+      case 'ellipseType': this.canvasService.selectedType = eContentType.ellipse; break;
+      //case 'portType': this.canvasService.selectedType = objectTypes.port; break;
+      //case 'lineType': this.canvasService.selectedType = objectTypes.line; break;
+      //case 'gradientType': this.canvasService.selectedType = objectTypes.gradientLine; break;
+      //case 'bezierType': this.canvasService.selectedType = objectTypes.bezierLine; break;
     }
-    this.selectedType.emit(this.canvasService.selectedType);
+   // this.selectedType.emit(this.canvasService.selectedType);
   }
 
   CopyObject(objectType: any) {
@@ -245,10 +251,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   }
   
   UpdatePort(): void {
-    this.portService.a
+  //  this.portService.a
     const dialogRef = this.dialog.open(UpdatePortDialog, {
-      width: '250px',
-      data: { result: 'update' }
+      width: '300px',
+      data: { result: 'update', offsetX: 10, offsetY: 10,path:'pathsss name',name:'Port Name', type: ePortType.source }
     });
     dialogRef.afterClosed().subscribe(result => {
       //add to port service...
@@ -259,12 +265,13 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   UpdateLine(): void {
     const dialogRef = this.dialog.open(UpdateLineDialog, {
       width: '600px',
-      data: { weight: 1, color: '#000000', state: '' }
+      data: { name: '', type: lineTypes.straight, path:'path Name', state: '' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.lines.AddLine(result.name,result.state);
+        this.canvasService.AddLine(result.name, result.state);
+        this.pathService.AddPath(result.path,result.name);
       }
     });
   }
@@ -272,7 +279,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   UpdateState(): void {
     const dialogRef = this.dialog.open(CanvasGraphicStateDialogComponent, {
       width: '600px',
-      data: { weight: 1,color:'#000000',state:'' }
+      data: { weight: 1,color:'#000000',state:''}
     });
 
     dialogRef.afterClosed().subscribe(result => {
