@@ -10,14 +10,11 @@ import { ShapeSelectResult } from '../shapes/shapeSelected';
 export enum lineTypes {
   straight = 0,
   gradient = 1,
-  bezier = 2
-}
-
-export enum orthogonalTypes {
-  VtoV = 0,
-  HtoH = 1,
-  VtoH = 2,
-  HtoV = 3
+  bezier = 2,
+  VtoV = 10,
+  HtoH = 11,
+  VtoH = 12,
+  HtoV = 13
 }
 
 export interface IPortPath {
@@ -25,7 +22,7 @@ export interface IPortPath {
 }
 export class PortPath implements IPortPath {
 
-  constructor(protected id: string, protected ports: Point[] = []) { }
+  constructor(protected id: string, protected ports: Point[] = [], offsetX: number = 0, offsetY: number = 0) { }
 
   get Id(): string {
     return this.id;
@@ -44,11 +41,101 @@ export class PortPath implements IPortPath {
     this.ports = [];
   }
 
+  SetInterimPorts(type: lineTypes) {
+
+    let dx = this.ports[1].X - this.ports[0].X
+    let dy = this.ports[1].Y - this.ports[0].Y;
+    let p = 0;
+    switch (type) {
+
+      case lineTypes.bezier:
+        p = dx / 4;
+        this.ports.push(new Point());
+        this.ports.push(new Point());
+        this.ports[3].SetToPosition(this.ports[1].X, this.ports[1].Y);
+        if (dx > 0) {
+          this.ports[1].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
+          this.ports[2].SetToPosition(this.ports[0].X + ( p * 3 ), this.ports[3].Y + 10);
+        }
+        else {
+          this.ports[1].SetToPosition(this.ports[3].X + p, this.ports[3].Y - 10);
+          this.ports[2].SetToPosition(this.ports[3].X + (p * 3), this.ports[0].Y + 10);
+        }
+        break;
+      case lineTypes.gradient:
+        p = dx / 2;
+        this.ports.push(new Point());
+        this.ports[1].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
+        this.ports[2].SetToPosition(this.ports[1].X, this.ports[1].Y);
+       break;
+      case lineTypes.VtoV:
+        this.ports.push(new Point());
+        this.ports.push(new Point());
+        let x = this.ports[0].X;
+        this.ports[3].SetToPosition(this.ports[1].X, this.ports[1].Y);
+        if (this.ports[1].X > this.ports[0].X) {
+          x = this.ports[0].X + ((this.ports[1].X - this.ports[0].X) / 2);
+        }
+        else {
+          x = this.ports[1].X + ((this.ports[0].X - this.ports[1].X) / 2);
+        }
+        this.ports[1].SetToPosition(x, this.ports[0].Y);
+        this.ports[2].SetToPosition(x, this.ports[1].Y);
+        break;
+      case lineTypes.VtoH:
+        this.ports.push(new Point());
+        this.ports[2].SetToPosition(this.ports[1].X, this.ports[1].Y);
+        this.ports[1].SetToPosition(this.ports[1].X, this.ports[0].Y);
+        break;
+      case lineTypes.HtoV:
+        this.ports.push(new Point());
+        this.ports[2].SetToPosition(this.ports[1].X, this.ports[1].Y);
+        this.ports[1].SetToPosition(this.ports[0].X, this.ports[2].Y);
+        break;
+      case lineTypes.HtoH:
+        this.ports.push(new Point());
+        this.ports.push(new Point());
+        let y = this.ports[0].Y;
+        this.ports[3].SetToPosition(this.ports[1].X, this.ports[1].Y);
+        if (this.ports[1].Y > this.ports[0].Y) {
+          y = this.ports[0].Y + ((this.ports[1].Y- this.ports[0].Y) / 2);
+        }
+        else {
+          y = this.ports[1].Y + ((this.ports[0].Y - this.ports[1].Y) / 2);
+        }
+        this.ports[1].SetToPosition(this.ports[0].X,y);
+        this.ports[2].SetToPosition(this.ports[1].X,y);
+        break;
+
+    }
+  }
+
   DrawLine(context: any) {
     if (this.ports.length < 2) { return; }
-    context.moveTo(this.ports[0]);
-    for (let j = 1; j < this.ports.length; j = j  + 1 ) {
-      context.lineTo(this.ports[j]);
+    context.moveTo(this.ports[0].X, this.ports[0].Y);
+    for (let j = 1; j < this.ports.length; j = j + 1) {
+      context.lineTo(this.ports[j].X, this.ports[j].Y);
+    }
+  }
+
+  DrawBezierPath(context: any) {
+    if (this.ports.length < 2) { return; }
+    context.moveTo(this.ports[0].X, this.ports[0].Y);
+    for (let j = 1; j < this.ports.length; j = j + 3) {
+      context.bezierCurveTo(
+        this.ports[j].X, this.ports[j].Y,
+        this.ports[j + 1].X, this.ports[j + 1].Y,
+        this.ports[j + 2].X, this.ports[j + 2].Y);
+    }
+  }
+
+  DrawGradientPath(context: any) {
+    if (this.ports.length < 2) { return; }
+    context.moveTo(this.ports[0].X, this.ports[0].Y);
+    for (let j = 1; j < this.ports.length; j = j + 2) {
+      context.quadraticCurveTo(
+        this.ports[j].X, this.ports[j].Y,
+        this.ports[j + 1].X, this.ports[j + 1].Y);
     }
   }
 
@@ -57,116 +144,48 @@ export class PortPath implements IPortPath {
   }
 }
 
-export class OrthogonalPortPath implements IPortPath {
-
-  interimports: Point[] = [];
-
-  constructor(private id: string,
-    private ports: number[] = [],
-    private type: orthogonalTypes) {
-
-    switch (this.type) {
-
-      case orthogonalTypes.VtoV:
-        this.interimports.push(new Point());
-        this.interimports.push(new Point());
-        break;
-      case orthogonalTypes.VtoH:
-        this.interimports.push(new Point());
-        break;
-      case orthogonalTypes.HtoV:
-        this.interimports.push(new Point());
-        break;
-      case orthogonalTypes.HtoH:
-        this.interimports.push(new Point());
-        this.interimports.push(new Point());
-        break;
-
-    }
-  }
-
-  get Id(): string {
-    return this.id;
-  }
-
-  SetInterimPorts(ports: Port[]): boolean {
-
-    if (ports.length < 1 || ports.length > 2) {
-      return false;
-    }
-    let p1 = ports[this.ports[0]].Center;
-    let p2 = ports[this.ports[1]].Center;
-
-    switch (this.type) {
-
-      case orthogonalTypes.VtoV: this.VerticalToVertical(p1, p2); break;
-      case orthogonalTypes.VtoH: this.VerticalToHorizontal(p1, p2); break;
-      case orthogonalTypes.HtoV: this.HorizontalToVertical(p1, p2); break;
-      case orthogonalTypes.HtoH: this.HorizontalToHorizontal(p1, p2); break;
-    }
-
-    return true;
-  }
-
-  VerticalToVertical(point1: Point, point2: Point) {
-    let x = 0;
-    if (point2.X > point1.X) {
-      x = point1.X + ((point2.X - point1.X) / 2);
-    }
-    else {
-      x = point2.X + ((point1.X - point2.X) / 2);
-    }
-    this.interimports[0].SetToPosition(x, point1.Y);
-    this.interimports[1].SetToPosition(x, point2.Y)
-  }
-
-  HorizontalToHorizontal(point1: Point, point2: Point) {
-    let y = 0;
-    if (point2.Y > point1.Y) {
-      y = point1.Y + ((point2.Y - point1.Y) / 2);
-    }
-    else {
-      y = point2.Y + ((point1.Y - point2.Y) / 2);
-    }
-    this.interimports[0].SetToPosition(point1.X, y);
-    this.interimports[1].SetToPosition(point2.X, y);
-  }
-
-  HorizontalToVertical(point1: Point, point2: Point) {
-    (point2.Y > point1.Y)
-      ? this.interimports[0].SetToPosition(point1.X, point2.Y)
-      : this.interimports[0].SetToPosition(point2.X, point1.Y);
-  }
-
-  VerticalToHorizontal(point1: Point, point2: Point) {
-    (point2.X > point1.X)
-      ? this.interimports[0].SetToPosition(point2.X, point1.Y)
-      : this.interimports[0].SetToPosition(point1.X, point2.Y);
-  }
-
-
-  DrawLine(context: any, ports: Port[]) {
-    //if (this.ports.length <= 1) { return; }
-    //ports[this.ports[0]].DrawSource(context);
-    //for (let j = 1; j < this.ports.length; j++) {
-    //  ports[this.ports[j]].DrawTarget(context);
-    //}
-  }
-}
-
-export class Line implements IContextItem, ILine {
+export class Line implements ILine {
 
   _class: string = '';
   _paths: PortPath[] = [];
-
+  _state: StateIndex;
   constructor(private id: string,
-    protected state: StateIndex) {
+    protected state: string,
+    paths: PortPath[] = [],
+    private type: lineTypes = lineTypes.straight ) {
+    this._paths = paths.concat([]);
+    this._state = DisplayValues.GetLineIndex(this.Id + "_state", state)
+    paths.forEach(function (p, i) { p.SetInterimPorts(this.type); });
+  }
+
+  Update(line: Line) {
+    this._paths = line.Paths;
+    this._state = DisplayValues.GetLineIndex(this.Id + "_state", line.StateName);
+    this.state = line.StateName;
+    this.type = line.Type;
+  }
+
+  get Type() {
+    return this.type;
+  }
+
+  get State() {
+    return this._state;
+  }
+
+  get StateName() {
+    return this.state;
   }
 
   get Id() { return this.id; }
 
   get Class(): string {
     return this._class;
+  }
+
+  AddPath(pathName: string, points: Point[] = []) {
+    let path = new PortPath(pathName, points);
+    this._paths.push(path);
   }
 
   AssignPathPoint(pathName: string, position: Point) {
@@ -196,19 +215,29 @@ export class Line implements IContextItem, ILine {
 
   public DrawPortPath(context: any, path: PortPath) {
     if (!path) { return; }
+    context.beginPath();
     path.DrawLine(context);
     this.Draw(context);
+    context.closePath();
+  }
+
+  Draw(context: any): void {
+
+    context.strokeStyle = 'black'; //this.state.color;
+    context.lineWidth = 2; //this.state.weight;
+    context.stroke();
+
   }
 
   public DrawPath(context: any, pathId: string) {
     let p = this._paths.find(p => p.Id == pathId);
-    this.DrawPortPath(context,p);
+    this.DrawPortPath(context, p);
   }
 
   public DrawAllPaths(context: any) {
     let self = this;
     this._paths.forEach(function (p, i) {
-      self.DrawPortPath(context,p);
+      self.DrawPortPath(context, p);
     });
   }
 
@@ -223,8 +252,12 @@ export class Line implements IContextItem, ILine {
     let self = this;
     ports.forEach(function (p, i) {
       let path = self.Paths.find(pp => pp.Id == p.PathId);
-      path.ResetToPort(p);
+      if (path) {
+        path.ResetToPort(p);
+        path.SetInterimPorts(this.type);
+      }
     });
+
   }
 
   CopyItem(newId: string) {
@@ -235,15 +268,7 @@ export class Line implements IContextItem, ILine {
     return false;
   }
 
-  Draw(context: any): void {
 
-    context.beginPath();
-    context.strokeStyle = this.state.color;
-    context.lineWidth = this.state.weight;
-    context.stroke();
-    context.closePath();
-
-  }
 
   SelectShape(shapeSelectResult: ShapeSelectResult) {
     return false;

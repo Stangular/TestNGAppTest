@@ -17,6 +17,8 @@ import { UpdateLineDialog } from 'src/ui/components/views/form/dialogs/addline/u
 import { LineService } from './models/lines/service/line.service';
 import { PortService } from './models/shapes/service/port.service';
 import { PathService } from './models/shapes/service/path.service';
+import { DisplayStateSelectorComponent } from './component/displaystate/displayStateSelector.component';
+import { ShapePropertyDialogComponent } from './component/dialogs/shape/shapePropertyDialog.component';
 
 library.add(
    faFilter
@@ -40,7 +42,9 @@ library.add(
     , UpdatePortDialog
     , CanvasGraphicStateDialogComponent
     , UpdateLineDialog
-    , ToolboxCanvasComponent],
+    , ShapePropertyDialogComponent
+    , ToolboxCanvasComponent
+    , DisplayStateSelectorComponent],
 
   exports: [CanvasComponent
     , DashboardPageComponent
@@ -49,10 +53,13 @@ library.add(
     , UpdatePortDialog
     , CanvasGraphicStateDialogComponent
     , UpdateLineDialog
+    , ShapePropertyDialogComponent
+    , DisplayStateSelectorComponent
     , ToolboxCanvasComponent],
   entryComponents: [
     UpdatePortDialog
     , UpdateLineDialog
+    , ShapePropertyDialogComponent
     , CanvasGraphicStateDialogComponent],
   providers: [CanvasService
     , LineService

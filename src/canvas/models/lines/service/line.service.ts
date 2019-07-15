@@ -17,16 +17,27 @@ export class LineService {
     this.linepad.setState(UIStates.color, 4);
     this.linepad.setState(UIStates.weight, 0);
 
-    this.AddLine('basic_line_A', 'basic');
+    this.AddLine('basic_line_A', 'basic','');
 
   }
 
-  AddLine(id: string,state:string) {
-    if (!id || id.length <= 0) { return false; }
-    let i = this._lines.findIndex(l => l.Id == id);
-    if (i >= 0) { return false; }
+  AddPath(line: Line, pathName: string) {
+    if (!line) { return false;}
+    let path = line.Paths.find(p => p.Id == pathName);
+    if (!path) {
+      line.AddPath(pathName);  
+    }
+    return true;
+  }
 
-    this._lines.push(new Line(id,DisplayValues.GetLineIndex(id + '_state',state)));
+  AddLine(id: string,state:string,pathName:string) {
+    if (!id || id.length <= 0) { return false; }
+    let line = this._lines.find(l => l.Id == id);
+    if (!line) {
+      line = new Line(id,state);
+      this._lines.push(line);
+    }
+    this.AddPath(line, pathName);
     return true;
   }
 
@@ -37,6 +48,7 @@ export class LineService {
     }
     return false;
   }
+
   get CurrentLine() {
     return this._currentLine;
   }

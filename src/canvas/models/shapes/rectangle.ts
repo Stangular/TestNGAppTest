@@ -8,6 +8,8 @@ import { Path } from '../lines/path';
 
 export class Rectangle extends Shape {
 
+  protected _roundedCorners: number = 0;
+
   constructor(id: string,
     top: number,
     left: number,

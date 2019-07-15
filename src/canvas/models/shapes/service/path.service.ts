@@ -28,6 +28,10 @@ export class PathService {
     this._paths.push(new Path(pathName, lineName));
   }
 
+  SetPaths(paths: Path[]) {
+    this._paths = paths.concat([]);
+  }
+
   public Filter(value: string): Path[] {
 
     const v = value.toLowerCase().trim();

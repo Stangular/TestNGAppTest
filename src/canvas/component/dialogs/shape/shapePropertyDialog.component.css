@@ -1,0 +1,24 @@
+
+.dialog-header {
+  width: 100%;
+  background-color: lightgray;
+  padding-left: 10px
+}
+
+
+
+label {
+  font-family: Verdana;
+  font-size: 12px;
+}
+
+
+.button-row button {
+  margin-right: 8px;
+}
+
+.toolbar-radio-button {
+  margin: 5px;
+  font-family: Verdana;
+  font-size: 12px;
+}

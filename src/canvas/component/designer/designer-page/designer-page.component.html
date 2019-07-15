@@ -13,7 +13,8 @@
                                             (selectedType)="TypeSelected($event)"
                                             (copySelectedItem)="CopySelectedItem()"
                                             (colorSelected)="ColorSelected($event)"
-                                            (deleteSelectedItem)="DeleteSelectedItem()"></app-canvas-designer-property-toolbar>
+                                            (deleteSelectedItem)="DeleteSelectedItem()"
+                                            (shapeChanged)="ShapeChanged($event)"></app-canvas-designer-property-toolbar>
     </div>
   </mat-grid-tile>
   <mat-grid-tile [colspan]="32"

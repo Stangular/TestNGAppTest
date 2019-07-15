@@ -20,19 +20,27 @@ export class Port implements IShape, IContextItem {
   
 
   constructor(private id: string,
-    offsetX: number,
-    offsetY: number,
+    private offsetX: number,
+    private offsetY: number,
     parent: IShape,
     private type: ePortType,
     state: StateIndex,
     private pathId: string,
     private pathPosition: number = -1
 ) {
-    let x = parent.Center.X + ( parent.Width / 2 ) * (offsetX / 100);
-    let y = parent.Center.Y + ( parent.Height / 2 ) * (offsetY / 100);
     this.internalShape = new Ellipse(id + "_*", 0,0, 5, 5, state);
-    this.internalShape.CenterOn(x, y);
     this._parentShapeId = parent.Id;
+    this.SetPortToParent(parent.Top, parent.Right, parent.Bottom, parent.Left);
+  }
+
+  SetPortToParent(top: number, right: number, bottom: number, left: number) {
+    let w = (right - left)/2;
+    let h = (bottom - top) / 2;
+    let cx = left + w;
+    let cy = top + h;
+    let x = cx + (w * (this.offsetX / 100));
+    let y = cy + (h * (this.offsetY / 100));
+    this.internalShape.CenterOn(x, y);
   }
 
   get ParentShapeID() {
@@ -81,7 +89,9 @@ export class Port implements IShape, IContextItem {
 
   DrawShape(context: any): void {
     // get line moveto/lineto
+    context.beginPath();
     this.internalShape.DrawShape(context);
+    context.closePath();
   }
 
   Draw(context: any): void {
@@ -97,14 +107,10 @@ export class Port implements IShape, IContextItem {
   }
 
   SizeBy(top: number, right: number, bottom: number, left: number) {
-    let w = (right - left) / 2;
-    let h = ( bottom - top ) / 2;
-    let cx = left + w;
-    let cy = top + h;
-    let x = cx + w * (this.internalShape.Center.X / 100);
-    let y = cy + h * (this.internalShape.Center.Y / 100);
-    this.internalShape.CenterOn(x, y);
+    this.SetPortToParent(top, right, bottom, left);
   }
+
+
   get Id(): string { return this.id; }
   get Top(): number { return this.internalShape.Top}
   get Right(): number { return this.internalShape.Right; }

@@ -32,13 +32,21 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="6" [rowspan]="1" style="text-align:left">
+      <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <button mat-flat-button color="accent" style="width:30px"
+                name="shapeColor"
+                [disabled]="canvasService.ActiveShape == null"
+                (click)="ManageShape()">
+          Manage Shape
+        </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
         <button mat-flat-button color="accent" style="width:20px"
                 name="shapeColor"
-                (click)="UpdatePort()">
-          Add Port
+                (click)="ManagePorts()">
+          Manage Ports
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
@@ -100,20 +108,8 @@
             <input type="number" class="widthInput" min="1" max="10" matInput placeholder="1" [formControl]="lineWidthControl">
           </div>
         </mat-form-field>
-        <!--<mat-form-field class="shapeClassInput"
-                    [floatLabel]="'never'">
-      <input matInput
-             placeholder="Port"
-             aria-label="State"
-             [matAutocomplete]="portName"
-             [formControl]="portControl">
-      <mat-autocomplete #portName="matAutocomplete">
-        <mat-option *ngFor="let port of filteredPortList  | async"
-                    [value]="port">{{port}}</mat-option>
-      </mat-autocomplete>
-    </mat-form-field>-->
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+      <!--<mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <button mat-button [matMenuTriggerFor]="color" (menuOpened)="SetProperties()">Color</button>
         <mat-menu #color="matMenu" overlapTrigger="false"
                   style="background-color:steelblue;">
@@ -131,21 +127,18 @@
                        aria-label="State"
                        [matAutocomplete]="shapeClass"
                        [formControl]="colorControl">
-                <!--<mat-autocomplete #shapeClass="matAutocomplete">
-              <mat-option *ngFor="let class of filteredshapeClassList  | async"
-                          [value]="class">{{class}}</mat-option>
-            </mat-autocomplete>-->
               </mat-form-field>
               <button mat-flat-button color="accent"
                       name="shapeColor" class="colorButton"
                       (click)="ApplyColor('bg')">
                 Select
+                bu
               </button>
             </div>
           </div>
         </mat-menu>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+      </mat-grid-tile>-->
+      <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
         <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
           <button mat-button [matMenuTriggerFor]="area">Area Options</button>
           <mat-menu #area="matMenu" overlapTrigger="false">
@@ -159,8 +152,8 @@
             </div>
           </mat-menu>
         </div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+      </mat-grid-tile>-->
+      <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
         <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
           <button mat-button [matMenuTriggerFor]="motion">Motion Range</button>
           <mat-menu #motion="matMenu" overlapTrigger="false">
@@ -177,8 +170,8 @@
             </mat-radio-group>
           </mat-menu>
         </div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+      </mat-grid-tile>-->
+      <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
         <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
           <button mat-button [matMenuTriggerFor]="sizing">Sizing</button>
           <mat-menu #sizing="matMenu" class="toolbar-menu" overlapTrigger="false" role="menuitemradio">
@@ -195,7 +188,7 @@
             </mat-radio-group>
           </mat-menu>
         </div>
-      </mat-grid-tile>
+      </mat-grid-tile>-->
     </mat-grid-list>
   </div>
 

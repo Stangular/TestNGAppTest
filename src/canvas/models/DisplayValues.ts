@@ -45,6 +45,7 @@ export class StateIndex {
   get weight() {
     return this.getState(UIStates.weight);
   }
+
   getState(state: UIStates) {
     return this.Index[state];
   }
@@ -75,6 +76,11 @@ export class DisplayValues {
   static ColorIndex(name: string) {
     return this.color.findIndex(c => c.Name == name);
   }
+
+  static WeightIndex(name: string) {
+    return this.weight.findIndex(c => c.Name == name);
+  }
+
 
   static SetColor(name: string, color: string) {
     let ndx = this.ColorIndex(name);
@@ -110,16 +116,45 @@ export class DisplayValues {
     return this.GetColor(ndx);
   }
 
+  static get Fonts() { return this.fonts; }
+
   static GetColor(index: number) {
+    if (index >= this.weight.length) {
+      this.GetColor(index - 1);
+    }
+    if (!index || index < 0) { index = 0; }
     return this.color[index].Value;
   }
 
   static GetWeight(index: number) {
+    if (index >= this.weight.length) {
+      this.GetWeight( index - 1 );
+    }
+    if (!index || index < 0 ) { index = 0; }
     return this.weight[index].Value;
   }
 
   static GetFont(index: number) {
+    if (index >= this.weight.length) {
+      this.GetFont(index - 1);
+    }
+    if (!index || index < 0) { index = 0; }
     return this.fonts[index].Value;
+  }
+
+  static GetColorFromValue(value: string) {
+    let ndx = this.GetColorIndex(value);
+    return this.GetColor(ndx);
+  }
+
+  static GetWeightFromValue(value: string) {
+    let ndx = this.GetWeightIndex(value);
+    return this.GetWeight(ndx);
+  }
+
+  static GetFontFromValue(value: string) {
+    let ndx = this.GetFontIndex(value);
+    return this.GetFont(ndx);
   }
 
   static GetColorIndex(name: string) {
@@ -138,6 +173,7 @@ export class DisplayValues {
     let stateIndex = new StateIndex(name);
     let ndx = this.ColorIndex(state);
     stateIndex.setState(UIStates.color, ndx);
+    ndx = this.WeightIndex(state);
     stateIndex.setState(UIStates.weight, ndx);
     return stateIndex;
   }
@@ -161,6 +197,21 @@ export class DisplayValues {
     stateIndex.setState(UIStates.foreground, ndx);
     return stateIndex;
   }
+
+  static RemoveState(stateName: string) {
+    let ndx = this.GetColorIndex(stateName);
+    if (ndx >= 0) {
+      this.color.splice(ndx, 1);
+    }
+    ndx = this.GetWeightIndex(stateName);
+    if (ndx >= 0) {
+      this.weight.splice(ndx, 1);
+    }
+    ndx = this.GetFontIndex(stateName);
+    if (ndx >= 0) {
+      this.fonts.splice(ndx, 1);
+    }
+  }
 }
 
 export class TheCanvasState {
@@ -168,30 +219,15 @@ export class TheCanvasState {
   constructor() {
 
     DisplayValues.Clear();
-    DisplayValues.SetColor('exlyrrect1bg', 'red');
-    DisplayValues.SetColor('exlyrrect1border', 'black');
-    DisplayValues.SetColor('exlyrrect2bg', 'blue');
-    DisplayValues.SetColor('exlyrtext1bg', 'black');
-    DisplayValues.SetColor('exlyrtext1color', '#a0120c');
-    DisplayValues.SetColor('transparent', 'red');
-    DisplayValues.SetWeight('exlyrrect1border', 1.0);
-    DisplayValues.SetFont('exlyrtext1font', '9px FontAwesome');
-    DisplayValues.SetColor('basic', 'black');
-    DisplayValues.SetWeight('basic', 2.0);
-
-    DisplayValues.SetColor('toolbar.tool.background', '#d3d3d3');
-    DisplayValues.SetColor('toolbar.tool.background_selected', '#708090');
-
-    DisplayValues.SetColor('default.rect.background', '#aa00aa');
+    DisplayValues.SetColor('DefaultBG', '#777777');
+    DisplayValues.SetWeight('DefaultBG', 2);
+    DisplayValues.SetFont('DefaultBG', 'verdana');
+    DisplayValues.SetColor('DefaultFG', '#ffffff');
     DisplayValues.SetColor('default.edit.background', 'yellow');
-    DisplayValues.SetFont('toolbarfont', '14px FontAwesome');
-
-    DisplayValues.SetColor('base_port_bg', '#aaaaaa');
-    DisplayValues.SetColor('base_port_border', 'black');
-    DisplayValues.SetWeight('base_port_border', 0.3);
+    DisplayValues.SetWeight('default.edit.background', 2);
 
   }
 
-
+  
 }
 

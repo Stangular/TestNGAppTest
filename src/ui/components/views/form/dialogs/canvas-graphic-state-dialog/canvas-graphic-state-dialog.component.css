@@ -1,11 +1,22 @@
-.mat-slider-vertical {
-  height: 300px;
+.mat-slider-horizontal {
+  width: 230px;
 }
 
 .button-row {
-  padding-left: 180px;
+  padding-left: 12px;
 }
 
 .button-row button{
   margin-right: 8px;
+}
+
+label {
+  font-family: Verdana;
+  font-size: 12px;
+}
+
+.dialog-header {
+  width: 100%;
+  background-color: lightgray;
+  padding-left: 10px
 }

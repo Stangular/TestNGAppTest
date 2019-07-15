@@ -1,3 +1,14 @@
+.dialog-header {
+  width: 100%;
+  background-color: lightgray;
+  padding-left: 10px
+}
+
+label {
+  font-family: Verdana;
+  font-size: 12px;
+}
+
 .dialog-form {
   min-width: 150px;
   max-width: 500px;
@@ -14,4 +25,10 @@
 }
 .xradioButton {
   margin-right: 5px;
+}
+
+
+
+.button-row button {
+  margin-right: 8px;
 }

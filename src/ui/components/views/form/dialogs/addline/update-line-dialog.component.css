@@ -1,5 +1,8 @@
-.dialog-form {
-  width: 280px;
+
+.dialog-header {
+  width: 100%;
+  background-color: lightgray;
+  padding-left: 10px
 }
 
 .full-width {
@@ -30,4 +33,16 @@
   width: 24px;
   height: 24px;
   border: none;
+}
+
+
+
+label {
+  font-family: Verdana;
+  font-size: 12px;
+}
+
+
+.button-row button {
+  margin-right: 8px;
 }

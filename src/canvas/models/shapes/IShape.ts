@@ -18,6 +18,7 @@ export interface IShape {
   MoveBy(x: number, y: number);
   SizeBy(top: number, right: number, bottom: number, left: number);
   CenterOn(x: number, y: number);
+  SetProperties(properties: any);
  // Track(point: TrackingPoint);
 //  SetToPosition(point: TrackingPoint);
 }

@@ -5,7 +5,7 @@ import {
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
-import { FreedomOfMotion } from 'src/canvas/models/shapes/shape';
+import { FreedomOfMotion, AreaType} from 'src/canvas/models/shapes/shape';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 import { map, startWith } from 'rxjs/operators';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
@@ -19,8 +19,9 @@ import { LineService } from 'src/canvas/models/lines/service/line.service';
 import { PortService } from 'src/canvas/models/shapes/service/port.service';
 import { eContentType } from 'src/canvas/models/shapes/shapeSelected';
 import { ePortType } from 'src/canvas/models/shapes/port';
-import { lineTypes } from 'src/canvas/models/lines/line';
+import { lineTypes, PortPath } from 'src/canvas/models/lines/line';
 import { PathService } from 'src/canvas/models/shapes/service/path.service';
+import { ShapePropertyDialogComponent } from '../../dialogs/shape/shapePropertyDialog.component';
 
 
 
@@ -43,6 +44,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   @Output() copySelectedItem = new EventEmitter<void>();
   @Output() updatePort = new EventEmitter<any>();
   @Output() colorSelected = new EventEmitter<{ type: string, color: string }>();
+  @Output() shapeChanged = new EventEmitter<string>();
   ot = objectTypes;
   width: number = 1;
   ShapeDetailsForm: FormGroup;
@@ -65,11 +67,6 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   colorControl = new FormControl();
   locxControl = new FormControl();
   locyControl = new FormControl();
-  lockedRatio: boolean = false;
-  constantArea: boolean = false;
-  freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
-  freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
-  fom = FreedomOfMotion;
   //public arrayColors: any = {
   //  color1: '#2883e9',
   //  color2: '#e920e9',
@@ -91,7 +88,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     , private lineService: LineService
     , private messageService: MessageService) {
 
-    this.constantArea = this.canvasService.ShapeProperties._constantArea;
+ 
     this.ShapeDetailsForm = fb.group({
       locX: this.selectedItemLeft,
       locY: this.selectedItemTop,
@@ -250,11 +247,58 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     this.messageSubscription.unsubscribe();
   }
   
-  UpdatePort(): void {
-  //  this.portService.a
+  UpdateLine(): void {
+    const dialogRef = this.dialog.open(UpdateLineDialog, {
+      width: '350px',
+      data: { name: '', type: lineTypes.straight,paths: [], state: '' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.canvasService.AddLine(result.name, result.state, result.paths,result.type);
+       // this.pathService.AddPath(result.path,result.name);
+      }
+    });
+  }
+
+  UpdateState(): void {
+    const dialogRef = this.dialog.open(CanvasGraphicStateDialogComponent, {
+      width: '350px',
+      data: { weight: 1,color:'#000000',state:''}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      DisplayValues.SetColor(result.state, result.color || '#ffffff');
+      DisplayValues.SetWeight(result.state, result.weight || 1);
+      DisplayValues.SetFont(result.state, result.font || 'verdana');
+    });
+  }
+
+  ManageShape(): void {
+    const dialogRef = this.dialog.open(ShapePropertyDialogComponent, {
+      width: '450px',
+      data: {
+        name: this.canvasService.ActiveShape.Id,
+        state: '',
+        areaType: this.canvasService.ActiveShape.AreaType,
+        freedomOfMotion: this.canvasService.ActiveShape.FreedomOfMotion,
+        freedomOfSizing: this.canvasService.ActiveShape.FreedomOfSizing,
+        width: this.canvasService.ActiveShape.Width,
+        height: this.canvasService.ActiveShape.Height
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.canvasService.ActiveShape.SetProperties(result);
+      this.canvasService.BaseSystem.Draw();
+    });
+  }
+
+  ManagePorts(): void {
+    //  this.portService.a
     const dialogRef = this.dialog.open(UpdatePortDialog, {
-      width: '300px',
-      data: { result: 'update', offsetX: 10, offsetY: 10,path:'pathsss name',name:'Port Name', type: ePortType.source }
+      width: '350px',
+      data: { result: 'update', offsetX: 10, offsetY: 10, path: '', name: '', type: ePortType.source }
     });
     dialogRef.afterClosed().subscribe(result => {
       //add to port service...
@@ -262,30 +306,5 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     });
   }
 
-  UpdateLine(): void {
-    const dialogRef = this.dialog.open(UpdateLineDialog, {
-      width: '600px',
-      data: { name: '', type: lineTypes.straight, path:'path Name', state: '' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.canvasService.AddLine(result.name, result.state);
-        this.pathService.AddPath(result.path,result.name);
-      }
-    });
-  }
-
-  UpdateState(): void {
-    const dialogRef = this.dialog.open(CanvasGraphicStateDialogComponent, {
-      width: '600px',
-      data: { weight: 1,color:'#000000',state:''}
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      DisplayValues.SetColor(result.state, result.color);
-      DisplayValues.SetWeight(result.state, result.weight);
-    });
-  }
 
 }

@@ -1,66 +1,115 @@
 <div class="dialog-form">
-  <h1 mat-dialog-title>Update Lines</h1>
+  <div class="dialog-header">
+    <h1 mat-dialog-title>Update Lines</h1>
+  </div>
   <mat-dialog-content>
     <mat-grid-list cols="16" rowHeight="40px">
-      <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
-        <mat-radio-group aria-label="Select an option" [(ngModel)]="data.type">
-          <mat-radio-button value="straight" name="lineType" [value]="lt.straight" >
-            <div id="lineType" mat-button class="designer_line_image"></div>
-          </mat-radio-button>
-          <mat-radio-button value="gradient" name="lineType" [value]="lt.gradient">
-            <div id="gradientType" mat-button class="designer_gradient_line_image"></div>
-          </mat-radio-button>
-          <mat-radio-button value="bezier" name="lineType" [value]="lt.bezier">
-            <div id="bezierType" mat-button class="designer_bezier_line_image"></div>
-          </mat-radio-button>
-        </mat-radio-group>
+      <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <label>Name</label>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
-        <div style="text-align:right">Line Name:</div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
+      <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
+        <mat-form-field [floatLabel]="'never'">
           <input matInput
                  [matAutocomplete]="linenames"
-                 placeholder="name"
                  [formControl]="lineName">
           <mat-autocomplete #linenames="matAutocomplete">
             <mat-option *ngFor="let line of lines | async" [value]="line.Id">
               <span>{{line.Id}}</span>
             </mat-option>
           </mat-autocomplete>
+        </mat-form-field>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
-        <mat-label>Select state</mat-label>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="16" [rowspan]="1" style="text-align:left">
-        <mat-form-field [floatLabel]="'never'">
-          <mat-select placeholder="Select State" [(ngModel)]="selectedState">
-            <mat-option *ngFor="let state of states" [value]="state">
-              {{state}}
+      <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <label style="padding-right:6px">Type</label>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
+        <mat-form-field>
+          <mat-select [(ngModel)]="data.type">
+            <mat-option value="lt.straight" selected>
+              Straight
+            </mat-option>
+            <mat-option value="lt.gradient">
+              Gradient
+            </mat-option>
+            <mat-option value="lt.bezier">
+              Bezier
+            </mat-option>
+            <mat-option value="lt.VtoV">
+              Vertical to Vertical
+            </mat-option>
+            <mat-option value="lt.HtoH">
+              Horizontal to Horizontal
+            </mat-option>
+            <mat-option value="lt.VtoH">
+              Vertical to Horizontal
+            </mat-option>
+            <mat-option value="lt.HtoV">
+              Horizontal to Vertical
             </mat-option>
           </mat-select>
         </mat-form-field>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="4" [rowspan]="1">
-        <div style="width:100%; text-align:left">
-          <label class="xLabel">Path</label>
-        </div>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <label>State</label>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
+        <display-state-selector [state]="data.state" (stateChange)="OnStateChange($event)"></display-state-selector>
+        <!--<mat-form-field [floatLabel]="'never'">
+          <mat-select placeholder="Select State" [(ngModel)]="data.state">
+            <mat-option *ngFor="let state of States" [value]="state">
+              {{state}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>-->
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <label style="padding-right:5px">Path</label>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="12" [rowspan]="1">
-        <input matInput
-               [matAutocomplete]="pathnames"
+        <mat-form-field [floatLabel]="'never'">
+          <input matInput
+                 [matAutocomplete]="pathnames"
                  placeholder="name"
                  [formControl]="pathName">
-        <mat-autocomplete #pathnames="matAutocomplete">
-          <mat-option *ngFor="let path of paths | async" [value]="path.Id">
-            <span>{{path.Id}}</span>
-          </mat-option>
-        </mat-autocomplete>
+          <mat-autocomplete #pathnames="matAutocomplete">
+            <mat-option *ngFor="let path of paths | async" [value]="path.Id">
+              <span>{{path.Id}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <button mat-icon-button aria-label="Add Path"
+                (click)="AddPath()"
+                [disabled]="!ValidLineName || !ValidPathName || PathNameSaved">
+          <mat-icon>playlist_add</mat-icon>
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="16" [rowspan]="2" style="text-align:left">
+        <div mat-dialog-actions class="button-row" style="width:100%">
+          <button mat-stroked-button color="warn"
+                  (click)="RemoveLine()"
+                  [disabled]="!LineSaved"
+                  [mat-dialog-close]="data" cdkFocusInitial>
+            Remove
+          </button>
+          <button mat-stroked-button color="primary"
+                  [disabled]="!ValidLineName"
+                  [mat-dialog-close]="data" cdkFocusInitial>
+            {{okMessage}}
+          </button>
+          <button mat-stroked-button
+                  color="basic" (click)="onNoClick()">
+            {{cancelMessage}}
+          </button>
+        </div>
       </mat-grid-tile>
     </mat-grid-list>
   </mat-dialog-content>
-  <div mat-dialog-actions style="padding-left:74px">
-    <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
-    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>{{okMessage}}</button>
-  </div>
 </div>

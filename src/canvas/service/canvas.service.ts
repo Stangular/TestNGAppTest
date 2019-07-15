@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { ShapeProperties } from '../models/shapes/shape';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult, eContentType } from '../models/shapes/shapeSelected';
 import { BaseDesignerModel, EditModel } from '../models/designer/base.model';
 import { ContextSystem, ContextLayer, ActionLayer } from '../models/IContextItem';
 import { PathService } from '../models/shapes/service/path.service';
-import { Line } from '../models/lines/line';
+import { Line, PortPath, lineTypes } from '../models/lines/line';
 import { DisplayValues } from '../models/DisplayValues';
+import { Shape } from '../models/shapes/shape';
 
 export enum objectTypes {
   rectangle = 0,
@@ -21,7 +21,6 @@ export enum objectTypes {
 export class CanvasService {
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   selectedType: eContentType = eContentType.rectangle;
-  private shapeProperties: ShapeProperties = new ShapeProperties();
   chartContent: ChartContentModel[] = [];
   private contextSystems: ContextSystem[] = [];
   constructor(private pathService: PathService) {
@@ -29,16 +28,15 @@ export class CanvasService {
   }
 
   AddPort(portData: any) {
-    this.contextSystems[0].AddPort(portData.id,
+    this.contextSystems[0].AddPort(portData.name,
       portData.offsetX,
       portData.offsetY,
       portData.type,
       portData.path);
   }
 
-  AddLine(id: string, state: string) {
-    let s = DisplayValues.GetLineIndex(id + '_state', state);
-    let line = new Line(id, s);
+  AddLine(id: string, state: string, paths: PortPath[], type: lineTypes) {
+    let line = new Line(id, state, paths,type);
     this.contextSystems[0].AddLine(line);
   }
 
@@ -47,11 +45,12 @@ export class CanvasService {
   }
 
 
-  get ActiveShape() {
-    if (!this.contextSystems[0].ActiveLayer) {
+  get ActiveShape() : Shape {
+    if (this.contextSystems.length <= 0
+      || !this.contextSystems[0].ActiveLayer) {
       return null;
     }
-    return this.contextSystems[0].ActiveLayer.SelectedShape;
+    return this.contextSystems[0].ActiveLayer.SelectedShape();
   }
 
   AddLayer() {
@@ -87,10 +86,6 @@ export class CanvasService {
 
   getChartModel(id: string) {
     return;
-  }
-
-  get ShapeProperties() {
-    return this.shapeProperties;
   }
 
   Select() {

@@ -124,9 +124,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.canvasService.Select();
     this.Clear();
     this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
-    
-  //  this.canvasService.BaseSystem.RedrawStatic(this.StaticCanvas.width, this.StaticCanvas.height);
-  //  this.canvasService.BaseSystem.RedrawActive(this.ActiveCanvas.width, this.ActiveCanvas.height);
  }
 
   CopySelectedContent() {
@@ -217,14 +214,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   //  this.editSystem.Draw(c);
   //}
   ///// 
-  //Draw() {StaticContext
-  //  if (!this.system) {
-  //    this.system = new ContextSystem();  // TODO: have default layer for this state.
-  //  }
-  //  let c = this.StaticContext;
-  //  c.clearRect(0, 0, this.width, this.height);
-  //  this.system.Draw(c);
-  //}
+  Draw() {
+    this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+  }
 
   ngOnDestroy() {
     // unsubscribe to ensure no memory leaks
@@ -237,64 +229,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   //  this.ReDraw();
   }
 
-  //@HostListener('document:mousedown', ['$event'])
-  //onMouseDown(e) {
-  //if (!e) {
-  //  return;
-  //}
-  //let posx = 0;
-  //let posy = 0;
-  //let c = this.Canvas;
-  //if (e.pageX) {
-  //  posx = e.pageX;
-  //} else if (e.clientX) {
-  //  posx = e.clientX + document.body.scrollLeft
-  //    + document.documentElement.scrollLeft;
-  //}
-  //posx = posx - c.offsetLeft;
-  //if (e.pageY) {
-  //  posy = e.pageY;
-  //} else if (e.clientY) {
-  //  posy = e.clientY + document.body.scrollTop
-  //    + document.documentElement.scrollTop;
-  //}
-  //posy = posy - c.offsetTop;
-  //this.shapeSelectResult.id = "";
-  //let rect = this.Canvas.getBoundingClientRect();
-  //let x = posx - rect.left;
-  //let y = posy - rect.top;
-  //if ( x >= 0 && y >= 0 ) {
 
-
-  //  this.point.SetToPosition(x, y);
-  //  this.shapeSelectResult.point.SetToPosition(x, y);
-
-  //  this.shapeSelectResult.id = "";
-  //  if (this.system.Select(this.shapeSelectResult)) {
-  //    this.select.emit(this.shapeSelectResult);
-  //    this.Edit();
-  //    this.ReDraw();
-  //  }
-  //}
-  //  return posy;
-  //  return posx;
-  //this.OnCapture(event);
-  //}
-
-  //@HostListener('document:mouseup', ['$event'])
-  //onMouseUp(event: any) {
-  //  this.OnRelease(event);
-  //}
-
-  //@HostListener('mousemove', ['$event'])
-  //onMousemove(event: MouseEvent) {
-  //  if (this.mouseDown) {
-  //    this.scene.rotate(
-  //      event.clientX - this.last.clientX,
-  //      event.clientY - this.last.clientY
-  //    );
-  //    this.last = event;
-  //  }
-  //}
-
+  
 }

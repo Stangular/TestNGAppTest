@@ -1,58 +1,89 @@
 <div class="dialog-form">
-  <div style="width:100%; background-color:lightgray; padding-left:10px">
+  <div class="dialog-header">
     <h1 mat-dialog-title>Update Graphic State</h1>
   </div>
   <mat-dialog-content>
-    <mat-grid-list cols="16" rowHeight="40px">
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <div style="text-align:left">Name:</div>
+    <mat-grid-list cols="6" rowHeight="40px">
+      <mat-grid-tile [colspan]="6" [rowspan]="1" style="text-align:left">
+        <div style="width:100%; text-align:left">
+          <label style="padding-right:25px">Name</label>
+          <mat-form-field class="shapeClassInput"
+                          [floatLabel]="'never'">
+            <input matInput
+                   id="stateName"
+                   [matAutocomplete]="stateauto"
+                   [formControl]="stateName">
+            <mat-autocomplete #stateauto="matAutocomplete">
+              <mat-option *ngFor="let state of states | async" [value]="state">
+                <span>{{state}}</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="14" [rowspan]="1" style="text-align:left">
-        <mat-form-field class="shapeClassInput"
-                        [floatLabel]="'never'">
-          <input matInput placeholder="name"
-                 [matAutocomplete]="auto"
-                 [formControl]="stateName">
-          <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let state of states | async" [value]="state">
-              <span>{{state}}</span> |
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+      <mat-grid-tile [colspan]="6" [rowspan]="1" style="text-align:left">
+        <div style="width:100%; text-align:left">
+          <label style="padding-right:35px">Font</label>
+          <mat-form-field class="shapeClassInput"
+                          [floatLabel]="'never'">
+            <input matInput
+                   id="fontname"
+                   [matAutocomplete]="fontauto"
+                   [formControl]="fontName">
+            <mat-autocomplete #fontauto="matAutocomplete">
+              <mat-option *ngFor="let font of fonts | async" [value]="font.Value">
+                <span>{{font.Value}}</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
-        <div style="text-align:right">Weight:{{data.weight}}</div>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <label style="padding-right:8px">Weight</label>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="13" [rowspan]="1">
-          <div style="width:40px; background-color:transparent;text-align:center">
-            Color:
-          </div>
+      <mat-grid-tile [colspan]="5" [rowspan]="1">
+        <div style="width:100%; text-align:left; padding-left:20px">
+          <mat-slider class="mat-slider-horizontal"
+                      [disabled]="false"
+                      [invert]="false"
+                      [max]="10"
+                      [min]="1"
+                      [step]="1"
+                      [thumbLabel]="false"
+                      [tickInterval]="1"
+                      [(ngModel)]="data.weight"
+                      [vertical]="false">
+          </mat-slider>
+        </div>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="8" style="text-align:left">
-        <mat-slider class="mat-slider-vertical"
-                    [disabled]="false"
-                    [invert]="false"
-                    [max]="10"
-                    [min]="1"
-                    [step]="1"
-                    [thumbLabel]="false"
-                    [tickInterval]="1"
-                    [(ngModel)]="data.weight"
-                    [vertical]="true">
-        </mat-slider>
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <label style="padding-right:17px">Color</label>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="13" [rowspan]="8" style="text-align:left">
+      <mat-grid-tile [colspan]="5" [rowspan]="7" style="text-align:left">
         <span [style.background]="data.color"
               [cpToggle]="true" [cpDialogDisplay]="'inline'"
-              [cpCancelButton]="true"
-              [cpCancelButtonClass]="'btn btn-primary btn-xs'"
+              [cpCancelButton]="false"
               [(colorPicker)]="data.color"></span>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="6" [rowspan]="2" style="text-align:left">
+        <div mat-dialog-actions class="button-row" style="width:100%">
+          <button mat-stroked-button color="warn"
+                   (click)="RemoveState()"
+                  [disabled]="StateIndex < 2"
+                  [mat-dialog-close]="data" cdkFocusInitial>
+            Remove
+          </button>
+          <button mat-stroked-button color="primary"
+                  [disabled]="StateName.length < 5"
+                  [mat-dialog-close]="data" cdkFocusInitial>
+            Save
+          </button>
+          <button mat-stroked-button color="basic" (click)="onNoClick()">
+            Cancel
+          </button>
+        </div>
       </mat-grid-tile>
     </mat-grid-list>
   </mat-dialog-content>
-  <div mat-dialog-actions class="button-row">
-    <button mat-stroked-button color="primary" (click)="onNoClick()">Cancel</button>
-    <button mat-stroked-button color="primary" [mat-dialog-close]="data" cdkFocusInitial>Save</button>
-  </div>
 </div>
 

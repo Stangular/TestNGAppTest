@@ -29,8 +29,8 @@ export class UpdatePortDialog implements OnInit {
   portType = this.ept.source;
   paths: Observable<Path[]>;
   pathName = new FormControl();
-  @Input() cancelMessage: string = 'No';
-  @Input() okMessage: string = 'Ok';
+  @Input() cancelMessage: string = 'Cancel';
+  @Input() okMessage: string = 'Save';
   constructor(
     public portService: PortService,
     public pathService: PathService,
@@ -46,6 +46,10 @@ export class UpdatePortDialog implements OnInit {
 
   LineSelected(line: Line) {
    // this.selectedLine = line;
+  }
+
+  RemovePort() {
+
   }
 
   ngOnInit() {

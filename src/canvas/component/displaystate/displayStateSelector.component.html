@@ -1,0 +1,8 @@
+<mat-form-field [floatLabel]="'never'">
+  <mat-select placeholder="Select State"
+              (selectionChange)="OnStateChange($event)">
+    <mat-option *ngFor="let state of States" [value]="state">
+      {{state}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>

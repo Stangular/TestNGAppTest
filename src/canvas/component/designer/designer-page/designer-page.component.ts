@@ -110,11 +110,14 @@ export class DesignerPageComponent implements OnInit {
  //   this.canvasService.Designer.SetTool(e.type);
   }
 
-  UpdateLine(lineData: any) {
-    
-  }
+  UpdateLine(lineData: any) {}
 
   UpdatePort(portData: any) {
     this.canvasService.AddPort(portData);
+    this.canvasService.BaseSystem.Draw();
+  }
+
+  ShapeChanged(sid:string) {
+    this.canvasService.BaseSystem.Draw();
   }
 }
