@@ -9,12 +9,8 @@
     "\\src\\canvas\\models\\shapes",
     "\\src\\canvas\\models\\shapes\\content",
     "\\src\\canvas\\models\\shapes\\content\\image",
-    "\\src\\canvas\\models\\shapes\\content\\text",
-    "\\src\\ui",
-    "\\src\\ui\\components",
-    "\\src\\ui\\components\\autocomplete",
-    "\\src\\ui\\components\\edit"
+    "\\src\\canvas\\models\\shapes\\content\\text"
   ],
-  "SelectedNode": "\\src\\canvas\\component\\canvas.component.ts",
+  "SelectedNode": "\\src\\canvas\\models\\shapes\\port.ts",
   "PreviewInSolutionExplorer": false
 }

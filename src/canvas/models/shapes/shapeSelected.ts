@@ -24,6 +24,7 @@ export class ShapeSelectResult {
   previousPoint: Point = new Point();
   shapeType: eContentType = eContentType.typeCount;
   state: StateIndex;
+  stateName: string = 'default';
 
   get DX() { return this.point.X - this.previousPoint.X; }
   get DY() { return this.point.Y - this.previousPoint.Y; }

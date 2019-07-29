@@ -22,17 +22,12 @@ import { Port } from '../shapes/port';
 
 export class Path implements IContextItem {
 
-  _class: string = '';
   nodeCount: number = 0;
   private portNames: string[] = [];
   constructor(private id: string
     , private line: string) { }
 
   get Id() { return this.id; }
-
-  get Class(): string {
-    return this._class;
-  }
 
   get Line() { return this.line; }
 
@@ -53,10 +48,6 @@ export class Path implements IContextItem {
     //  port.DrawTarget(context);
     //}
     //line.Draw(context);
-  }
-
-  AssignToClass(clss: string): void {
-    this._class = clss;
   }
 
   UpdateContextState() { }

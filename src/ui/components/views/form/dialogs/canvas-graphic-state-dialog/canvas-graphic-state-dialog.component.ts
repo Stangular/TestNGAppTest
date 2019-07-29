@@ -5,6 +5,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { AcknowlegeDeleteDialog } from '../acknowledgeDelete/acknowledge-delete-dialog.component';
+import { CanvasService } from 'src/canvas/service/canvas.service';
 
 export interface GraphicData {
   weight: number;
@@ -25,7 +26,7 @@ export class CanvasGraphicStateDialogComponent implements OnInit {
   fonts: Observable<NamedValue<string>[]>;
   stateName = new FormControl();
   fontName = new FormControl();
-  constructor(public dialogRef: MatDialogRef<CanvasGraphicStateDialogComponent>,
+  constructor(public canvasService: CanvasService,public dialogRef: MatDialogRef<CanvasGraphicStateDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: GraphicData
     , public dialog: MatDialog) { }
 
@@ -33,13 +34,15 @@ export class CanvasGraphicStateDialogComponent implements OnInit {
     this.states = this.stateName.valueChanges
       .pipe(
         startWith(''),
-        map(value => this._filter(value))
+      map(value => this._filterState(value))
       );
     this.fonts = this.fontName.valueChanges
       .pipe(
         startWith(''),
         map(value => this._filterFonts(value))
-      );
+    );
+    this.canvasService.RetrieveState();
+
   }
 
   public get StateName() {
@@ -62,7 +65,7 @@ export class CanvasGraphicStateDialogComponent implements OnInit {
     return DisplayValues.GetColorIndex(this.data.state);
   }
 
-  private _filter(value: string): string[] {
+  private _filterState(value: string): string[] {
 
     const filterValue = value.toLowerCase();
     this.data.state = value;

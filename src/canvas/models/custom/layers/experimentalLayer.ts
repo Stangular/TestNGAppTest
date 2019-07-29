@@ -44,8 +44,8 @@ export class ExperimentalLayer { //extends ContextLayer {
     //super.AddContent(new TextCenter('text1c', 220, 100, 100, 16, this.state3, "text1c",  a));
     //super.AddContent(new Text('text1d', 220, 150, 100, 16, this.state3, "text1d",  a));
 
-    const p1 = new SimplePortRectangle('sss1', 70, 10, 50, 50, this.state1);
-    const p2 = new SimplePortRectangle('sss2', 10, 70, 50, 50, this.state1);
+    //const p1 = new SimplePortRectangle('sss1', 70, 10, 50, 50, this.state1);
+    //const p2 = new SimplePortRectangle('sss2', 10, 70, 50, 50, this.state1);
     //super.AddContent(p1);
     //super.AddContent(p2);
 

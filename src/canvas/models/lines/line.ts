@@ -43,6 +43,7 @@ export class PortPath implements IPortPath {
 
   SetInterimPorts(type: lineTypes) {
 
+    if (this.ports.length < 2) { return; }
     let dx = this.ports[1].X - this.ports[0].X
     let dy = this.ports[1].Y - this.ports[0].Y;
     let p = 0;
@@ -146,16 +147,16 @@ export class PortPath implements IPortPath {
 
 export class Line implements ILine {
 
-  _class: string = '';
   _paths: PortPath[] = [];
   _state: StateIndex;
   constructor(private id: string,
     protected state: string,
     paths: PortPath[] = [],
-    private type: lineTypes = lineTypes.straight ) {
+    private type: lineTypes = lineTypes.straight) {
+    let t = this.type;
     this._paths = paths.concat([]);
     this._state = DisplayValues.GetLineIndex(this.Id + "_state", state)
-    paths.forEach(function (p, i) { p.SetInterimPorts(this.type); });
+    paths.forEach(function (p, i) { p.SetInterimPorts(t); });
   }
 
   Update(line: Line) {
@@ -178,10 +179,6 @@ export class Line implements ILine {
   }
 
   get Id() { return this.id; }
-
-  get Class(): string {
-    return this._class;
-  }
 
   AddPath(pathName: string, points: Point[] = []) {
     let path = new PortPath(pathName, points);
@@ -207,9 +204,6 @@ export class Line implements ILine {
     return this._paths;
   }
 
-  AssignToClass(clss: string): void {
-    this._class = clss;
-  }
 
   UpdateContextState() { }
 

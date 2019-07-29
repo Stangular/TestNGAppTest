@@ -1,6 +1,7 @@
 import { Point, TrackingPoint } from './primitives/point';
+import { IContextItem } from '../IContextItem';
 
-export interface IShape {
+export interface IShape extends IContextItem {
 
   Id: string;
   Top: number;
@@ -12,8 +13,6 @@ export interface IShape {
   Height: number;
 
   Center: Point;
-  Class: string;
-  AssignToClass(clss: string): void;
   DrawShape(context: any);
   MoveBy(x: number, y: number);
   SizeBy(top: number, right: number, bottom: number, left: number);

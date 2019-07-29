@@ -1,5 +1,5 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatSelect } from '@angular/material';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
 import { LineService } from 'src/canvas/models/lines/service/line.service';
 import { Observable } from 'rxjs';
@@ -125,8 +125,8 @@ export class UpdateLineDialog implements OnInit {
 
   }
 
-  OnStateChange(value: string) {
-    this.data.state = value;
+  OnStateChange(selection: MatSelect) {
+    this.data.state = selection.value;
   }
   acknowledgeDelete(): void {
     const dialogRef = this.dialog.open(AcknowlegeDeleteDialog, {

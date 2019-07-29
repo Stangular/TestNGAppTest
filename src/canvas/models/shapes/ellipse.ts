@@ -12,13 +12,13 @@ export class Ellipse extends Shape implements IContextItem {
     left: number,
     width: number,
     height: number,
-    state: StateIndex) {
+    stateName: string) {
     super(id,
       top,
       left,
       width,
       height,
-      state);
+      stateName);
   }
 
   private getXPos(i: number, centerX: number, width: number, height: number) {
@@ -75,7 +75,7 @@ export class Ellipse extends Shape implements IContextItem {
 
   CopyShape(newID: string): Shape {
 
-    return new Ellipse(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state);
+    return new Ellipse(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName);
   }
   
   CopyItem(newID: string) {

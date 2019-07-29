@@ -1,6 +1,7 @@
 import { IShape } from './shapes/IShape';
 import { ILine } from './lines/ILine';
 import { Point } from '../models/shapes/primitives/point';
+import { CanvasService } from '../service/canvas.service';
 
 export class NamedValue<T> {
 
@@ -58,6 +59,10 @@ export class DisplayValues {
   private static color: NamedValue<string>[] = [];
   private static weight: NamedValue<number>[] = [];
   private static fonts: NamedValue<string>[] = [];
+
+  constructor(service: CanvasService) {
+     service.RetrieveState();
+  }
 
   static Clear() {
     this.color.length = 0;
@@ -119,8 +124,8 @@ export class DisplayValues {
   static get Fonts() { return this.fonts; }
 
   static GetColor(index: number) {
-    if (index >= this.weight.length) {
-      this.GetColor(index - 1);
+    if (index >= this.color.length) {
+      return this.GetColor(index - 1);
     }
     if (!index || index < 0) { index = 0; }
     return this.color[index].Value;
@@ -128,15 +133,15 @@ export class DisplayValues {
 
   static GetWeight(index: number) {
     if (index >= this.weight.length) {
-      this.GetWeight( index - 1 );
+      return this.GetWeight( index - 1 );
     }
     if (!index || index < 0 ) { index = 0; }
     return this.weight[index].Value;
   }
 
   static GetFont(index: number) {
-    if (index >= this.weight.length) {
-      this.GetFont(index - 1);
+    if (index >= this.fonts.length) {
+      return this.GetFont(index - 1);
     }
     if (!index || index < 0) { index = 0; }
     return this.fonts[index].Value;
@@ -188,7 +193,10 @@ export class DisplayValues {
    return stateIndex;
   }
 
-  static GetShapeIndex(name: string, background: string, border: string): StateIndex {
+  static GetShapeIndex(name: string, background: string = '', border: string = ''): StateIndex {
+    if (name.length <= 0) { return null; }
+    if (background.length <= 0) { background = name; }
+    if (border.length <= 0) { border = background; }
     let stateIndex = new StateIndex(name);
     let ndx = this.ColorIndex(background);
     stateIndex.setState(UIStates.background, ndx);

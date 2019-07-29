@@ -23,8 +23,8 @@ class Sizer extends Rectangle {
     left: number,
     width: number,
     height: number,
-    state: StateIndex) {
-    super(id, top, left, width, height, state);
+    stateName: string) {
+    super(id, top, left, width, height, stateName);
   }
 
   MoveByXXX(x: number, y: number, side: number) {
@@ -100,14 +100,14 @@ export class EditModel extends ContextLayer {
     this.designerpad.setState(UIStates.color, 4);
     this.designerpad.setState(UIStates.weight, 0);
     // this.AddContent(new Rectangle('test111', 100, 100, 200, 200, this.designerpad));
-    this._sizer.push(new Sizer('sizerTopLeft', 0, 0, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerTop', 1, 1, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerTopRight', 0, 2, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerRight', 2, 3, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerBottomRight', 0, 4, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerBottom', 1, 5, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerBottomLeft', 0, 6, 0, 0, 9, 9, this.designerpad));
-    this._sizer.push(new Sizer('sizerLeft', 2, 7, 0, 0, 9, 9, this.designerpad));
+    //this._sizer.push(new Sizer('sizerTopLeft', 0, 0, 0, 0, 9, 9, 'default.edit.background'));
+    //this._sizer.push(new Sizer('sizerTop', 1, 1, 0, 0, 9, 9, 'default.edit.background'));
+    //this._sizer.push(new Sizer('sizerTopRight', 0, 2, 0, 0, 9, 9, 'default.edit.background'));
+    //this._sizer.push(new Sizer('sizerRight', 2, 3, 0, 0, 9, 9, this.designerpad));
+    //this._sizer.push(new Sizer('sizerBottomRight', 0, 4, 0, 0, 9, 9, this.designerpad));
+    //this._sizer.push(new Sizer('sizerBottom', 1, 5, 0, 0, 9, 9, this.designerpad));
+    //this._sizer.push(new Sizer('sizerBottomLeft', 0, 6, 0, 0, 9, 9, this.designerpad));
+    //this._sizer.push(new Sizer('sizerLeft', 2, 7, 0, 0, 9, 9, this.designerpad));
   }
 
   Draw(context: any) {
@@ -334,10 +334,10 @@ export class BaseDesignerModel extends ContextLayer {
     let cnt = this.Content.length;
     switch (this.tooltype) {
       case tooltypes.rectangle:
-        shape = new Rectangle('rect_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
+        shape = new Rectangle('rect_' + cnt, point.Y, point.X, 30, 30, 'default.rect.background');
         break;
       case tooltypes.ellipse:
-        shape = new Ellipse('ellipse_' + cnt, point.Y, point.X, 30, 30, this.designerpad);
+        shape = new Ellipse('ellipse_' + cnt, point.Y, point.X, 30, 30, 'default.rect.background');
         break;
       //case tooltypes.lineStraight: break;
       //case tooltypes.lineGradient: break;

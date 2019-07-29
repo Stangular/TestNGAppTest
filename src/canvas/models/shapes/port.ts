@@ -24,11 +24,11 @@ export class Port implements IShape, IContextItem {
     private offsetY: number,
     parent: IShape,
     private type: ePortType,
-    state: StateIndex,
+    stateName: string,
     private pathId: string,
     private pathPosition: number = -1
 ) {
-    this.internalShape = new Ellipse(id + "_*", 0,0, 5, 5, state);
+    this.internalShape = new Ellipse(id + "_*", 0, 0, 5, 5, stateName);
     this._parentShapeId = parent.Id;
     this.SetPortToParent(parent.Top, parent.Right, parent.Bottom, parent.Left);
   }
@@ -43,6 +43,10 @@ export class Port implements IShape, IContextItem {
     this.internalShape.CenterOn(x, y);
   }
 
+  SetProperties(properties: any) {
+
+  }
+
   get ParentShapeID() {
     return this._parentShapeId;
   }
@@ -51,13 +55,9 @@ export class Port implements IShape, IContextItem {
     return this.type;
   }
 
-  get Class(): string {
-    return this.internalShape.Class;
-  }
-
-  AssignToClass(clss: string): void {
-    this.internalShape.AssignToClass( clss );
-  }
+  //get Class(): string {
+  //  return this.internalShape.Class;
+  //}
 
   Select(shapeSelectResult: ShapeSelectResult): boolean {
     return false;

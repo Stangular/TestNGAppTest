@@ -31,17 +31,17 @@ export class ContainedShape {
 
 }
 
-export abstract class Shape implements IShape, IContextItem {
+export abstract class Shape implements IShape {
 
-  _bgNdx: number = 0;
-  _center: Point = new Point();
-  _class: string = '';
+  protected _center: Point = new Point();
+  protected _unitCell: string = '';
   protected _areaType: AreaType = AreaType.normal;
   protected _freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
   protected _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
   protected _ports: Port[] = [];
   protected _shapes: Shape[] = [];
   protected _isSelected = false;
+  protected _stateIndex: StateIndex = null
 
   constructor(
     private id: string,
@@ -49,12 +49,12 @@ export abstract class Shape implements IShape, IContextItem {
     private left: number,
     private width: number,
     private height: number,
-    protected state: StateIndex = null) {
+    private stateName: string) {
     
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-
-    this.UpdateContextState();
+    this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
+   // this.UpdateContextState();
   }
 
   SetProperties(properties: any) {
@@ -64,31 +64,33 @@ export abstract class Shape implements IShape, IContextItem {
     this._freedomOfSizing = properties.freedomOfSizing;
     this.width = properties.width;
     this.height = properties.height;
-    this.state = DisplayValues.GetShapeIndex(properties.state, properties.state, properties.state);
+    this.stateName = properties.state;
+    this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
+ //   this.UpdateContextState();
   }
 
-  get Class(): string {
-    return this._class;
+  get UnitCell(): string {
+    return this._unitCell;
   }
 
-  AssignToClass(clss: string): void {
-    this._class = clss;
+  get StateIndex() {
+    return this._stateIndex;
   }
 
-  UpdateContextState() {
-    let bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + 'bg');
-    if (bgNdx <= 0) {
-      bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + this.Class + "_" + 'bg');
-    }
-    if (bgNdx >= 0) {
-      this._bgNdx = bgNdx;
-      this.state.setState(UIStates.background, bgNdx);
-    }
-    else {
-      this._bgNdx = this.state.Index[UIStates.background];
-    }
-  }
-  get BackgroundColorIndex() { return this._bgNdx; }
+  //UpdateContextState() {
+  //  //let bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + 'bg');
+  //  ////if (bgNdx <= 0) {
+  //  ////  bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + this.Class + "_" + 'bg');
+  //  ////}
+  //  //if (bgNdx >= 0) {
+  //  //  this._bgNdx = bgNdx;
+  //  //  this._stateIndex.setState(UIStates.background, bgNdx);
+  //  //}
+  //  //else {
+  //  //  this._bgNdx = this._stateIndex.Index[UIStates.background];
+  //  //}
+  //}
+  get BackgroundColorIndex() { return this._stateIndex.Index[UIStates.background]; }
 
   get Id(): string { return this.id; }
   get Top(): number { return this.top; }
@@ -117,6 +119,10 @@ export abstract class Shape implements IShape, IContextItem {
       return true;
     }
     return false;
+  }
+
+  get StateName(): string {
+    return this.stateName;
   }
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
@@ -227,7 +233,7 @@ export abstract class Shape implements IShape, IContextItem {
   }
 
   public SetState(state: StateIndex) {
-    this.state = state;
+    this._stateIndex = state;
   }
 
   private IsPointInShape(point: Point) {

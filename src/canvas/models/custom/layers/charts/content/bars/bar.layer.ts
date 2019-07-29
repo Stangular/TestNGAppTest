@@ -29,21 +29,17 @@ export class Bar implements IContextItem{
     size: Size,
     offset: number,
     width: number,
-    state: StateIndex) {
+    stateName: string) {
     this.sourceID = sid;
     let h = ((value / maxValue) * size.Height);
     let t = size.Height - h;
     h -= 2;
     let l = offset;
-    this.area = new Rectangle( id, t, l, width, h,state );
+    this.area = new Rectangle(id, t, l, width, h, stateName );
   }
 
   get Id(): string { return this.area.Id; }
   get Class(): string { return ""; }
-
-  AssignToClass(clss: string) : void {
-
-  }
 
   UpdateContextState(): void {
 
@@ -80,11 +76,11 @@ export class BarLayer extends ContentLayer {
     size: Size ) {
     super(margins,size, 'barchart');
  
-    let barState = new StateIndex('barsss');
-    barState.setState(UIStates.background, 2);
-    barState.setState(UIStates.foreground, 1);
-    barState.setState(UIStates.color, 4);
-    barState.setState(UIStates.weight, 0);
+    //let barState = new StateIndex('barsss');
+    //barState.setState(UIStates.background, 2);
+    //barState.setState(UIStates.foreground, 1);
+    //barState.setState(UIStates.color, 4);
+    //barState.setState(UIStates.weight, 0);
     let barcount = data.length;
     let w = size.Width - (margins.Left + margins.Right);
     let barwidth = (w / barcount);
@@ -94,7 +90,7 @@ export class BarLayer extends ContentLayer {
     
     let chartSize = new Size(size.Width - margins.Right, size.Height - margins.Bottom);
     data.forEach(function (d, i) {
-      let bar = new Bar(idData[i],'barchart' + i, minValue, maxValue, d, chartSize, offset, barwidth, barState);
+      let bar = new Bar(idData[i], 'barchart' + i, minValue, maxValue, d, chartSize, offset, barwidth, 'barsss');
    //   self.AddContent(bar);
     });
     

@@ -16,21 +16,21 @@ export class SimplePort  {
 
 export class SimplePortRectangle extends Rectangle implements IContextItem {
 
-  constructor(id: string,
-    top: number,
-    left: number,
-    width: number,
-    height: number,
-    state: StateIndex) {
-    super(id,
-      top,
-      left,
-      width,
-      height,
-      state);
-    const c = this.Center;
-   // this._ports.push(new SimplePort(this.Id + '_portA', this.Top, this.Left, state, c));
-  }
+  //constructor(id: string,
+  //  top: number,
+  //  left: number,
+  //  width: number,
+  //  height: number,
+  //  stateName: string) {
+  //  super(id,
+  //    top,
+  //    left,
+  //    width,
+  //    height,
+  //    stateName);
+  //  const c = this.Center;
+  // // this._ports.push(new SimplePort(this.Id + '_portA', this.Top, this.Left, state, c));
+  //}
 
  // PortOffset(index: number = 0) { return this._ports[index].Center; }
 }

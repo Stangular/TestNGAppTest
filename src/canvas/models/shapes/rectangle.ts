@@ -15,13 +15,13 @@ export class Rectangle extends Shape {
     left: number,
     width: number,
     height: number,
-    state: StateIndex) {
+    stateName: string) {
     super(id,
       top,
       left,
       width,
       height,
-      state);
+      stateName);
   }
 
   DrawShape(context: any): void {
@@ -29,8 +29,8 @@ export class Rectangle extends Shape {
     context.rect(this.Left, this.Top, this.Width, this.Height);
     context.fillStyle = DisplayValues.GetColor(this.BackgroundColorIndex);
     context.fill();
-    context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
-    context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
+    context.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
     context.stroke();
   }
 
@@ -44,7 +44,7 @@ export class Rectangle extends Shape {
 
   CopyShape(newID: string ) : Shape {
 
-    return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state );
+    return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName);
   }
 
   CopyItem(newID: string) {
@@ -63,28 +63,28 @@ export class RoundedRectangle extends Shape implements IContextItem {
     right: number,
     bottom: number,
     left: number,
-    state: StateIndex) {
+    stateName: string) {
     super(id,
       top,
       right,
       bottom,
       left,
-      state);
+      stateName);
   }
 
   DrawShape(context: any): void {
 
     context.rect(this.Left, this.Top, this.Width, this.Height);
-    context.fillStyle = DisplayValues.GetColor(this.state.Index[UIStates.background]);
+    context.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
     context.fill();
-    context.lineWidth = DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
-    context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
+    context.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
     context.stroke();
   }
 
   CopyShape(newID: string): Shape {
 
-    return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state);
+    return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName);
   }
 
   CopyItem(newID: string) {

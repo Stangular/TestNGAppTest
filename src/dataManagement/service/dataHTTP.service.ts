@@ -60,7 +60,7 @@ export class DataHTTPService {
     return error.statusText;
   }
 
-  getContent(filter: any, restPath: string = 'https://localhost:44336/api/data/GetFilteredContent'): Observable<IForm> {
+  getContent(filter: any, restPath: string = 'https://localhost:44336/api/data/GetFilteredContent'): Observable<any> {
     let f: any = { formName: 'charttestTableA', paging: { pageLength: 4, pageNumber: 1 }, filters: [{ FieldId: 'income', Sort: 2, Value: 0, Operation: 0 }] };
     this._headers.set('Content-Type', 'application/json');
     this._headers.set('Accept', 'application/json');
@@ -73,6 +73,7 @@ export class DataHTTPService {
     return this.http.get(restPath, this.httpOptions(myParams))
       .pipe(map(response => this.processData(response), catchError(this.handleError)));
   }
+
 
   startUpPromise(restPath: string): Promise<any> {
     this._startupData = null;

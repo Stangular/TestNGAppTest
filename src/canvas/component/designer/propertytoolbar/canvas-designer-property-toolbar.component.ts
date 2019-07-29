@@ -22,6 +22,8 @@ import { ePortType } from 'src/canvas/models/shapes/port';
 import { lineTypes, PortPath } from 'src/canvas/models/lines/line';
 import { PathService } from 'src/canvas/models/shapes/service/path.service';
 import { ShapePropertyDialogComponent } from '../../dialogs/shape/shapePropertyDialog.component';
+import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
+import { UnitCell } from 'src/canvas/models/IContextItem';
 
 
 
@@ -55,10 +57,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   shapeClassList: string[] = ['one', 'two', 'three'];
   portList: string[] = ['pone', 'ptwo', 'pthree'];
   stateList: string[] = ['sone', 'stwo', 'sthree'];
-  filteredshapeClassList: Observable<string[]>;
+  filteredUnitCellList: Observable<UnitCell[]>;
   filteredPortList: Observable<string[]>;
   filteredStateList: Observable<string[]>;
-  shapeClassControl = new FormControl();
+  unitCellControl = new FormControl();
   portControl = new FormControl();
   stateControl = new FormControl();
   lineWidthControl = new FormControl();
@@ -78,6 +80,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   public cmykColor: Cmyk = new Cmyk(0, 0, 0, 0);
   //private currentColor: string = 'color1';
   constructor(
+    public _httpService: DataHTTPService,
     public portService: PortService,
     public pathService: PathService,
     public vcRef: ViewContainerRef
@@ -100,10 +103,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   }
 
   ngOnInit() {
-    this.filteredshapeClassList = this.shapeClassControl.valueChanges
+    this.filteredUnitCellList = this.unitCellControl.valueChanges
       .pipe(
         startWith(''),
-        map(value => this._filter(value))
+      map(value => this._filterUnitCell(value))
       );
 
     this.filteredPortList = this.portControl.valueChanges
@@ -204,10 +207,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     return '';
   }
 
-  private _filter(value: string): string[] {
+  private _filterUnitCell(value: string): UnitCell[] {
     const filterValue = value.toLowerCase();
 
-    return this.shapeClassList.filter(option => option.toLowerCase().includes(filterValue));
+    return this.canvasService.BaseSystem.Cells.filter(option => option.Name.toLowerCase().includes(filterValue));
   }
 
   private _filterPorts(value: string): string[] {
@@ -255,8 +258,8 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.canvasService.AddLine(result.name, result.state, result.paths,result.type);
-       // this.pathService.AddPath(result.path,result.name);
+        this.canvasService.AddLine(result.name, result.state, result.paths, result.type);
+        this.canvasService.UpdateLine(result);
       }
     });
   }
@@ -271,9 +274,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
       DisplayValues.SetColor(result.state, result.color || '#ffffff');
       DisplayValues.SetWeight(result.state, result.weight || 1);
       DisplayValues.SetFont(result.state, result.font || 'verdana');
+      this.canvasService.UpdateState(result);
     });
   }
-
+  
   ManageShape(): void {
     const dialogRef = this.dialog.open(ShapePropertyDialogComponent, {
       width: '450px',
@@ -292,6 +296,15 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
       this.canvasService.ActiveShape.SetProperties(result);
       this.canvasService.BaseSystem.Draw();
     });
+  }
+
+  SaveUnitCell() {
+    this.canvasService.UpdateSystem(this.unitCellControl.value);
+  }
+
+  RemoveUnitCell() {
+    this.canvasService.RemoveUnitCell(this.unitCellControl.value);
+
   }
 
   ManagePorts(): void {

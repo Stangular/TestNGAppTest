@@ -14,7 +14,7 @@ export class Text extends Shape implements IContextItem {
     left: number,
     width: number,
     height: number,
-    state: StateIndex,
+    stateName: string,
     protected text: string,
     protected angle: number = 0) {
     super(id,
@@ -22,7 +22,7 @@ export class Text extends Shape implements IContextItem {
       left,
       width,
       height,
-      state);
+      stateName);
   }
 
   align(context: any) {
@@ -35,15 +35,15 @@ export class Text extends Shape implements IContextItem {
     context.translate(this.Left, this.Top);
     context.rotate(this.angle);
     context.rect(0, 0, this.Width, this.Height);
-    context.fillStyle = DisplayValues.GetColor(this.state.Index[UIStates.background]);
+    context.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
     context.fill();
   //  context.lineWidth = 5; //DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
-    context.strokeStyle = DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
+    context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
 
-    context.font = this.Height + "px " + DisplayValues.GetFont(this.state.Index[UIStates.fontFace]);
+    context.font = this.Height + "px " + DisplayValues.GetFont(this.StateIndex.Index[UIStates.fontFace]);
     context.textBaseline = 'bottom';
     context.textAlign = 'left';
-    context.fillStyle = DisplayValues.GetColor(this.state.Index[UIStates.color]);
+    context.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.color]);
     this.align(context);
     context.strokeStyle = 'transparent';
     context.lineWidth = 1;
@@ -68,7 +68,7 @@ export class Text extends Shape implements IContextItem {
 
   CopyShape(newID: string): Shape {
 
-    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName, this.text, this.angle);
   }
 
   CopyItem(newID: string) {
@@ -83,7 +83,7 @@ export class TextCenter extends Text {
     left: number,
     width: number,
     height: number,
-    state: StateIndex,
+    stateName: string,
     text: string,
     angle: number = 0) {
     super(id,
@@ -91,7 +91,7 @@ export class TextCenter extends Text {
       left,
       width,
       height,
-      state,
+      stateName,
       text,
       angle);
   }
@@ -103,7 +103,7 @@ export class TextCenter extends Text {
 
   CopyShape(newID: string): Shape {
 
-    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName, this.text, this.angle);
   }
 
   CopyItem(newID: string) {
@@ -118,7 +118,7 @@ export class TextRight extends Text {
     left: number,
     width: number,
     height: number,
-    state: StateIndex,
+    stateName: string,
     text: string,
     angle: number = 0) {
     super(id,
@@ -126,7 +126,7 @@ export class TextRight extends Text {
       left,
       width,
       height,
-      state,
+      stateName,
       text,
       angle);
   }
@@ -138,7 +138,7 @@ export class TextRight extends Text {
 
   CopyShape(newID: string): Shape {
 
-    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.text, this.angle);
+    return new Text(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName, this.text, this.angle);
   }
 
   CopyItem(newID: string) {

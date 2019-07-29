@@ -19,7 +19,7 @@ export class ContentImage extends Shape implements IContextItem {
     left: number,
     width: number,
     height: number,
-    state: StateIndex,
+    stateName: string,
     protected content: string,
     private angle: number = 0) {
     super(id,
@@ -27,13 +27,13 @@ export class ContentImage extends Shape implements IContextItem {
       left,
       width,
       height,
-      state);
+      stateName);
 
     this._image = new Image()
     this._image.onload = (() => this.imageReady());
     this._image.src = content;
 
-    this.container = new Rectangle(id + "_containerRect", top, left, width, height, state);
+    this.container = new Rectangle(id + "_containerRect", top, left, width, height, stateName);
   }
 
   DrawShape(context: any): void {
@@ -62,7 +62,7 @@ export class ContentImage extends Shape implements IContextItem {
 
   CopyShape(newID: string): Shape {
 
-    return new ContentImage(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.state, this.content, this.angle);
+    return new ContentImage(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName, this.content, this.angle);
   }
 
   CopyItem(newID: string) {

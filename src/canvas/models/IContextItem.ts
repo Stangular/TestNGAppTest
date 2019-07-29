@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable} from '@angular/core';
 import { Point } from "./shapes/primitives/point";
 import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult, eContentType } from "./shapes/shapeSelected";
@@ -22,8 +22,8 @@ class SizerHandle extends Rectangle {
     left: number,
     width: number,
     height: number,
-    state: StateIndex) {
-    super(id, top, left, width, height, state);
+    stateName: string) {
+    super(id, top, left, width, height, stateName);
   }
 
   MoveSide(x: number, y: number, handle: number) {
@@ -111,12 +111,9 @@ class SizerHandle extends Rectangle {
 export interface IContextItem {
 
   Id: string;
-  Class: string;
-  AssignToClass(clss: string): void;
   Draw(context: any): void;
   Select(criteria: any): boolean;
   CopyItem(newId: string): IContextItem;
-  UpdateContextState();
 
 }
 
@@ -166,11 +163,11 @@ export class ContextLayer implements IContextSystem {
   get Content(): IContextItem[] { return this.content; }
   get Lines(): ILine[] { return this.lines; }
 
-  UpdateContextState() {
-    this.content.forEach(function (c, i) {
-      c.UpdateContextState();
-    });
-  }
+  //UpdateContextState() {
+  //  this.content.forEach(function (c, i) {
+  //    c.UpdateContextState();
+  //  });
+  //}
 
   SelectContent(index: number) {
     if (index > 0) {
@@ -250,7 +247,9 @@ export class ContextLayer implements IContextSystem {
     if (!L) {
       this.lines.push(line);
     }
-    L.Update(line);
+    else {
+      L.Update(line);
+    }
   }
 
   RemoveLine(lineName: string) {
@@ -285,23 +284,23 @@ class Sizer implements IContextItem {
   private areaType: AreaType = AreaType.normal;
 
   constructor(designerpad: StateIndex) {
-    let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
-    designerpad.setState(UIStates.background, bgNdx);
-    designerpad.setState(UIStates.foreground, 1);
-    designerpad.setState(UIStates.color, 4);
-    designerpad.setState(UIStates.weight, 0);
-    this._handles.push(new SizerHandle('sizerTopLeft', 0, 0, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerTop', 1, 1, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerTopRight', 0, 2, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerRight', 2, 3, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerBottomRight', 0, 4, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerBottom', 1, 5, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerBottomLeft', 0, 6, 0, 0, 9, 9, designerpad));
-    this._handles.push(new SizerHandle('sizerLeft', 2, 7, 0, 0, 9, 9, designerpad));
+  //  let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
+    //designerpad.setState(UIStates.background, bgNdx);
+    //designerpad.setState(UIStates.foreground, 1);
+    //designerpad.setState(UIStates.color, 4);
+    //designerpad.setState(UIStates.weight, 0);
+    this._handles.push(new SizerHandle('sizerTopLeft', 0, 0, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerTop', 1, 1, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerTopRight', 0, 2, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerRight', 2, 3, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerBottomRight', 0, 4, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerBottom', 1, 5, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerBottomLeft', 0, 6, 0, 0, 9, 9, 'default.edit.background'));
+    this._handles.push(new SizerHandle('sizerLeft', 2, 7, 0, 0, 9, 9, 'default.edit.background'));
   }
   AssignToClass(clss: string): void { }
   CopyItem(newId: string): IContextItem { return null; }
-  UpdateContextState(): void { }
+//  UpdateContextState(): void { }
 
   get Id(): string { return 'sizer'; }
 
@@ -432,9 +431,9 @@ export class ActionLayer extends ContextLayer {// uses separate context
 
     let ppath = this.GetPath(pathName);
     if (!ppath) { return; }
-    let state = DisplayValues.GetPortIndex(id + "_state", "base_port_bg", "base_port_border");
+  //  let state = DisplayValues.GetPortIndex(id + "_state", "base_port_bg", "base_port_border");
     let shape = this._layer.Content[0] as Shape;
-    let port = new Port(id, offsetX, offsetY, shape, type, state, pathName, ppath.Length);
+    let port = new Port(id, offsetX, offsetY, shape, type, id + "_state", pathName, ppath.Length);
     ppath.AddPortPoint(port.Center);
     shape.AddPort(port);
   }
@@ -467,10 +466,24 @@ export class ActionLayer extends ContextLayer {// uses separate context
   }
 }
 
+export class UnitCell {
+  constructor(
+    private Id: string,
+    private name: string,
+    private updatedBy: string,
+    private updatedOn: Date) {
 
+  }
+
+  get ID() { return this.Id; }
+  get Name() { return this.name }
+  get UpdatedBy() { return this.updatedBy; }
+  get UpdatedOn() { return this.updatedOn; }
+}
 // manages context layers...
 export class ContextSystem implements IContextSystem {
 
+  private _cells: UnitCell[] = [];
   ssr: ShapeSelectResult;
   _staticContext: any = null;
   _activeContext: any = null;
@@ -617,10 +630,10 @@ export class ContextSystem implements IContextSystem {
     let shp: Shape = null;
     switch (ssr.shapeType) {
       case eContentType.rectangle:
-        shp = new Rectangle(shapeName, ssr.point.Y, ssr.point.X, 30, 30, ssr.DesignState);
+        shp = new Rectangle(shapeName, ssr.point.Y, ssr.point.X, 30, 30, ssr.stateName);
         break;
       case eContentType.ellipse:
-        shp = new Ellipse(shapeName, ssr.point.Y, ssr.point.X, 30, 30, ssr.DesignState);
+        shp = new Ellipse(shapeName, ssr.point.Y, ssr.point.X, 30, 30, ssr.stateName);
         break;
     }
     if (shp) {
@@ -633,4 +646,6 @@ export class ContextSystem implements IContextSystem {
     }
     return false;
   }
+
+  get Cells() { return this._cells; }
 }
