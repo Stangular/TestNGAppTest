@@ -34,7 +34,7 @@ export class StateIndex {
   get Index() { return this.index; }
 
   setState(index: UIStates, value: number): boolean {
-    if (index >= UIStates.stateCount) { return false; }
+    if (index < 0 || index >= UIStates.stateCount) { return false; }
     this.index[index] = value;
     return true;
   }
@@ -88,6 +88,7 @@ export class DisplayValues {
 
 
   static SetColor(name: string, color: string) {
+    if (!name || name.length <= 0 || !color || color.length <= 0) { return; }
     let ndx = this.ColorIndex(name);
     if (ndx >= 0) {
       this.color.splice(ndx, 1, new NamedValue(name, color));
@@ -129,6 +130,14 @@ export class DisplayValues {
     }
     if (!index || index < 0) { index = 0; }
     return this.color[index].Value;
+  }
+
+  static GetColorStateName(index: number) {
+    if (index >= this.color.length) {
+      return this.GetColor(index - 1);
+    }
+    if (!index || index < 0) { index = 0; }
+    return this.color[index].Name;
   }
 
   static GetWeight(index: number) {

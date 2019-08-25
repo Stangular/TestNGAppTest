@@ -8,7 +8,7 @@ import { HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 //import 'rxjs/add/operator/map';
 //mport 'rxjs/add/operator/catch';
 import { map, catchError } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, forkJoin } from 'rxjs';
 import { IForm } from '../model/form/form';
 import { TokenService } from '../../app/user/token/token.service';
 
@@ -58,6 +58,15 @@ export class DataHTTPService {
   protected handleError(error: Response) {
     // ErrorManager.HandleError(error);
     return error.statusText;
+  }
+
+  getCombined(paths: string[]) {
+    let self = this;
+    let obs: Observable<any>[] = [];
+    paths.forEach(function (p, i) {
+      obs.push(self.getContent(null, p));
+    });
+    return forkJoin(obs);
   }
 
   getContent(filter: any, restPath: string = 'https://localhost:44336/api/data/GetFilteredContent'): Observable<any> {

@@ -22,3 +22,33 @@ label {
   font-family: Verdana;
   font-size: 12px;
 }
+
+
+label {
+  font-family: Verdana;
+  font-size: 12px;
+}
+
+.dialog-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.xLabel {
+  margin-right: 5px;
+  text-align: left;
+}
+
+.xradioButton {
+  margin-right: 5px;
+}
+
+.offsetValue {
+  background-color: #dddddd;
+  text-align: right;
+}

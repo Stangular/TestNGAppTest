@@ -69,12 +69,12 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   AcceptMessage(message: any) {
-   // switch (message.text) {
-   //   case 11: break;
-   //   case 10: this.editSystem.Draw(this.ActiveContext);
-   //     break;
-   ////   default: this.ReDraw(); break;
-   // }
+    switch (message.text) {
+      case 11: break;
+      case 10: this.editSystem.Draw(this.ActiveContext); break;
+      case 1001: this.Draw(); break;
+   //   default: this.ReDraw(); break;
+    }
   }
   ngOnInit() {}
 
@@ -193,6 +193,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.ActiveCanvas.width = this.StaticCanvas.width;
       this.ActiveCanvas.height = this.StaticCanvas.height;
     }
+    this.Draw();
   }
 
   //ReDraw() {
@@ -215,6 +216,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   //}
   ///// 
   Draw() {
+    if (!this.canvasService.BaseSystem) { return; }
     this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
   }
 

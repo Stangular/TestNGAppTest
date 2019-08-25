@@ -3,149 +3,244 @@
     <h1 mat-dialog-title>Update Shape</h1>
   </div>
   <mat-dialog-content>
+    <mat-tab-group>
+      <mat-tab label="Basic">
+        <ng-template matTabContent>
+          <mat-grid-list cols="16" rowHeight="40px">
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+              <label style="padding-right:5px">Model</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="8" [rowspan]="1">
+              <mat-form-field [floatLabel]="'never'">
+                <input matInput
+                       [matAutocomplete]="shapenames"
+                       style="width:100%"
+                       placeholder="name"
+                       [formControl]="modelName">
+                <mat-autocomplete #shapenames="matAutocomplete">
+                  <mat-option *ngFor="let shape of shapes | async" [value]="shape.Id">
+                    <span>{{shape.Id}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="3" [rowspan]="1">
+              <label>Corners</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
+              <div class="toolbar-options-menu-group">
+                <div style="display:inline-block; padding-right:3px">
+                  <input type="number"
+                         min="0" max="25"
+                         style="background-color:#dddddd;text-align:right"
+                         matInput
+                         placeholder="0"
+                         [(ngModel)]="data.cornerRadius">
+                </div>
+              </div>
+            </mat-grid-tile>
+            <!--<mat-grid-tile [colspan]="6" [rowspan]="1">
+            </mat-grid-tile>-->
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+              <label style="padding-right:6px">Name</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="8" [rowspan]="1" style="text-align:left">
+              <mat-form-field [floatLabel]="'never'">
+                <input matInput
+                       style="width:100%"
+                       placeholder="name"
+                       [(ngModel)]="data.name">
+              </mat-form-field>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="3" [rowspan]="1">
+              <label>Width</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
+              <div class="toolbar-options-menu-group">
+                <div style="display:inline-block; padding-right:3px">
+                  <input type="number"
+                         min="0" max="25"
+                         style="background-color:#dddddd;text-align:right"
+                         matInput
+                         placeholder="0"
+                         [(ngModel)]="data.width">
+                </div>
+              </div>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+              <label style="padding-right:6px">State</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="8" [rowspan]="1" style="text-align:left">
+              <mat-form-field [floatLabel]="'never'">
+                <mat-select [(ngModel)]="data.state">
+                  <mat-option *ngFor="let state of States" [value]="state">
+                    {{state}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <!--     <display-state-selector [stateName]="lineState" (stateChange)="OnStateChange($event)"></display-state-selector>-->
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="3" [rowspan]="1">
+              <label>Height</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
+              <div class="toolbar-options-menu-group">
+                <div style="display:inline-block; padding-right:3px">
+                  <input type="number"
+                         min="0" max="25"
+                         style="background-color:#dddddd;text-align:right"
+                         matInput
+                         placeholder="0"
+                         [(ngModel)]="data.height">
+                </div>
+              </div>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Size and Motion">
+        <ng-template matTabContent>
+          <mat-grid-list cols="16" rowHeight="40px">
+            <mat-grid-tile [colspan]="5" [rowspan]="1">
+              <label style="vertical-align:top; text-align:left; padding-right:90px ">Area</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="5" [rowspan]="1" style="text-align:left">
+              <label style="vertical-align:top; text-align:left; padding-right:86px">Sizing</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="5" [rowspan]="1" style="text-align:left">
+              <label style="vertical-align:top; text-align:left; padding-right:80px ">Motion</label>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="5" [rowspan]="2">
+              <mat-radio-group name="areatype" [(ngModel)]="data.areaType" class="toolbar-radio-group">
+
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.areaType == at.normal"
+                                  (change)="AreaTypeChanged($event)"
+                                  [value]="at.normal">Normal</mat-radio-button>
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.areaType == at.lockedRatio"
+                                  [value]="at.lockedRatio">Locked Ratio</mat-radio-button>
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.areaType == at.constantArea"
+                                  [value]="at.constantArea">Constant Area</mat-radio-button>
+              </mat-radio-group>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="5" [rowspan]="2" style="text-align:left">
+              <mat-radio-group name="freedomOfSizing" [(ngModel)]="data.freedomOfSizing" class="toolbar-radio-group">
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.freedomOfSizing==fom.full"
+                                  [disabled]="data.areaType != at.normal"
+                                  [value]="fom.full">Full</mat-radio-button>
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.freedomOfSizing==fom.horizontal"
+                                  [disabled]="data.areaType != at.normal"
+                                  [value]="fom.horizontal">Horizontal</mat-radio-button>
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.freedomOfSizing==fom.vertical"
+                                  [disabled]="data.areaType != at.normal"
+                                  [value]="fom.vertical">Vertical</mat-radio-button>
+              </mat-radio-group>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="5" [rowspan]="2" style="text-align:left">
+              <mat-radio-group name="freedomOfMotion" [(ngModel)]="data.freedomOfMotion" class="toolbar-radio-group">
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.freedomOfMotion==fom.full"
+                                  [value]="fom.full">Full</mat-radio-button>
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.freedomOfMotion==fom.horizontal"
+                                  [value]="fom.horizontal">Horizontal</mat-radio-button>
+                <mat-radio-button class="toolbar-radio-button"
+                                  [checked]="data.freedomOfMotion==fom.vertical"
+                                  [value]="fom.vertical">Vertical</mat-radio-button>
+              </mat-radio-group>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+            </mat-grid-tile>
+
+          </mat-grid-list>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Ports">
+        <mat-grid-list cols="16" rowHeight="40px">
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
+            <div style="width:100%; text-align:left">
+              <label>Name</label>
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="5" [rowspan]="1">
+            <mat-form-field class="full-width" [floatLabel]="'never'">
+              <input matInput
+                     [matAutocomplete]="portnames"
+                     [formControl]="portName">
+              <mat-autocomplete #portnames="matAutocomplete"
+                                (closed)="PortSelected()">
+                <mat-option *ngFor="let port of ports | async" [value]="port.Id">
+                  <span>{{port.Id}}</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
+            <div style="width:100%; text-align:left">
+              <label class="xLabel">Path</label>
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="5" [rowspan]="1">
+            <mat-select placeholder="Select Path" [(ngModel)]="data.port.path">
+              <mat-option *ngFor="let path of canvasService.BaseSystem.Paths" [value]="path.Id">
+                {{path.Id + ' : '+ path.LineId}}
+              </mat-option>
+            </mat-select>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="16" [rowspan]="1">
+            <div style="width:100%; text-align:left;padding:5px">
+              <label style="font-size:12px; font-weight:bold">Offset from center</label>
+              <div style="width:100%; margin-top:5px">
+                <div style="display:inline-block; padding-right:3px">
+                  <label>X</label>
+                </div>
+                <div style="display:inline-block; padding-right:3px">
+                  <input type="number"
+                         min="0" max="110"
+                         class="offsetValue"
+                         matInput
+                         placeholder="0" [(ngModel)]="data.port.offsetX">
+                </div>
+                <div style="display:inline-block; padding-right:3px">
+                  <label>%</label>
+                </div>
+                <div style="display:inline-block; width:20px; padding-right:3px">
+
+                </div>
+                <div style="display:inline-block; padding-right:3px">
+                  <label>Y</label>
+                </div>
+                <div style="display:inline-block; padding-right:3px">
+                  <input type="number"
+                         min="0" max="110"
+                         class="offsetValue"
+                         matInput placeholder="0"
+                         [(ngModel)]="data.port.offsetY">
+                </div>
+                <div style="display:inline-block; padding-right:3px">
+                  <label>%</label>
+                </div>
+              </div>
+            </div>
+          </mat-grid-tile>
+
+          <mat-grid-tile [colspan]="16" [rowspan]="1">
+          </mat-grid-tile>
+        </mat-grid-list>
+      </mat-tab>
+    </mat-tab-group>
     <mat-grid-list cols="16" rowHeight="40px">
-      <mat-grid-tile [colspan]="2" [rowspan]="1">
-        <label style="padding-right:5px">Model</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="8" [rowspan]="1">
-        <mat-form-field [floatLabel]="'never'">
-          <input matInput
-                 [matAutocomplete]="shapenames"
-                 style="width:100%"
-                 placeholder="name"
-                 [formControl]="modelName">
-          <mat-autocomplete #shapenames="matAutocomplete">
-            <mat-option *ngFor="let shape of shapes | async" [value]="shape.Id">
-              <span>{{shape.Id}}</span>
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1">
-        <label>Corners</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
-        <div class="toolbar-options-menu-group">
-          <div style="display:inline-block; padding-right:3px">
-            <input type="number"
-                   min="0" max="25"
-                   style="background-color:#dddddd;text-align:right"
-                   matInput
-                   placeholder="0"
-                   [(ngModel)]="data.cornerRadius">
-          </div>
-        </div>
-      </mat-grid-tile>
-      <!--<mat-grid-tile [colspan]="6" [rowspan]="1">
-      </mat-grid-tile>-->
-      <mat-grid-tile [colspan]="2" [rowspan]="1">
-        <label style="padding-right:6px">Name</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="8" [rowspan]="1" style="text-align:left">
-        <mat-form-field [floatLabel]="'never'">
-          <input matInput
-                 style="width:100%"
-                 placeholder="name"
-                 [(ngModel)]="data.name">
-        </mat-form-field>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1">
-        <label>Width</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
-        <div class="toolbar-options-menu-group">
-          <div style="display:inline-block; padding-right:3px">
-            <input type="number"
-                   min="0" max="25"
-                   style="background-color:#dddddd;text-align:right"
-                   matInput
-                   placeholder="0"
-                   [(ngModel)]="data.width">
-          </div>
-        </div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1">
-        <label style="padding-right:6px">State</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="8" [rowspan]="1" style="text-align:left">
-        <display-state-selector [state]="data.state" (stateChange)="OnStateChange($event)"></display-state-selector>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1">
-        <label>Height</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="3" [rowspan]="1" style="text-align:left">
-        <div class="toolbar-options-menu-group">
-          <div style="display:inline-block; padding-right:3px">
-            <input type="number"
-                   min="0" max="25"
-                   style="background-color:#dddddd;text-align:right"
-                   matInput
-                   placeholder="0"
-                   [(ngModel)]="data.height">
-          </div>
-        </div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="5" [rowspan]="1">
-        <label style="vertical-align:top; text-align:left; padding-right:90px ">Area</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="5" [rowspan]="1" style="text-align:left">
-        <label style="vertical-align:top; text-align:left; padding-right:86px">Sizing</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="5" [rowspan]="1" style="text-align:left">
-        <label style="vertical-align:top; text-align:left; padding-right:80px ">Motion</label>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="5" [rowspan]="2">
-        <mat-radio-group name="areatype" [(ngModel)]="data.areaType" class="toolbar-radio-group">
-
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.areaType == at.normal"
-                            (change)="AreaTypeChanged($event)"
-                            [value]="at.normal">Normal</mat-radio-button>
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.areaType == at.lockedRatio"
-                            [value]="at.lockedRatio">Locked Ratio</mat-radio-button>
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.areaType == at.constantArea"
-                            [value]="at.constantArea">Constant Area</mat-radio-button>
-        </mat-radio-group>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="5" [rowspan]="2" style="text-align:left">
-        <mat-radio-group name="freedomOfSizing" [(ngModel)]="data.freedomOfSizing" class="toolbar-radio-group">
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.freedomOfSizing==fom.full"
-                            [disabled]="data.areaType != at.normal"
-                            [value]="fom.full">Full</mat-radio-button>
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.freedomOfSizing==fom.horizontal"
-                            [disabled]="data.areaType != at.normal"
-                            [value]="fom.horizontal">Horizontal</mat-radio-button>
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.freedomOfSizing==fom.vertical"
-                            [disabled]="data.areaType != at.normal"
-                            [value]="fom.vertical">Vertical</mat-radio-button>
-        </mat-radio-group>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="5" [rowspan]="2" style="text-align:left">
-        <mat-radio-group name="freedomOfMotion" [(ngModel)]="data.freedomOfMotion" class="toolbar-radio-group">
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.freedomOfMotion==fom.full"
-                            [value]="fom.full">Full</mat-radio-button>
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.freedomOfMotion==fom.horizontal"
-                            [value]="fom.horizontal">Horizontal</mat-radio-button>
-          <mat-radio-button class="toolbar-radio-button"
-                            [checked]="data.freedomOfMotion==fom.vertical"
-                            [value]="fom.vertical">Vertical</mat-radio-button>
-        </mat-radio-group>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-      </mat-grid-tile>
-
-      <mat-grid-tile [colspan]="10" [rowspan]="1">
-      </mat-grid-tile>
-
       <mat-grid-tile [colspan]="16" [rowspan]="2" style="text-align:left">
         <div mat-dialog-actions class="button-row" style="padding-left:100px; width:100%">
           <button mat-stroked-button color="warn"

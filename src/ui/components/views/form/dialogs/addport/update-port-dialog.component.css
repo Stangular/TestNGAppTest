@@ -27,7 +27,10 @@ label {
   margin-right: 5px;
 }
 
-
+.offsetValue{
+  background-color: #dddddd;
+  text-align: right;
+}
 
 .button-row button {
   margin-right: 8px;

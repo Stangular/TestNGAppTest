@@ -18,7 +18,15 @@ export interface LineData {
   paths: PortPath[];
   state: string;
 }
-
+const LineTypessss = [
+  { namex: "Straight", valuex: "0"},
+  { namex: "Gradient", valuex: "1"},
+  { namex: "Bezier", valuex: "2"},
+  { namex: "Vertical to Vertical", valuex: "3"},
+  { namex: "Horizontal to Horizontal", valuex: "4"},
+  { namex: "Vertical to Horizontal", valuex: "5"},
+  { namex: " Horizontal to Vertical", valuex: "6"}
+]
 @Component({
 
   selector: 'line-update-dialog',
@@ -26,6 +34,7 @@ export interface LineData {
   styleUrls: ['update-line-dialog.component.css']
 })
 export class UpdateLineDialog implements OnInit {
+  lineTypesss = LineTypessss;
   lt = lineTypes;
   savedLineSelected: boolean = false;
   selectedColor: string = '';
@@ -35,6 +44,9 @@ export class UpdateLineDialog implements OnInit {
   paths: Observable<PortPath[]>;
   pathName = new FormControl();
   lineName = new FormControl();
+  lineState = "greenState";
+  stateName = '';
+  selectedType = "0";
   constructor(
     public lineService: LineService,
     private canvasService: CanvasService,
@@ -47,8 +59,12 @@ export class UpdateLineDialog implements OnInit {
 
   onNoClick(): void {
     this.dialogRef.close();
+    
   }
 
+  get States() {
+    return DisplayValues.StateNames;
+  }
   //get States() {
   //  return DisplayValues.StateNames;
   //}
@@ -63,7 +79,39 @@ export class UpdateLineDialog implements OnInit {
       .pipe(startWith(''),
         map(value => this._filterPath(value))
       );
-    //  this.pathName.setValue(this);
+  }
+
+  public _filterPath(value: string): PortPath[] {
+
+    const v = value.toLowerCase().trim();
+    if (v.length <= 0) { return this.data.paths; }
+    return this.data.paths
+      .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
+
+  }
+  LineSelected() {
+    this.SetSelectedLineType();
+  }
+
+  SetSelectedLineType() {
+    let type = lineTypes.straight;
+    let line = this.canvasService.BaseSystem.Lines.find(l => l.Id == this.lineName.value);
+    if (line) {
+      type = line.Type;
+      this.lineState = DisplayValues.GetColorStateName(line.State.color);
+    }
+    this.data.type = type;
+    this.stateName = this.data.state;
+  switch (type) {
+      case lineTypes.gradient: this.selectedType = "1"; break;
+      case lineTypes.bezier: this.selectedType = "2"; break;
+      case lineTypes.VtoV: this.selectedType = "3"; break;
+      case lineTypes.HtoH: this.selectedType = "4"; break;
+      case lineTypes.VtoH: this.selectedType = "5"; break;
+      case lineTypes.HtoV: this.selectedType = "6"; break;
+      default: this.selectedType = "0"; break;
+   }
+    return type;
   }
 
   get ValidLineName() {
@@ -88,7 +136,7 @@ export class UpdateLineDialog implements OnInit {
   }
 
   AddPath() {
-    this.data.paths.push(new PortPath(this.pathName.value));
+    this.data.paths.push(new PortPath(this.pathName.value, this.lineName.value));
   }
 
   RemoveLine() {
@@ -98,36 +146,31 @@ export class UpdateLineDialog implements OnInit {
   private _filterLine(value: string): ILine[] {
 
     const v = value.toLowerCase();
-    if (v.length <= 0) { return []; }
+ 
     this.data.name = value;
     this.data.paths = [];
   //  this.data.state = this.States[0];
     this.data.type = lineTypes.straight;
     this.savedLineSelected = false;
-    let list = this.canvasService
-      .BaseSystem.Lines
+    let list = this.canvasService.BaseSystem.Lines
       .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
     if (list.length == 1 && list[0].Id == value) {
-      this.data.paths = list[0].Paths;
+      this.data.paths = this.canvasService.BaseSystem.Paths.filter(p => p.LineId == value);
       this.data.state = list[0].StateName;
       this.data.type = list[0].Type;
       this.savedLineSelected = true;
     }
+    if (list.length <= 0) {
+      return this.canvasService.BaseSystem.Lines;
+    }
     return list;
   }
 
-  public _filterPath(value: string): PortPath[] {
-
-    const v = value.toLowerCase().trim();
-    if (v.length <= 0) { return []; }
-    return this.data.paths
-      .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
-
-  }
 
   OnStateChange(selection: MatSelect) {
     this.data.state = selection.value;
   }
+
   acknowledgeDelete(): void {
     const dialogRef = this.dialog.open(AcknowlegeDeleteDialog, {
       width: '250px',

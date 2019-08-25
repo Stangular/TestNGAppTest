@@ -32,6 +32,8 @@ export class PortModel {
 
 export class ShapeModel {
   Id: string = '';
+  Top: Number = 0;
+  Left: Number = 0;
   Width: number = 0;
   Height: number = 0;
   Type: number = 0;

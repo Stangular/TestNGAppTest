@@ -1,7 +1,9 @@
 <mat-form-field [floatLabel]="'never'">
   <mat-select placeholder="Select State"
+              [compareWith]="compareStates"
+              [(ngModel)]="stateName"
               (selectionChange)="OnStateChange($event)">
-    <mat-option *ngFor="let state of States" [value]="state">
+    <mat-option *ngFor="let state of States" value="state">
       {{state}}
     </mat-option>
   </mat-select>

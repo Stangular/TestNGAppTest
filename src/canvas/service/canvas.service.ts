@@ -2,13 +2,19 @@ import { Injectable } from '@angular/core';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult, eContentType } from '../models/shapes/shapeSelected';
 import { BaseDesignerModel, EditModel } from '../models/designer/base.model';
-import { ContextSystem, ContextLayer, ActionLayer } from '../models/IContextItem';
+import { ContextSystem, ContextLayer, ActionLayer, UnitCell } from '../models/IContextItem';
 import { PathService } from '../models/shapes/service/path.service';
 import { Line, PortPath, lineTypes } from '../models/lines/line';
 import { DisplayValues } from '../models/DisplayValues';
 import { Shape } from '../models/shapes/shape';
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { DisplayValueModel, GraphicsModel, LineModel, PathModel, PortModel, ShapeModel } from './graphicsModel';
+import { Point } from '../models/shapes/primitives/point';
+import { Port, ePortType } from '../models/shapes/port';
+import { MatDialog, MatDialogRef, MatDialogConfig, MAT_DIALOG_DATA } from '@angular/material';
+import { Rectangle } from '../models/shapes/rectangle';
+import { MessageService } from 'src/app/messaging/message.service';
+import { Path } from '../models/lines/path';
 
 export enum objectTypes {
   rectangle = 0,
@@ -21,14 +27,21 @@ export enum objectTypes {
 
 @Injectable()
 export class CanvasService {
+  // protected lines: Line[] = []
+  //  protected paths: PortPath[] = [];
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   selectedType: eContentType = eContentType.rectangle;
   chartContent: ChartContentModel[] = [];
   private contextSystems: ContextSystem[] = [];
   readonly datapath: string = 'https://localhost:44328/api/canvas';
-  constructor(private pathService: PathService, public httpService: DataHTTPService) {}
+  constructor(
+    private pathService: PathService,
+    public httpService: DataHTTPService,
+    public dialog: MatDialog,
+    private messageService: MessageService) { }
 
   AddPort(portData: any) {
+    if (!portData) { return; }
     this.contextSystems[0].AddPort(portData.name,
       portData.offsetX,
       portData.offsetY,
@@ -36,22 +49,12 @@ export class CanvasService {
       portData.path);
   }
 
-  AddLine(id: string, state: string, paths: PortPath[], type: lineTypes) {
-    let line = new Line(id, state, paths,type);
-    this.contextSystems[0].AddLine(line);
-  }
-
-  AddPath() {
-
-  }
-
-
-  get ActiveShape() : Shape {
+  get ActiveShape(): Shape {
     if (this.contextSystems.length <= 0
       || !this.contextSystems[0].ActiveLayer) {
       return null;
     }
-    return this.contextSystems[0].ActiveLayer.SelectedShape();
+    return this.contextSystems[0].ActiveLayer.SelectedShape;
   }
 
   AddLayer() {
@@ -59,7 +62,7 @@ export class CanvasService {
     let layers: ContextLayer[] = [];
     layers.push(new ContextLayer("baseLayer", "displayState"));
     activeLayer = new ActionLayer();
-    this.contextSystems.push( new ContextSystem(layers, activeLayer));
+    this.contextSystems.push(new ContextSystem(layers, activeLayer));
   }
 
   AddNewChartContent(id: string,
@@ -97,22 +100,58 @@ export class CanvasService {
   }
 
   RetrieveState() {
-    this.httpService.getContent(null, this.datapath + '/DisplayState')
+    let path = "https://localhost:44328/api/state";
+    this.httpService.getContent(null, path)
       .subscribe(
-      data => { this.RetrieveSuccess(data) },
-      err => { this.Fail(err) });
+        data => { this.RetrieveStateSuccess(data) },
+        err => { this.Fail(err) });
+  }
+
+  RetrieveShape(unitCellId: string) {
+    let path = "https://localhost:44328/api/shape/" + unitCellId;
+    this.httpService.getContent(null, path)
+      .subscribe(
+        data => { this.RetrieveShapeSuccess(data) },
+        err => { this.Fail(err) });
   }
 
   RetrieveLines() {
-    this.httpService.getContent(null, this.datapath + '/DisplayState')
+    let path = "https://localhost:44328/api/Line";
+    this.httpService.getContent(null, path)
       .subscribe(
         data => { this.RetrieveLineSuccess(data) },
         err => { this.Fail(err) });
   }
 
-  UpdateState(result: any)  {
+  RetrievePaths() {
+    this.httpService.getContent(null, this.datapath + '/Lines')
+      .subscribe(
+        data => { this.RetrievePathSuccess(data) },
+        err => { this.Fail(err) });
+  }
+
+  RetrieveInitial() {
+    let paths: string[] = [];
+    paths.push("https://localhost:44328/api/state");
+    paths.push("https://localhost:44328/api/Line");
+    paths.push(this.datapath + '/Cells');
+    this.httpService.getCombined(paths).subscribe(results => {
+      this.RetrieveStateSuccess(results[0]);
+      this.RetrieveLineSuccess(results[1]);
+      this.RetrieveCellsSuccess(results[2]);
+   });
+
+  }
+  RetrieveCells() {
+    this.httpService.getContent(null, this.datapath + '/Cells')
+      .subscribe(
+        data => { this.RetrieveCellsSuccess(data) },
+        err => { this.Fail(err) });
+  }
+
+  UpdateState(result: any) {
     let model: GraphicsModel = new GraphicsModel();
-   
+
     let value: DisplayValueModel = new DisplayValueModel();
     value.DisplayValueId = result.state;
     value.BGColor = result.color;
@@ -121,30 +160,36 @@ export class CanvasService {
     model.displayValues.push(value);
     this.httpService.postContent(model, this.datapath)
       .subscribe(
-      data => { this.UpdateSuccess(data) },
-      err => { this.Fail(err) });
+        data => { this.UpdateSuccess(data) },
+        err => { this.Fail(err) });
   }
 
-  UpdateSystem(unitCellName: string) {
+  UpdateSystem(unitCellId: string, unitCellName: string) {
     let model: GraphicsModel = new GraphicsModel();
+    model.UnitCellId = unitCellId;
     model.UnitCellName = unitCellName;
     this.BaseSystem.Content.forEach(function (c, i) {
       let shapeModel = new ShapeModel();
       let s = c as Shape;
       shapeModel.DisplayValueId = s.StateName;
       shapeModel.Id = s.Id;
+      shapeModel.Top = s.Top;
+      shapeModel.Left = s.Left;
       shapeModel.Width = s.Width;
       shapeModel.Height = s.Height;
       shapeModel.Shadow = 0;
       shapeModel.CornerRadius = 0;
-      model.shapes.push(shapeModel);
       s.Ports.forEach(function (p, j) {
         let portModel = new PortModel();
         portModel.ShapeId = c.Id;
+        portModel.PathId = (<Port>p).PathId;
         portModel.PortId = p.Id;
-        portModel.OffsetX = p.Offset.X;
-        portModel.OffsetY = p.Offset.Y;
+        portModel.OffsetX = (<Port>p).OffsetX;
+        portModel.OffsetY = (<Port>p).OffsetY;
+        shapeModel.Ports.push(portModel);
       });
+      model.shapes.push(shapeModel);
+
     });
 
     this.httpService.postContent(model, this.datapath)
@@ -161,7 +206,7 @@ export class CanvasService {
   UpdateShape(result: any) {
     let model: GraphicsModel = new GraphicsModel();
     let value: ShapeModel = new ShapeModel();
-    
+
   }
 
   UpdateLine(result: any) {
@@ -176,29 +221,68 @@ export class CanvasService {
     value.OffsetY1 = 0;
     value.OffsetY2 = 0;
     model.lines.push(value);
-     result.paths.forEach(function (p, i) {
+    result.paths.forEach(function (p, i) {
       let path = new PathModel();
       path.LineId = result.name;
       path.PathId = p.Id;
       model.paths.push(path);
     });
-   this.httpService.postContent(model, this.datapath)
+    this.httpService.postContent(model, this.datapath)
       .subscribe(
         data => { this.UpdateSuccess(data) },
-      err => { this.Fail(err) });
+        err => { this.Fail(err) });
   }
-  
-  RetrieveLineSuccess(data: any[]) {
+
+  RetrieveLineSuccess(data: any) {
+    let self = this;
+    data.lines.forEach(function (d, i) {
+      self.BaseSystem.Lines.push(new Line(d.lineId, d.displayValueId, d.lineType));
+    });
+    data.paths.forEach(function (d, i) {
+      self.BaseSystem.Paths.push(new PortPath(d.pathId, d.lineId));
+    });
+    setTimeout(() => this.messageService.sendMessage(1002), 0);
+  }
+
+  RetrievePathSuccess(data: any[]) {
+    let self = this;
     data.forEach(function (d, i) {
-      
+      self.BaseSystem.Paths.push(new PortPath(d.PathId, d.LineId))
     });
   }
 
-  RetrieveSuccess(data: any[]) {
+  RetrieveShapeSuccess(data: any[]) {
+    let self = this;
     data.forEach(function (d, i) {
-      DisplayValues.SetColor(d.displayValueId,d.bgColor);
-      DisplayValues.SetWeight(d.displayValueId,d.weight);
-      DisplayValues.SetFont(d.displayValueId,d.font);
+      let s = new Rectangle(d.id, d.top, d.left, d.width, d.height, d.displayValueId);
+      d.ports.forEach(function (p, i) {
+        let port = new Port(p.portId, p.offsetX, p.offsetY, s, ePortType.source, '', p.pathId);
+        s.AddPort(port);
+      });
+      self.BaseSystem.AddContent(s);
+    });
+    setTimeout(() => this.messageService.sendMessage(1001), 0);
+  }
+
+  RetrieveCellsSuccess(data: any[]) {
+    let self = this;
+    self.BaseSystem.ClearCells();
+    data.forEach(function (d, i) {
+      self.BaseSystem.AddCell(d.unitCellId, d.name, d.updatedBy, d.updatedOn);
+    });
+  }
+
+  AddLine(result: any) {
+    this.BaseSystem.AddLine(result);
+    this.UpdateLine(result);
+
+  }
+
+  RetrieveStateSuccess(data: any[]) {
+    data.forEach(function (d, i) {
+      DisplayValues.SetColor(d.displayValueId, d.bgColor);
+      DisplayValues.SetWeight(d.displayValueId, d.weight);
+      DisplayValues.SetFont(d.displayValueId, d.font);
     });
   }
 

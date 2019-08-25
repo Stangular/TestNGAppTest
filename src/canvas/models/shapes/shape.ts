@@ -4,7 +4,6 @@ import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { Line, PortPath } from '../lines/line';
-import { Path } from '../lines/path';
 import { ePortType, Port } from './port';
 
 export enum FreedomOfMotion {
@@ -38,11 +37,10 @@ export abstract class Shape implements IShape {
   protected _areaType: AreaType = AreaType.normal;
   protected _freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
   protected _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
-  protected _ports: Port[] = [];
   protected _shapes: Shape[] = [];
   protected _isSelected = false;
   protected _stateIndex: StateIndex = null
-
+  protected _ports: IShape[] = [];
   constructor(
     private id: string,
     private top: number,
@@ -54,7 +52,10 @@ export abstract class Shape implements IShape {
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
-   // this.UpdateContextState();
+    let self = this;
+  //  ports.forEach(function (p, i) {
+  //    self._ports.push(new Port(p.portId, p.offsetX, p.offsetY, self, ePortType.source, this.stateName, this.pathId));
+  //    });
   }
 
   SetProperties(properties: any) {
@@ -250,9 +251,25 @@ export abstract class Shape implements IShape {
   //  this._ports.push(new Port(id, offsetX, offsetY, this, type, state, pathId));
   //}
 
-  AddPort(port: Port) {
+  AddPort(port: IShape) : IShape{
+    let removedPort: IShape [] = [];
+    let index = this._ports.findIndex(p => p.Id.toLowerCase() == port.Id.toLowerCase());
+    if (index >= 0) {// Remove items with the same Id...
+      removedPort = this._ports.splice(index, 1);
+    }
     this._ports.push(port);
+    return (removedPort.length > 0 ) ? removedPort[0] : null;
   }
+
+  RemovePort(portId: string): IShape {
+    let removedPort: IShape[] = [];
+    let index = this._ports.findIndex(p => p.Id.toLowerCase() == portId.toLowerCase());
+    if (index >= 0) {// Remove items with the same Id...
+      removedPort = this._ports.splice(index, 1);
+    }
+    return (removedPort.length > 0) ? removedPort[0] : null;
+  }
+
 
   get Ports() {
     return this._ports;

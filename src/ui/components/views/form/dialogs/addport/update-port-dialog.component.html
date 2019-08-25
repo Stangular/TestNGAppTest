@@ -14,7 +14,15 @@
       </mat-grid-tile>
       <mat-grid-tile [colspan]="12" [rowspan]="1">
         <mat-form-field class="full-width" [floatLabel]="'never'">
-          <input matInput [(ngModel)]="data.name">
+              <input matInput
+                 [matAutocomplete]="portnames"
+                 [formControl]="portName">
+          <mat-autocomplete #portnames="matAutocomplete" 
+                 (closed)="PortSelected()">
+            <mat-option *ngFor="let port of ports | async" [value]="port.Id">
+              <span>{{port.Id}}</span>
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -33,7 +41,12 @@
                 <label>X</label>
               </div>
               <div style="display:inline-block; padding-right:3px">
-                <input type="number" min="0" max="110" style="background-color:#dddddd; text-align:right" matInput placeholder="0" [(ngModel)]="data.offsetX">
+                <input
+                       type="number"
+                       min="0" max="110"
+                       class="offsetValue"
+                       matInput
+                       placeholder="0" [(ngModel)]="data.offsetX">
               </div>
               <div style="display:inline-block; padding-right:3px">
                 <label>%</label>
@@ -45,7 +58,12 @@
                 <label>Y</label>
               </div>
               <div style="display:inline-block; padding-right:3px">
-                <input type="number" min="0" max="110" style="background-color:#dddddd; text-align:right" matInput placeholder="0" [(ngModel)]="data.offsetY">
+                <input
+                       type="number"
+                       min="0" max="110"
+                       class="offsetValue"
+                       matInput placeholder="0"
+                       [(ngModel)]="data.offsetY">
               </div>
               <div style="display:inline-block; padding-right:3px">
                 <label>%</label>
@@ -60,14 +78,11 @@
         </div>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="12" [rowspan]="1">
-        <input matInput
-               [matAutocomplete]="pathnames"
-               [formControl]="pathName">
-        <mat-autocomplete #pathnames="matAutocomplete">
-          <mat-option *ngFor="let path of paths | async" [value]="path.Id">
-            <span>{{path.Id}}</span>
+        <mat-select placeholder="Select Path" [(ngModel)]="data.path">
+          <mat-option *ngFor="let path of canvasService.BaseSystem.Paths" [value]="path.Id">
+            {{path.Id + ' : '+ path.LineId}}
           </mat-option>
-        </mat-autocomplete>
+        </mat-select>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1">
 
@@ -76,7 +91,7 @@
         <div mat-dialog-actions class="button-row" style="width:100%">
           <button mat-stroked-button color="warn"
                   (click)="RemovePort()"
-                  [disabled]="!LineSaved"
+                  [disabled]="!PortSaved"
                   [mat-dialog-close]="data" cdkFocusInitial>
             Remove
           </button>

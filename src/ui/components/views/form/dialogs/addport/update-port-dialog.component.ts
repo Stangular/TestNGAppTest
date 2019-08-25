@@ -1,14 +1,13 @@
 import { Component, Inject,Input,OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { LineService } from 'src/canvas/models/lines/service/line.service';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { IPortPath, Line } from 'src/canvas/models/lines/line';
+import { IPortPath, Line, PortPath } from 'src/canvas/models/lines/line';
 import { map, startWith } from 'rxjs/operators';
-import { ePortType } from 'src/canvas/models/shapes/port';
-import { PortService } from 'src/canvas/models/shapes/service/port.service';
-import { PathService } from 'src/canvas/models/shapes/service/path.service';
+import { ePortType, Port } from 'src/canvas/models/shapes/port';
 import { Path } from 'src/canvas/models/lines/path';
+import { CanvasService } from 'src/canvas/service/canvas.service';
+import { IShape } from 'src/canvas/models/shapes/IShape';
 
 export interface PortData {
   result: string;
@@ -17,6 +16,7 @@ export interface PortData {
   path: string;
   name: string;
   type: ePortType;
+  paths: PortPath[];
 }
 
 @Component({
@@ -27,18 +27,17 @@ export interface PortData {
 export class UpdatePortDialog implements OnInit {
   ept = ePortType;
   portType = this.ept.source;
-  paths: Observable<Path[]>;
+  paths: Observable<PortPath[]>;
+  ports: Observable<IShape[]>;
   pathName = new FormControl();
+  portName = new FormControl();
   @Input() cancelMessage: string = 'Cancel';
   @Input() okMessage: string = 'Save';
   constructor(
-    public portService: PortService,
-    public pathService: PathService,
-    public lineService: LineService,
+    private canvasService: CanvasService,
     public dialogRef: MatDialogRef<UpdatePortDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: PortData) {
-
-  }
+    @Inject(MAT_DIALOG_DATA) public data: PortData
+    , public dialog: MatDialog) {}
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -48,22 +47,56 @@ export class UpdatePortDialog implements OnInit {
    // this.selectedLine = line;
   }
 
-  RemovePort() {
-
-  }
+  RemovePort() {}
 
   ngOnInit() {
-    this.paths = this.pathName.valueChanges
-      .pipe(startWith(''),
-        map(value => this.PathFilter(value))
-      );
-    this.pathName.setValue(this.data.path);
+    this.ports = this.portName.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this._filterPort(value))
+    );
+    if (this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports.length > 0) {
+      let port = this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports[0];
+      this.portName.setValue(port.Id);
+    }
   }
 
-  private PathFilter(value: string) {
-    let res = this.pathService.Filter(value);
-    this.data.path = this.pathService._selectedPathName;
-    return res;
+
+  private _filterPort(value: string): IShape[] {
+
+    const v = value.toLowerCase();
+     
+    this.data.name = value;
+    this.data.paths = [];
+    let list = this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports
+      .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
+    if (list.length == 1) {
+      let port = list[0] as Port;
+      this.data.offsetX = port.OffsetX.toString();
+      this.data.offsetY = port.OffsetY.toString();
+      this.data.path = port.PathId;
+    }
+    if (list.length <= 0) {
+      this.data.offsetX = "0";
+      this.data.offsetY = "0";
+      this.data.path = '';
+    }
+    if (list.length > 0) {
+      this.pathName.setValue(list[0].Id);
+    }
+    return list;
+  }
+
+  PortSelected() {
+
+  }
+
+  get ValidLineName() {
+    return this.data.name.length > 0;
+  }
+
+  get PortSaved() {
+    return false;
   }
   
 }

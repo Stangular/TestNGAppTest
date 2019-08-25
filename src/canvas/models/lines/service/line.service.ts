@@ -23,10 +23,10 @@ export class LineService {
 
   AddPath(line: Line, pathName: string) {
     if (!line) { return false;}
-    let path = line.Paths.find(p => p.Id == pathName);
-    if (!path) {
-      line.AddPath(pathName);  
-    }
+    //let path = line.Paths.find(p => p.Id == pathName);
+    //if (!path) {
+    //  line.AddPath(pathName);  
+    //}
     return true;
   }
 

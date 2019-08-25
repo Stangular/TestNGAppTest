@@ -13,24 +13,25 @@
         </mat-menu>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        <button mat-flat-button color="accent" style="width:10px"
+                name="loadData"
+                (click)="LoadData()">
+          Start
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <div mat-button class="designer_copy_image" (click)="CopyObject($event)"></div>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <div mat-button class="designer_delete_image" (click)="DeleteObject($event)"></div>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <mat-form-field class="shapeClassInput"
-                        [floatLabel]="'never'">
-          <input matInput
-                 placeholder="Unit"
-                 aria-label="State"
-                 [matAutocomplete]="shapeClass"
-                 [formControl]="unitCellControl">
-          <mat-autocomplete #shapeClass="matAutocomplete">
-            <mat-option *ngFor="let cell of filteredUnitCellList  | async"
-                        [value]="class">{{cell}}</mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+        <!--<mat-form-field class="shapeClassInput"
+                        [floatLabel]="'never'">-->
+          <mat-select (selectionChange)="RetrieveUnitCell($event)">
+            <mat-option  *ngFor="let cell of Cells" [value]="cell">{{cell.Name}}</mat-option>
+          </mat-select>
+        <!--</mat-form-field>-->
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <button mat-flat-button color="accent" style="width:10px"
@@ -46,11 +47,11 @@
           Remove
         </button>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
 
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <button mat-flat-button color="accent" style="width:30px"
+        <button mat-flat-button color="accent" style="width:100%"
                 name="shapeColor"
                 [disabled]="canvasService.ActiveShape == null"
                 (click)="ManageShape()">
@@ -58,11 +59,11 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <button mat-flat-button color="accent" style="width:20px"
+        <!--<button mat-flat-button color="accent" style="width:20px"
                 name="shapeColor"
                 (click)="ManagePorts()">
           Manage Ports
-        </button>
+        </button>-->
       </mat-grid-tile>
       <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
         <button mat-flat-button color="accent" style="width:20px"
@@ -80,49 +81,14 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <mat-form-field class="shapeClassInput"
-                        [floatLabel]="'never'">
-          <input matInput
-                 placeholder="X"
-                 aria-label="locx"
-                 formControlName="locX">
-        </mat-form-field>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <mat-form-field class="shapeClassInput"
-                        [floatLabel]="'never'">
-          <input matInput
-                 placeholder="Y"
-                 aria-label="locy"
-                 formControlName="locY">
-        </mat-form-field>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <mat-form-field class="shapeClassInput"
-                        [floatLabel]="'never'">
-          <input matInput
-                 style="width:100%"
-                 placeholder="W"
-                 aria-label="width"
-                 formControlName="sizeX">
-        </mat-form-field>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <mat-form-field class="shapeClassInput"
-                        [floatLabel]="'never'">
-          <input matInput
-                 placeholder="H"
-                 aria-label="height"
-                 formControlName="sizeY">
-        </mat-form-field>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1">
-
-        <mat-form-field [floatLabel]="'never'">
-          <div style="width:40px; background-color:transparent; padding-left:135px; text-align:right">
-            <input type="number" class="widthInput" min="1" max="10" matInput placeholder="1" [formControl]="lineWidthControl">
-          </div>
-        </mat-form-field>
       </mat-grid-tile>
       <!--<mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
     <button mat-button [matMenuTriggerFor]="color" (menuOpened)="SetProperties()">Color</button>

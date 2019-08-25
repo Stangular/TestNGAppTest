@@ -1,4 +1,4 @@
-import { Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Point } from "./shapes/primitives/point";
 import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult, eContentType } from "./shapes/shapeSelected";
@@ -78,7 +78,7 @@ class SizerHandle extends Rectangle {
         if (this.side == 1 || this.side == 3 || this.side == 5 || this.side == 7) {
           this.Draw(context);
         }
-      break;
+        break;
       default: {
         switch (fos) {
           case FreedomOfMotion.vertical:
@@ -134,23 +134,102 @@ export class ContextLayer implements IContextSystem {
     private id: string,
     private displayState: string = '',
     protected content: IContextItem[] = [],
-    protected lines: Line[] = []) {
-  }
+    protected lines: Line[] = [],
+    protected paths: PortPath[] = []) { }
 
   get Id() { return this.id; }
 
   Draw(context: any = null) {
-    let c = context;
+    let self = this;
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    this.content.forEach(i => i.Draw(c));
-    this.lines.forEach(l => l.DrawAllPaths(c));
-    this.layers.forEach(l => l.Draw(c));
+    this.content.forEach(s => self.DrawShape(context, s as Shape));
+    this.lines.forEach(l => self.DrawPaths(context, l));
+  }
+
+  DrawPaths(context: any, line: Line) {
+    let paths = this.paths.filter(p => p.LineId == line.Id);
+    paths.forEach(p => line.DrawPortPath(context, p));
+  }
+
+  DrawShape(context: any, shape: Shape) {
+    shape.Draw(context);
+    shape.Ports.forEach(p => this.DrawPortPath(context, p as Port));
+  }
+
+  DrawPortPath(context: any, port: Port) {
+    let self = this;
+    let paths = this.paths.filter(p => p.Id == port.PathId);
+    paths.forEach(function (p, i) {
+      let lines = self.lines.filter(l => l.Id == p.LineId);
+      lines.forEach(l => l.DrawPortPath(context, p));
+    });
+  }
+
+  AddLine(result: any) {
+    let L = this.lines.find(l => l.Id == result.name);
+    if (!L) {
+      L = new Line(result.name, result.state, result.type);
+      this.lines.push(L);
+    }
+    else {
+      L.Update(result.state, result.type);
+    }
+    this.paths = result.paths.concat(this.paths);
+    this.paths.forEach(function (p, i) { p.SetInterimPorts(result.type); });
+  }
+
+  AddPortPath(shape: Shape) {
+    let self = this;
+    shape.Ports.forEach(function (p, i) {
+      let pp = self.paths.find(px => px.Id == (<Port>p).PathId);
+      pp.AddPortPoint(p.Center);
+      //     self.paths.push();
+    });
+  }
+  //AssignPathPoint(pathName: string, position: Point) {
+  //  let path = this.paths.find(p => p.Id == pathName);
+  //  if (!path) {
+  //    path = new PortPath(pathName);
+  //    this.paths.push(path);
+  //  }
+  //  return path.AddPortPoint(position);
+  //}
+
+  PathLength(pathName: string) {
+    let path = this.paths.find(p => p.Id == pathName);
+    if (!path) { return 0; }
+    return path.Length;
+  }
+
+  //get Paths() {
+  //  return this.paths;
+  //}
+
+  get Paths() {
+    return this.paths;
+  }
+  AddPath() { }
+
+  ResetPath(shape: Shape) {
+    let self = this;
+    shape.Ports.forEach(function (p, i) {
+      let path = self.Paths.find(pp => pp.Id == (<Port>p).PathId);
+      if (path) {
+        //  path.ResetToPort(p as Port);
+        let line = self.lines.find(l => l.Id == path.LineId);
+        if (line) {
+          path.SetInterimPorts(line.Type);
+
+        }
+      }
+    });
+    shape.MoveBy(0, 0);
   }
 
   SetLinePaths() {
     let self = this;
     this.lines.forEach(function (l, i) {
-      l.Paths.forEach(function (p, k) {
+      self.paths.forEach(function (p, k) {
         self.content.forEach(c => (<Shape>c).LinePath(p));
       });
     });
@@ -189,6 +268,8 @@ export class ContextLayer implements IContextSystem {
   AddContent(content: IContextItem) {
     if (content) {
       this.content.unshift(content);
+      this.AddPortPath(content as Shape);
+      this.ResetPath(content as Shape);
     }
   }
 
@@ -242,16 +323,6 @@ export class ContextLayer implements IContextSystem {
     return true;
   }
 
-  AddLine(line: Line) {
-    let L = this.lines.find(l => l.Id == line.Id);
-    if (!L) {
-      this.lines.push(line);
-    }
-    else {
-      L.Update(line);
-    }
-  }
-
   RemoveLine(lineName: string) {
     let ndx = this.lines.findIndex(l => l.Id == lineName);
     if (ndx >= 0) {
@@ -284,7 +355,7 @@ class Sizer implements IContextItem {
   private areaType: AreaType = AreaType.normal;
 
   constructor(designerpad: StateIndex) {
-  //  let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
+    //  let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
     //designerpad.setState(UIStates.background, bgNdx);
     //designerpad.setState(UIStates.foreground, 1);
     //designerpad.setState(UIStates.color, 4);
@@ -300,7 +371,7 @@ class Sizer implements IContextItem {
   }
   AssignToClass(clss: string): void { }
   CopyItem(newId: string): IContextItem { return null; }
-//  UpdateContextState(): void { }
+  //  UpdateContextState(): void { }
 
   get Id(): string { return 'sizer'; }
 
@@ -368,9 +439,9 @@ export class ActionLayer extends ContextLayer {// uses separate context
     super('edit', 'default');
     let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
     this.designerpad.setState(UIStates.background, bgNdx);
-    this.designerpad.setState(UIStates.foreground, 1);
-    this.designerpad.setState(UIStates.color, 4);
-    this.designerpad.setState(UIStates.weight, 0);
+    this.designerpad.setState(UIStates.foreground, bgNdx);
+    this.designerpad.setState(UIStates.color, bgNdx);
+    this.designerpad.setState(UIStates.weight, bgNdx);
     this._sizer = new Sizer(this.designerpad);
   }
 
@@ -392,12 +463,16 @@ export class ActionLayer extends ContextLayer {// uses separate context
   }
 
   Draw(context: any = null) {
+    let self = this;
     if (!this._layer) { return; }
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     this._layer.Content[0].Draw(context);
     this._sizer.Draw(context);
-    let ports = (<Shape>this._layer.Content[0]).Ports;
-    this._layer.Lines.forEach(l => l.DrawToContent(context,ports));
+    //  let ports = (<Shape>this._layer.Content[0]).Ports;
+    this.content.forEach(s => self.DrawShape(context, s as Shape));
+    this.lines.forEach(l => self.DrawPaths(context, l));
+    //  this._layer.Lines.forEach(l => l.DrawToContent(context, ports));
+
   }
 
   Select(ssr: ShapeSelectResult): boolean {
@@ -409,18 +484,18 @@ export class ActionLayer extends ContextLayer {// uses separate context
     return result;
   }
 
-  private GetPath(pathName: string) {
-    if (!this._layer) { return null; }
+  //private GetPath(pathName: string) {
+  //  if (!this._layer) { return null; }
 
-    let ppath: PortPath;
-    for (let i = 0; i < this._layer.Lines.length; i = i + 1) {
-      ppath = this._layer.Lines[i].Paths.find(p => p.Id == pathName);
-      if (ppath) {
-        break;
-      }
-    }
-    return ppath;
-  }
+  //  let ppath: PortPath;
+  //  for (let i = 0; i < this._layer.Lines.length; i = i + 1) {
+  //    ppath = this._layer.Lines[i].Paths.find(p => p.Id == pathName);
+  //    if (ppath) {
+  //      break;
+  //    }
+  //  }
+  //  return ppath;
+  //}
 
   AddPort(id: string,
     offsetX: number,
@@ -429,22 +504,28 @@ export class ActionLayer extends ContextLayer {// uses separate context
     pathName: string) {
     if (!this._layer) { return; }
 
-    let ppath = this.GetPath(pathName);
+    let ppath = this._layer.Paths.find(p => p.Id == pathName);
     if (!ppath) { return; }
-  //  let state = DisplayValues.GetPortIndex(id + "_state", "base_port_bg", "base_port_border");
+    //  let state = DisplayValues.GetPortIndex(id + "_state", "base_port_bg", "base_port_border");
     let shape = this._layer.Content[0] as Shape;
+
     let port = new Port(id, offsetX, offsetY, shape, type, id + "_state", pathName, ppath.Length);
-    ppath.AddPortPoint(port.Center);
-    shape.AddPort(port);
+    let removedPort = shape.AddPort(port);
+    if (null != removedPort) {
+      ppath.RemovePortPoint(removedPort.Center, port.Center);
+    }
+    else {
+      ppath.AddPortPoint(port.Center);
+
+    }
   }
 
   AddContent(content: IContextItem) {
     if (!this._layer) { return; }
-
     this._sizer.Reset(this._layer.Content[0] as Shape);
   }
 
-  SelectedShape(): Shape {
+  get SelectedShape(): Shape {
     if (!this._layer) { return; }
     return this._layer.Content[0] as Shape;
   }
@@ -462,18 +543,18 @@ export class ActionLayer extends ContextLayer {// uses separate context
       this._sizer.Reset(c);
     }
     ssr.UpdatePosition();
-    this._layer.Lines.forEach(l => l.ResetPath(c.Ports));
+    this._layer.ResetPath(c);
   }
+
+
 }
 
 export class UnitCell {
   constructor(
     private Id: string,
     private name: string,
-    private updatedBy: string,
-    private updatedOn: Date) {
-
-  }
+    private updatedBy: string = '',
+    private updatedOn: Date = null) { }
 
   get ID() { return this.Id; }
   get Name() { return this.name }
@@ -600,12 +681,16 @@ export class ContextSystem implements IContextSystem {
     this.activeLayer.AddPort(id, offsetX, offsetY, type, path);
   }
 
+  get Paths() {
+    return this.layers[0].Paths;
+  }
+
   get Lines() {
     return this.layers[0].Lines;
   }
 
-  AddLine(line: Line) {
-    this.layers[0].AddLine(line);
+  AddLine(result: any) {
+    this.layers[0].AddLine(result);
   }
 
   RemoveLine(lineName: string) {
@@ -645,6 +730,14 @@ export class ContextSystem implements IContextSystem {
       this.activeLayer.EndEdit();
     }
     return false;
+  }
+
+  ClearCells() {
+    this._cells = [];
+  }
+
+  AddCell(id: string, name: string, updatedBy: string, updatedOn: Date) {
+    this._cells.push(new UnitCell(id, name, updatedBy, updatedOn));
   }
 
   get Cells() { return this._cells; }

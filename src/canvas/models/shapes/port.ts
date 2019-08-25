@@ -1,13 +1,8 @@
 import { IShape } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
-import { extend } from 'webdriver-js-extender';
 import { Ellipse } from './ellipse';
-import { StateIndex } from '../DisplayValues';
-import { Size } from 'src/d3/services/d3.common.model';
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
-import { Path } from '../lines/path';
-import { Line, PortPath } from '../lines/line';
 
 export enum ePortType {
   source = 0,
@@ -17,7 +12,7 @@ export class Port implements IShape, IContextItem {
 
   internalShape: IShape;
   private _parentShapeId: string = '';
-  
+
 
   constructor(private id: string,
     private offsetX: number,
@@ -27,19 +22,19 @@ export class Port implements IShape, IContextItem {
     stateName: string,
     private pathId: string,
     private pathPosition: number = -1
-) {
+  ) {
     this.internalShape = new Ellipse(id + "_*", 0, 0, 5, 5, stateName);
     this._parentShapeId = parent.Id;
     this.SetPortToParent(parent.Top, parent.Right, parent.Bottom, parent.Left);
   }
 
   SetPortToParent(top: number, right: number, bottom: number, left: number) {
-    let w = (right - left)/2;
+    let w = (right - left) / 2;
     let h = (bottom - top) / 2;
     let cx = left + w;
     let cy = top + h;
-    let x = cx + (w * (this.offsetX / 100));
-    let y = cy + (h * (this.offsetY / 100));
+    let x = Math.round(cx + (w * (this.offsetX / 100)));
+    let y = Math.round(cy + (h * (this.offsetY / 100)));
     this.internalShape.CenterOn(x, y);
   }
 
@@ -112,7 +107,7 @@ export class Port implements IShape, IContextItem {
 
 
   get Id(): string { return this.id; }
-  get Top(): number { return this.internalShape.Top}
+  get Top(): number { return this.internalShape.Top }
   get Right(): number { return this.internalShape.Right; }
   get Bottom(): number { return this.internalShape.Bottom; }
   get Left(): number { return this.internalShape.Left; }
@@ -121,6 +116,12 @@ export class Port implements IShape, IContextItem {
   get Height(): number { return this.internalShape.Height; }
 
   get Center(): Point { return this.internalShape.Center; }
+  get OffsetX() {
+    return this.offsetX;
+  }
+  get OffsetY() {
+    return this.offsetY;
+  }
 
   get Offset(): Point {
     return this.internalShape.Center;
