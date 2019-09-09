@@ -18,7 +18,7 @@
                        placeholder="name"
                        [formControl]="modelName">
                 <mat-autocomplete #shapenames="matAutocomplete">
-                  <mat-option *ngFor="let shape of shapes | async" [value]="shape.Id">
+                  <mat-option *ngFor="let shape of shapes" [value]="shape.Id">
                     <span>{{shape.Id}}</span>
                   </mat-option>
                 </mat-autocomplete>
@@ -40,7 +40,7 @@
               </div>
             </mat-grid-tile>
             <!--<mat-grid-tile [colspan]="6" [rowspan]="1">
-            </mat-grid-tile>-->
+        </mat-grid-tile>-->
             <mat-grid-tile [colspan]="2" [rowspan]="1">
               <label style="padding-right:6px">Name</label>
             </mat-grid-tile>
@@ -236,6 +236,61 @@
           </mat-grid-tile>
 
           <mat-grid-tile [colspan]="16" [rowspan]="1">
+          </mat-grid-tile>
+        </mat-grid-list>
+      </mat-tab>
+      <mat-tab label="Content">
+        <mat-grid-list cols="16" rowHeight="40px">
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <div style="width:100%; text-align:left">
+              <label>Text</label>
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="5" [rowspan]="1">
+            <mat-form-field class="full-width" [floatLabel]="'never'">
+              <input matInput
+                     [(ngModel)]="textContent">
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="5" [rowspan]="1">
+            <mat-checkbox [(ngModel)]="textFromDataSource">From Data Source</mat-checkbox>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="3" [rowspan]="1">
+            <button mat-stroked-button color="warn" (click)="AddText()">
+              Add
+            </button>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <div style="width:100%; text-align:left">
+              <label class="xLabel">Image</label>
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="5" [rowspan]="1">
+            <mat-form-field class="full-width" [floatLabel]="'never'">
+              <input matInput
+                     [(ngModel)]="imageContentURL">
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="5" [rowspan]="1">
+            <mat-checkbox [(ngModel)]="imageFromDataSource">From Data Source</mat-checkbox>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="3" [rowspan]="1">
+            <button mat-stroked-button color="warn" (click)="AddImage()">
+              Add
+            </button>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="16" [rowspan]="5">
+            <image-upload [url]="ImagePostURL"
+                          (uploadFinished)="onUploadFinished($event)"
+                          (uploadStateChanged)="onUploadStateChanged($event)">
+            </image-upload>
+            <div class="ui one wide column">
+              <img class="ui image small" style="margin-right: 10px;" src="{{urlToImage}}" />
+            </div>
           </mat-grid-tile>
         </mat-grid-list>
       </mat-tab>

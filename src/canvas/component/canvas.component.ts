@@ -8,6 +8,8 @@ import {
   ViewChild,
   AfterViewInit,
   OnDestroy,
+  OnChanges,
+  DoCheck,
   HostListener
 } from '@angular/core';
 import { ContextSystem, ContextLayer } from '../models/IContextItem';
@@ -42,9 +44,8 @@ export class CanvasContextModel {
     '(window:resize)': 'onResize($event)'
   }
 })
-export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges, DoCheck{
 
-  editOn: boolean = true;
   mouseCaptured: boolean = false;
   subscription: Subscription;
   @Input() width: number = 0;
@@ -61,7 +62,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   @Output() move: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   private point: Point = new Point();
-
   constructor(private messageService: MessageService, private canvasService: CanvasService) {
 
     this.subscription = this.messageService.getMessage().subscribe(
@@ -83,12 +83,26 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get ActiveCanvas() {
-    if (!this.editOn || !this.activeCanvas) {
-      //  this.editOn = false;
+    if (!this.canvasService.EditOn || !this.activeCanvas) {
       return null;
     }
     return <HTMLCanvasElement>this.activeCanvas.nativeElement;
   }
+
+  ngDoCheck() {
+    if (this.canvasService.EditOn) {
+      setTimeout(() =>
+        this.setSize()
+        , 10);
+    }
+  }
+
+  //ngOnChanges() {
+  //  setTimeout(() =>
+  //    this.SetActiveLayer()
+  //    , 10);
+
+  //}
 
   ngAfterViewInit(): void {
     setTimeout(() =>
@@ -102,6 +116,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get ActiveContext() {
+    if (!this.canvasService.EditOn) { return null; }
     return this.ActiveCanvas.getContext('2d');
   }
 
@@ -121,9 +136,11 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   OnMousedown(e: any) {
     this.PositionFromEvent(e);
-    this.canvasService.Select();
-    this.Clear();
-    this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+    if (this.canvasService.EditOn) {
+      this.canvasService.Select();
+      this.Clear();
+      this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+    }
  }
 
   CopySelectedContent() {
@@ -134,8 +151,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   RemoveSelectedContent() {
     this.system.RemoveContentById(this.canvasService.shapeSelectResult.id);
     this.canvasService.shapeSelectResult.id = "";
-   // this.Edit();
-    //this.ReDraw();
     this.mouseCaptured = false;
 
   }
@@ -154,8 +169,6 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.setSize();
     if (this.ActiveCanvas) {
       this.canvasService.AddLayer();
-   
-
     }
     else {
       this.canvasService.AddLayer();
@@ -195,26 +208,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.Draw();
   }
-
-  //ReDraw() {
-
-  //  this.setSize();
-  //  //if (!this.system) {
-  //  //  this.system = this.source.ChartGraphic(this.canvasID, this.width, this.height, 'bar');
-  //  //}
-  //  this.Draw();
-
-  //}
-
-  //DrawActive() {
-  //  if (!this.editSystem) {
-  //    this.editSystem = new EditModel();  // TODO: have default layer for this state.
-  //  }
-  //  let c = this.ActiveContext;
-  //  c.clearRect(0, 0, this.width, this.height);
-  //  this.editSystem.Draw(c);
-  //}
-  ///// 
+  
   Draw() {
     if (!this.canvasService.BaseSystem) { return; }
     this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);

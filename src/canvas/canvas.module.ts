@@ -19,6 +19,8 @@ import { PortService } from './models/shapes/service/port.service';
 import { PathService } from './models/shapes/service/path.service';
 import { DisplayStateSelectorComponent } from './component/displaystate/displayStateSelector.component';
 import { ShapePropertyDialogComponent } from './component/dialogs/shape/shapePropertyDialog.component';
+import { WaitComponent } from 'src/ui/components/views/form/wait/wait.component';
+import { ImageUploadModule } from "angular2-image-upload";
 
 library.add(
    faFilter
@@ -32,7 +34,9 @@ library.add(
     , ReactiveFormsModule
     , CommonModule
     , ngMaterialModule
+    , ImageUploadModule.forRoot()
     , ColorPickerModule
+
   ],
   declarations: [
     CanvasComponent
@@ -42,6 +46,7 @@ library.add(
     , UpdatePortDialog
     , CanvasGraphicStateDialogComponent
     , UpdateLineDialog
+    , WaitComponent
     , ShapePropertyDialogComponent
     , ToolboxCanvasComponent
     , DisplayStateSelectorComponent],

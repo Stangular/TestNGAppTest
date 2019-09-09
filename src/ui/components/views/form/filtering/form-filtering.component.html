@@ -3,31 +3,56 @@
   <h1 mat-dialog-title>{{DialogTitle}}</h1>
   <div mat-dialog-content>
     <div class="dialog-form">
-      <mat-grid-list cols="1" rowHeight="30px">
+      <mat-grid-list cols="3" rowHeight="30px">
         <mat-grid-tile [colspan]="1" [rowspan]="1">
-          <mat-form-field [floatLabel]="'never'" style="width:90%">
-            <mat-select placeholder="Filter Option" [(ngModel)]="data.operation">
-              <mat-option *ngFor="let t of filterSelection" [value]="t">
-                {{t.label}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div style="text-align:left" *ngIf="!asContent && !exact">
+            Lower Value:
+          </div>
+          <div style="text-align:left" *ngIf="asContent || exact">
+            Value:
+          </div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1">
+          <div style="text-align:left">
+            <input-edit [element]="selectedLowerElement"
+                        [form]="form"></input-edit>
+          </div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+          <div style="text-align:left" *ngIf="!asContent && !exact">
+            Upper Value:
+          </div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1">
+          <div style="text-align:left" *ngIf="!asContent && !exact">
+            <input-edit [element]="selectedUpperElement"
+                        [form]="form"></input-edit>
+          </div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+          <div style="text-align:left" *ngIf="selectedLowerElement.Type == 'text'">
+            <mat-slide-toggle class="example-margin"
+                              [(ngModel)]="asContent"
+                              [checked]="asContent">
+              As Content
+            </mat-slide-toggle>
+          </div>
         </mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">
           <div style="text-align:left">
-            <input-edit [element]="selectedElement"
-                        [form]="form"
-                        (blur)="UpdateFilter($event)"></input-edit>
+            <mat-slide-toggle class="example-margin"
+                              [(ngModel)]="exact">
+              Exact
+            </mat-slide-toggle>
           </div>
-   
         </mat-grid-tile>
-
       </mat-grid-list>
     </div>
 
   </div>
   <div mat-dialog-actions>
     <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
-    <button mat-button [mat-dialog-close]="FilterData" cdkFocusInitial>{{okMessage}}</button>
+    <button mat-button [mat-dialog-close]="FilterData">{{okMessage}}</button>
   </div>
 </div>
+<!--cdkFocusInitial-->

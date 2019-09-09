@@ -15,3 +15,9 @@
   border: 0;
   background-color: rgba(254, 254, 254, 0.7);
 }
+
+.waitSpinner {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+}

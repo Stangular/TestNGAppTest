@@ -42,6 +42,9 @@ export class Rectangle extends Shape {
     this._ports.forEach(p => p.DrawShape(context));
   }
 
+  ShapeType(): number {
+    return 0;
+  }
   CopyShape(newID: string ) : Shape {
 
     return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName);
@@ -80,6 +83,8 @@ export class RoundedRectangle extends Shape implements IContextItem {
     context.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
     context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
     context.stroke();
+    this._shapes.forEach((s, i) => s.DrawShape(context));
+
   }
 
   CopyShape(newID: string): Shape {

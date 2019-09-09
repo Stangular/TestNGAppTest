@@ -28,63 +28,32 @@ export class ElementFilter<T> {
   constructor() { }
   FieldId: string = '';
   Sort: SortOrder = SortOrder.unsorted;
-  Value: any;
-  Operation: FilterType = FilterType.none;
-  apply: boolean = false;
-  result: { FieldId: string, Sort: SortOrder, Value: any, Operation: FilterType } = { FieldId: '', Sort: SortOrder.unsorted, Value: undefined, Operation: FilterType.none };
-
-  get Filter() {
-
-    this.result.FieldId = this.FieldId;
-    this.result.Sort = this.Sort;
-    this.result.Value = undefined;
-    this.result.Operation = FilterType.none;
-
-    if (this.apply) {
-      this.result.Value = this.Value;
-      this.result.Operation = this.Operation;
-    }
-
-    return this.result;
-
-  }
-
-  get Description() {
-    let d: string = '';
-    if (this.apply) {
-      switch (this.Operation) {
-        case FilterType.greaterThan: d += "> " + this.Value.toString(); break;
-        case FilterType.lessThan: d += "< " + this.Value.toString(); break;
-        case FilterType.equal: d += "= " + this.Value.toString(); break;
-        case FilterType.greaterThanORequal: d += ">= " + this.Value.toString(); break;
-        case FilterType.lessThanORequal: d += "<= " + this.Value.toString(); break;
-        case FilterType.contains: d += "contains " + this.Value.toString(); break;
-        case FilterType.doesNotContain: d += "does not contain " + this.Value.toString(); break;
-      }
-    }
-    return d;
-  }
+  LowerValue: any;
+  UpperValue: any;
+  asContent: boolean = false;
+  not: boolean = false;
+  applied: boolean = false;
 
   Remove() {
 
-    this.Operation = FilterType.none;
-    this.Value = undefined;
-    this.apply = false;
+    this.UpperValue = undefined;
+    this.LowerValue = undefined;
+    this.asContent = false;
+    this.applied = false;
   }
 
   get Applied() {
-    return this.apply;
+    return this.applied;
+  }
+
+  TurnOff() {
+    this.applied = false;
   }
 
   Toggle() {
-    if (this.Operation == FilterType.none) {
-      this.apply = false;
-      return; // cannot apply if no operation defined...
-    }
-    this.apply = !this.apply;
+    this.applied = !this.applied;
+    return this.applied;
   }
-
-
 }
 
 export class ElementModel<T>{
@@ -98,9 +67,6 @@ export class ElementModel<T>{
   defaultValue: T;
   mask: number = 0; // RegExp[] = []; //or {ID:'',mask:RegExp[] = []}
   validator: number = 0;
- // filterValue: T;
- // filterType: FilterType = FilterType.none;
-//  sortOrder: SortOrder = SortOrder.unsorted;
   autoDirtyOnDefault: boolean = false;
   filter: ElementFilter<T> = new ElementFilter();
 
@@ -114,15 +80,14 @@ export class ElementModel<T>{
       this.mask = model.mask;
       this.validator = model.validator;
       this.filter.FieldId = model.fieldID;
-      this.filter.Operation = model.filter.Operation;
-      this.filter.Value = model.filter.Value;
+      this.filter.UpperValue = model.filter.UpperValue;
+      this.filter.LowerValue = model.filter.LowerValue;
+      this.filter.asContent = model.filter.asContent;
       this.filter.Sort = model.filter.Sort;
-      //  this.filter = model.filter;
     }
   }
-
-
 }
+
 export interface IElementDefinition<T> {
 
   FormID(): string;
@@ -141,20 +106,20 @@ export interface IElementDefinition<T> {
   isDirty(): boolean;
   Clean(): void;
   ResetToDefault(): void;
-  // ResetToInvalid(): void;
   validateValue(v: T): boolean;
   SetInitialValue(v: T): boolean;
   UpdateCurrentValue(v: T): boolean;
   UpdateFromUI(): T;
-  setFilter(value: T, filterType: FilterType);
+  setFilter(lowervalue: T, uppervalue: T, asContent: boolean);
   getFilter();
-  //FilterValue(): T;
-  //FilterType(): FilterType;
   SortOrder(): SortOrder;
   SetNextSortOrder(): void;
   UIConvert(): T;
   UIValueConvert(value: T): T;
-  HasFilter(): boolean;
+  TurnFilterOff();
+  FilterApplied: boolean;
+  HasFilter: boolean;
+  ToggleFilter();
 };
 
 export class EditElementDefinition<T> implements IElementDefinition<T> {
@@ -170,15 +135,19 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
   
   getFilter() {
     this._model.filter.FieldId = this._model.fieldID;
-    return this._model.filter.Filter;
+    return this._model.filter;
   }
 
-  setFilter(value: T, filterType: FilterType) {
-    this._model.filter.Value = value;
-    this._model.filter.Operation = filterType;
-    this._model.filter.apply = filterType != FilterType.none;
+  setFilter(lowervalue: T,uppervalue: T, asContent: boolean = false) {
+    this._model.filter.LowerValue = lowervalue;
+    this._model.filter.UpperValue = uppervalue;
+    this._model.filter.asContent = asContent;
+    this._model.filter.applied = lowervalue != undefined || uppervalue != undefined;
   }
 
+  get HasFilter() {
+    return this._model.filter.LowerValue != null || this._model.filter.UpperValue != null;
+  }
   //FilterValue(): T {
   //  return this._model.;
   //}
@@ -211,26 +180,18 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
 
   }
 
-  HasFilter(): boolean {
-    return this._model.filter.Operation > FilterType.none;
-  }
-
-  get FilterOperation() {
-    return this._model.filter.Operation;
-  }
-
   ToggleFilter() {
-    this._model.filter.Toggle();
+    return this._model.filter.Toggle();
   }
 
-  get FilterDescription() {
-    return this._model.filter.Description;
+  TurnFilterOff() {
+    this._model.filter.TurnOff();
   }
 
   get FilterApplied() {
     return this._model.filter.Applied;
   }
-
+  
   Label(): string {
     return this._model.label;
   }

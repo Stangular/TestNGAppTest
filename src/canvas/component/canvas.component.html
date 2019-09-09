@@ -1,14 +1,16 @@
+<wait [Width]="StaticCanvas.width" [Height]="StaticCanvas.height" *ngIf="canvasService.DataLoading"></wait>
 <canvas #staticcanvas
         class="staticCanvas"
         [id]="'staticCanvas'"
         (mousedown)="OnMousedown($event)"
-        (mouseup)="OnRelease($event)">
-</canvas>
-  <canvas #activeCanvas
-          class="activeCanvas"
-          (mousedown)="OnMousedown($event)"
-          (mouseup)="OnRelease($event)"
-          (mousemove)="OnMouseMove($event)"
-          [id]="'activeCanvas'">
-  </canvas>
+        (mouseup)="OnRelease($event)"></canvas>
+<canvas #activeCanvas
+        *ngIf="canvasService.EditOn"
+        class="activeCanvas"
+        (mousedown)="OnMousedown($event)"
+        (mouseup)="OnRelease($event)"
+        (mousemove)="OnMouseMove($event)"
+        [id]="'activeCanvas'"></canvas>
+
+
 

@@ -15,6 +15,7 @@ import { MatDialog, MatDialogRef, MatDialogConfig, MAT_DIALOG_DATA } from '@angu
 import { Rectangle } from '../models/shapes/rectangle';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Path } from '../models/lines/path';
+import { Ellipse } from '../models/shapes/ellipse';
 
 export enum objectTypes {
   rectangle = 0,
@@ -27,11 +28,14 @@ export enum objectTypes {
 
 @Injectable()
 export class CanvasService {
+  editOn: boolean = false;
+
   // protected lines: Line[] = []
   //  protected paths: PortPath[] = [];
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   selectedType: eContentType = eContentType.rectangle;
   chartContent: ChartContentModel[] = [];
+  private _loadingData: boolean = false;
   private contextSystems: ContextSystem[] = [];
   readonly datapath: string = 'https://localhost:44328/api/canvas';
   constructor(
@@ -56,6 +60,7 @@ export class CanvasService {
     }
     return this.contextSystems[0].ActiveLayer.SelectedShape;
   }
+  get DataLoading() { return this._loadingData; }
 
   AddLayer() {
     let activeLayer: ActionLayer = null;
@@ -63,6 +68,15 @@ export class CanvasService {
     layers.push(new ContextLayer("baseLayer", "displayState"));
     activeLayer = new ActionLayer();
     this.contextSystems.push(new ContextSystem(layers, activeLayer));
+  }
+
+  ToggleEdit() {
+    this.editOn = !this.editOn;
+  }
+
+
+  get EditOn() {
+    return this.editOn;
   }
 
   AddNewChartContent(id: string,
@@ -94,6 +108,7 @@ export class CanvasService {
 
   Select() {
     if (this.contextSystems.length > 0 && !this.contextSystems[0].Select(this.SSR)) {
+
       this.SSR.shapeType = this.selectedType;
       this.contextSystems[0].AddNewContent(this.SSR);
     }
@@ -131,6 +146,7 @@ export class CanvasService {
   }
 
   RetrieveInitial() {
+    this._loadingData = true;
     let paths: string[] = [];
     paths.push("https://localhost:44328/api/state");
     paths.push("https://localhost:44328/api/Line");
@@ -139,10 +155,18 @@ export class CanvasService {
       this.RetrieveStateSuccess(results[0]);
       this.RetrieveLineSuccess(results[1]);
       this.RetrieveCellsSuccess(results[2]);
-   });
+      this.FinishedLoading();
+    },
+      err => { this.Fail(err) });
 
   }
+
+  FinishedLoading() {
+    setTimeout(() => { this._loadingData = false }, 1000);
+  }
+
   RetrieveCells() {
+    this._loadingData = true;
     this.httpService.getContent(null, this.datapath + '/Cells')
       .subscribe(
         data => { this.RetrieveCellsSuccess(data) },
@@ -178,6 +202,7 @@ export class CanvasService {
       shapeModel.Width = s.Width;
       shapeModel.Height = s.Height;
       shapeModel.Shadow = 0;
+      shapeModel.Type = (s instanceof Ellipse) ? 1 : 0;
       shapeModel.CornerRadius = 0;
       s.Ports.forEach(function (p, j) {
         let portModel = new PortModel();
@@ -189,7 +214,6 @@ export class CanvasService {
         shapeModel.Ports.push(portModel);
       });
       model.shapes.push(shapeModel);
-
     });
 
     this.httpService.postContent(model, this.datapath)
@@ -253,8 +277,17 @@ export class CanvasService {
 
   RetrieveShapeSuccess(data: any[]) {
     let self = this;
+    let s = null;
     data.forEach(function (d, i) {
-      let s = new Rectangle(d.id, d.top, d.left, d.width, d.height, d.displayValueId);
+      switch (d.type) {
+        case 1:
+          s = new Ellipse(d.id, d.top, d.left, d.width, d.height, d.displayValueId);
+          break;
+        default:
+          s = new Rectangle(d.id, d.top, d.left, d.width, d.height, d.displayValueId);
+          break;
+        
+      }
       d.ports.forEach(function (p, i) {
         let port = new Port(p.portId, p.offsetX, p.offsetY, s, ePortType.source, '', p.pathId);
         s.AddPort(port);
@@ -270,6 +303,12 @@ export class CanvasService {
     data.forEach(function (d, i) {
       self.BaseSystem.AddCell(d.unitCellId, d.name, d.updatedBy, d.updatedOn);
     });
+    this.FinishedLoading();
+  }
+
+  AddText(textContent, angle) {
+    this.BaseSystem.AddText(textContent, angle);
+    setTimeout(() => this.messageService.sendMessage(1001), 0);
   }
 
   AddLine(result: any) {
@@ -293,7 +332,7 @@ export class CanvasService {
 
 
   Fail(data: any) {
-    let sss = 0;
+    this.FinishedLoading();
   }
 
 }

@@ -4,9 +4,11 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 
 export interface FilterDialogData {
-  value: any;
-  operation: any;
-  elementModel: ElementModel<any>;
+  upperValue: any;
+  lowerValue: any;
+  asContent: boolean;
+  elementLowerModel: ElementModel<any>;
+  elementUpperModel: ElementModel<any>;
 }
 
 
@@ -39,8 +41,13 @@ export class FormFilteringComponent {
   ];
 
   // @Input() elements: IElementDefinition<any>[] = [];
-  selectedElement: IElementDefinition<any>;
+  selectedLowerElement: IElementDefinition<any>;
+  selectedUpperElement: IElementDefinition<any>;
   label: string = '';
+
+  asContent: boolean = false;
+  inclusive: boolean = true;
+  exact: boolean = true;
   @Input() cancelMessage: string = 'No';
   @Input() okMessage: string = 'Ok';
 
@@ -48,58 +55,45 @@ export class FormFilteringComponent {
   @Output() applyfilter: EventEmitter<number> = new EventEmitter<number>();
   constructor(public dialogRef: MatDialogRef<FormFilteringComponent>,
     @Inject(MAT_DIALOG_DATA) public data: FilterDialogData) {
-    data.elementModel.fieldID = data.elementModel.fieldID + '_filter';
-    this.label = data.elementModel.label;
-    data.elementModel.label = '';
-    this.selectedElement = new EditElementDefinition(data.elementModel);
-    this.selectedElement.UpdateCurrentValue(data.elementModel.defaultValue);
-  }
+    data.elementLowerModel.fieldID = data.elementLowerModel.fieldID + '_lowerfilter';
+    this.label = data.elementLowerModel.label;
 
+    data.elementLowerModel.label = '';
+    this.selectedLowerElement = new EditElementDefinition(data.elementLowerModel);
+    this.selectedLowerElement.UpdateCurrentValue(data.elementLowerModel.filter.LowerValue || data.elementLowerModel.defaultValue);
+
+    data.elementUpperModel.fieldID = data.elementUpperModel.fieldID + '_upperfilter';
+
+    this.label = data.elementUpperModel.label;
+    data.elementUpperModel.label = '';
+
+    this.selectedUpperElement = new EditElementDefinition(data.elementUpperModel);
+    this.selectedUpperElement.UpdateCurrentValue(data.elementUpperModel.filter.UpperValue || data.elementUpperModel.defaultValue);
+    this.exact = this.selectedUpperElement.CurrentValue() == this.selectedLowerElement.CurrentValue();
+  
+ }
+
+  get IsSameValue() {
+    this.selectedLowerElement.UpdateFromUI();
+    this.selectedUpperElement.UpdateFromUI();
+   return this.selectedUpperElement.CurrentValue() == this.selectedLowerElement.CurrentValue();
+  }
+ 
   get FilterData() {
-    this.data.value = this.selectedElement.CurrentValue();
+    this.selectedLowerElement.UpdateFromUI();
+    this.selectedUpperElement.UpdateFromUI();
+    this.selectedLowerElement.Type();
+    this.data.lowerValue = this.selectedLowerElement.CurrentValue();
+    this.data.upperValue = this.selectedUpperElement.CurrentValue();
+    this.data.asContent = this.asContent;
+    if (this.exact) {
+      this.data.upperValue = this.data.lowerValue;
+    }
     return this.data;
   }
-  //get filterSelection() {
-  //  return [
-  //    { type: 0, label: 'none' },
-  //    { type: 1, label: 'less than' },
-  //    { type: 2, label: 'less than or equal to' },
-  //    { type: 3, label: 'equal to' },
-  //    { type: 4, label: 'greater than or equal to' },
-  //    { type: 5, label: 'greater than' },
-  //    { type: 6, label: 'contains' },
-  //    { type: 7, label: 'does not contain' }
-  //  ];
-  //}
-
-  //onFieldChange(event: any): void {
-  //  this.selectedElement = event.value;
-  //  let fid = event.value._model.fieldID + '_filter';
-  //  this.selectedElementFilter = this.selections.find(s => s.FieldID() == fid);
-  //  if (!this.selectedElementFilter) {
-  //    let m = new ElementModel(event.value._model);
-  //    m.fieldID = fid;
-  //    m.label = '';
-  //    this.selectedElementFilter = new EditElementDefinition(m);
-  //    this.selections.push(this.selectedElementFilter);
-  //  }
-  //  this.selectedElementFilter.UpdateCurrentValue(event.value.CurrentValue());
-  //}
-
-  Apply() {
-    if (this.selectedElement) {
-      this.applyfilter.emit(this.pageSize);
-    }
-  }
-
+  
   get DialogTitle() {
     return 'Define Filter Parameters for ' + this.label;
-  }
-
-  UpdateFilter(elmId = { id: '', value: '' }) {
-    this.selectedElement.setFilter(
-      this.selectedElement.UpdateFromUI()
-      , this.data.operation.type);
   }
 
   RemoveFromField() {
@@ -109,31 +103,7 @@ export class FormFilteringComponent {
   RemoveAll() {
 
   }
-
-  //get viewableFields() {
-  //  return this.elements.filter(f => f.Label() != ':') || [];
-  //}
-
-  Sort() {
-    if (this.selectedElement) {
-      this.selectedElement.SetNextSortOrder();
-    }
-  }
-
-  get ElementSelected() {
-    if (this.selectedElement) {
-      return true;
-    }
-    return false;
-  }
-
-  get DefaultValue() {
-    if (!this.selectedElement) {
-      return '';
-    }
-    return this.selectedElement.CurrentValue || '';
-  }
-
+  
   onNoClick(): void {
     this.dialogRef.close();
   }

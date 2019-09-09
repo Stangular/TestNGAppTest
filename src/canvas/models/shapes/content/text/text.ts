@@ -29,6 +29,7 @@ export class Text extends Shape implements IContextItem {
     context.textAlign = 'left';
     context.fillText(this.text, 0, this.Height); 
   }
+
   DrawShape(context: any): void {
 
     context.save();
@@ -51,7 +52,7 @@ export class Text extends Shape implements IContextItem {
     context.restore();
 
   }
-
+  
   Draw(context: any): void {
 
     context.beginPath();

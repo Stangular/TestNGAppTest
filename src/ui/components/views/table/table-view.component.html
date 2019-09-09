@@ -2,25 +2,15 @@
   <thead>
     <tr>
       <th>
-        <div *ngIf="source.hasFilters" class="header-filter_remove">
+        <div class="header-filter_remove">
           <mat-grid-list cols="1" rowHeight="30px">
-            <mat-icon (click)="removeAllFilters()" aria-label="Remove all filters">not_interested</mat-icon>
-          </mat-grid-list>
-          <mat-grid-list cols="1" rowHeight="30px">
-            <mat-icon (click)="saveFilter()" aria-label="Save Filter">save_alt</mat-icon>
+            <mat-icon (click)="removeAllFilters()" *ngIf="filtersApplied" aria-label="Remove all filters">not_interested</mat-icon>
+            <i class="fa fa-filter" style="padding-right:5px" *ngIf="HasFilter && !filtersApplied" (click)="ApplyAllFilters(element)"></i>
           </mat-grid-list>
         </div>
       </th>
       <th *ngFor="let element of VisibleElements" style="width:10%">
         <mat-grid-list cols="3" rowHeight="30px">
-          <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-            <div style="text-align:left">{{element.FilterDescription}}</div>
-          </mat-grid-tile>
-          <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-            <div *ngIf="element.FilterApplied" class="header-filter_remove">
-              <mat-icon (click)="removeFilter(element)" aria-label="Remove Filter">not_interested</mat-icon>
-            </div>
-          </mat-grid-tile>
           <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
             <div class="header-label">
               {{ElementLabel(element)}}
@@ -37,13 +27,18 @@
           <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
             <div class="header-filter" *ngIf="!element.FilterApplied">
               <i class="fa fa-filter" style="padding-right:5px" (click)="toggleFilter(element)"></i>
-            </div><div class="header-filter_remove" *ngIf="element.FilterApplied">
+            </div>
+            <div class="header-filter_remove" *ngIf="element.FilterApplied">
               <i class="fa fa-filter" style="padding-right:5px" (click)="toggleFilter(element)"></i>
             </div>
           </mat-grid-tile>
         </mat-grid-list>
       </th>
-      <th></th>
+      <th style="text-align:right">
+        <mat-grid-list cols="1" rowHeight="30px">
+          <mat-icon (click)="saveFilter()" *ngIf="filtersApplied" aria-label="Save Filter">save_alt</mat-icon>
+        </mat-grid-list>
+      </th>
     </tr>
   </thead>
   <tbody>
@@ -55,7 +50,6 @@
         {{CellData(element,i)}}
       </td>
       <td style="text-align:right">
-        <button mat-raised-button color="warn">Warn</button>
         <button mat-icon-button color="warn" (click)="GotoDetail(i)">
           <mat-icon aria-label="Ascending">view_compact</mat-icon>
         </button>

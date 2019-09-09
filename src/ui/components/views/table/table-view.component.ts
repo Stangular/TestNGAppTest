@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormFilteringComponent  } from '../form/filtering/form-filtering.component';
+import { FormFilteringComponent } from '../form/filtering/form-filtering.component';
 import { Field } from '../../../../dataManagement/model/field';
 import { IRecordService, Records } from '../../../../dataManagement/model/records'
 import { IElementDefinition, EditElementDefinition, SortOrder, FilterType } from '../../../../dataManagement/model/definitions/ElementDefinition';
@@ -12,8 +12,8 @@ import { IElementDefinition, EditElementDefinition, SortOrder, FilterType } from
 })
 export class TableViewComponent {
 
-//  @Input() elements: IElementDefinition<string>[] = [];
- // @Input() fields: Field<any>[] = [];
+  //  @Input() elements: IElementDefinition<string>[] = [];
+  // @Input() fields: Field<any>[] = [];
   @Input() source: Records<string>;
   @Output() gotoDetail: EventEmitter<number> = new EventEmitter<number>();
   @Output() sortChange: EventEmitter<void> = new EventEmitter<void>();
@@ -21,7 +21,7 @@ export class TableViewComponent {
   sortOrder = SortOrder;
   filterType = FilterType;
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog) { }
 
   CellData(elm: IElementDefinition<string>, row: number): string {
 
@@ -53,12 +53,13 @@ export class TableViewComponent {
   }
 
   toggleFilter(elm: EditElementDefinition<any>) {
-    if (elm.FilterOperation != FilterType.none) {
-      elm.ToggleFilter();
-      this.applyFilter.emit();
+
+    if (!elm.FilterApplied) {
+      this.showFilter(elm);
     }
     else {
-      this.showFilter(elm);
+      elm.TurnFilterOff();
+      this.applyFilter.emit();
     }
   }
 
@@ -67,11 +68,29 @@ export class TableViewComponent {
     this.applyFilter.emit();
   }
 
+  get filtersApplied() {
+    let appliedFilters = this.VisibleElements.filter(e => e.FilterApplied);
+    return appliedFilters.length > 0;
+  }
+
   saveFilters() {
   }
 
   removeFilter(elm: EditElementDefinition<any>) {
-    elm.setFilter('', FilterType.none);
+    elm.setFilter(undefined, undefined, false);
+    this.applyFilter.emit();
+  }
+
+  get HasFilter() {
+    const elements = this.source.GetFormDefinition();
+    let fltrs = elements.filter(e => e.HasFilter);
+    return fltrs.length > 0;
+  }
+
+  ApplyAllFilters(e:any) {
+    const elements = this.source.GetFormDefinition();
+    let fltrs = elements.filter(e => e.HasFilter);
+    fltrs.forEach(f => f.ToggleFilter());
     this.applyFilter.emit();
   }
 
@@ -81,13 +100,16 @@ export class TableViewComponent {
   }
 
   showFilter(elm: EditElementDefinition<any>): void {
+    let fltr = elm.getFilter();
+    if (!fltr) {  return; }
     const dialogRef = this.dialog.open(FormFilteringComponent, {
       width: '400px',
-      data: { value: '', operation: '', elementModel: elm.CloneModel }
+      data: { upperValue: fltr.UpperValue, lowerValue: fltr.LowerValue, asContent: elm.getFilter().asContent, elementLowerModel: elm.CloneModel, elementUpperModel: elm.CloneModel }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      elm.setFilter(result.value, result.operation.type);
+      elm.setFilter(result.lowerValue, result.upperValue, result.asContent);
+   
       this.applyFilter.emit();
     });
   }

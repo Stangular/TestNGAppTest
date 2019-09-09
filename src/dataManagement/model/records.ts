@@ -115,8 +115,7 @@ export class Paging {
 
   gotoNextPage() {
     let nextPage = this.pageNumber + 1;
-    if ( nextPage * this.pageSize >= this.pageTotal)
-    {
+    if (nextPage * this.pageSize >= this.pageTotal) {
       return false;
     }
     this.pageNumber = nextPage;
@@ -140,10 +139,10 @@ export class Paging {
 
 export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
-  public page: Paging = new Paging(0); 
+  public page: Paging = new Paging(0);
   protected _UIElements: IElementDefinition<any>[] = [];
   //protected _childRecords: Records<T>[] = [];
-  protected _pageSize: number = 10;  
+  protected _pageSize: number = 10;
   protected _form: FormGroup;
   private _selectedItem: number = -1;
   protected _new: number[] = [];
@@ -176,12 +175,12 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
   // abstract get testData(): Field<any>[];
   abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
   abstract ChartGraphic(chartID: string, width: number, height: number, chartName: string);
-  abstract ChartIDFrom(chartNumber: number );
+  abstract ChartIDFrom(chartNumber: number);
 
-  get hasFilters() {
-    let r = this._UIElements.findIndex(e => e.HasFilter());
-    return r >= 0;
-  }
+  //get hasFilters() {
+  //  let r = this._UIElements.findIndex(e => e.HasFilter());
+  //  return r >= 0;
+  //}
 
   private createFormGroup() {
     let group: any = {};
@@ -223,7 +222,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     }
   }
 
-  
+
   get FormName(): string {
     return this.formName;
   }
@@ -244,7 +243,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   RemoveAllFilters() {
     this._UIElements.forEach(e => {
-      e.setFilter(undefined, FilterType.none);
+      e.TurnFilterOff();
     });
   }
 
@@ -337,7 +336,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   public LoadData(content: IRecord[] = [], converters: Converter[] = [], recordCount = 0, totalRecordCount = 0) {
     let self = this;
- 
+
     this._fields.length = 0;
     this._recordCount = recordCount;
     this.page.UpdateTotal(totalRecordCount);
@@ -345,7 +344,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
       let fldID = c.fieldID.toLowerCase();
       let fldElm = self._UIElements.find(e => e.FieldID().toLowerCase() == fldID);
       if (fldElm) {
-        self._fields.push(self.New( c ));
+        self._fields.push(self.New(c));
         fldElm.ResetToDefault();
       }
     });
@@ -361,12 +360,12 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
 
   public First(): boolean {
     this.Goto(0);
-    return( this.page.gotoFirstPage());
+    return (this.page.gotoFirstPage());
   }
 
   public Final(): boolean {
     this.Goto(this.Count - 1);
-    return( this.page.gotoFinalPage());
+    return (this.page.gotoFinalPage());
   }
 
   public NextPage(): boolean {
@@ -406,7 +405,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
     }
     return false;
   }
-  
+
   public Goto(index: number): boolean {
 
     if (this.IsDirty) {// if the current record is dirty you do not want to leave it...
@@ -414,7 +413,7 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
       return false; // isdirty   TODO: Dirty record message (or just disable buttons)?
     }
     if (index < 0 || index >= this.Count) {
-     return false;
+      return false;
     }
 
     this._selectedItem = index;
@@ -474,7 +473,10 @@ export abstract class Records<T> implements IRecordManager, IListNavigator<T> {
       filters: []
     }
     this._UIElements.forEach(e => {
-       f.filters.push(e.getFilter());
+      let fltr = e.getFilter();
+      if (fltr && fltr.Applied) {
+        f.filters.push(fltr);
+      }
     });
     return f;
   }

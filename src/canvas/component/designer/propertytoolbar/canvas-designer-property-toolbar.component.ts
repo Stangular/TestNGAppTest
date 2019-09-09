@@ -25,6 +25,7 @@ import { ShapePropertyDialogComponent } from '../../dialogs/shape/shapePropertyD
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { UnitCell } from 'src/canvas/models/IContextItem';
 import { GraphicsModel } from 'src/canvas/service/graphicsModel';
+import { WaitDialogComponent } from 'src/ui/components/views/form/dialogs/wait/wait.component';
 
 
 
@@ -70,6 +71,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   locxControl = new FormControl();
   locyControl = new FormControl();
   selectedUnitCellId = '';
+
   //public arrayColors: any = {
   //  color1: '#2883e9',
   //  color2: '#e920e9',
@@ -126,6 +128,9 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
       );
 
     this.selectedColor = this.BGColor;
+
+    this.canvasService.RetrieveInitial();
+
   }
 
   get CanvasService() {
@@ -278,7 +283,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
       }
     });
   }
-
+  
   ShowLineDialog() {
     
   }
@@ -296,10 +301,11 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
       this.canvasService.UpdateState(result);
     });
   }
-  
+
+
   ManageShape(): void {
     const dialogRef = this.dialog.open(ShapePropertyDialogComponent, {
-      width: '550px',
+      width: '700px',
       data: {
         name: this.canvasService.ActiveShape.Id,
         state: this.canvasService.ActiveShape.StateName,
@@ -330,8 +336,9 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     this.canvasService.UpdateSystem(ucell.ID,ucell.Name);
   }
 
-  RemoveUnitCell() {
-   // this.canvasService.RemoveUnitCell(this.unitCellControl.value);
+  RemoveShape() {
+    this.canvasService.BaseSystem.RemoveContent();
+    this.canvasService.BaseSystem.Draw();
   }
 
   ManagePorts(): void {

@@ -1,0 +1,8 @@
+<div class="wait" [style.width.px]="Width" [style.height.px]="Height"
+     [style.paddingLeft.px]="XOffset" [style.paddingTop.px]="YOffset">
+  <div [style.paddingTop.px]="YOffset/4"
+       class="message">
+    {{Message}}
+  </div>
+  <mat-spinner [diameter]="SpinnerDiameter"></mat-spinner>
+</div>

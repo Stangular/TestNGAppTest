@@ -12,6 +12,8 @@ import { ILine } from './lines/ILine';
 import { Ellipse } from './shapes/ellipse';
 import { Path } from './lines/path';
 import { LineService } from './lines/service/line.service';
+import { Text } from '../models/shapes/content/text/text';
+import { IShape } from './shapes/IShape';
 
 
 class SizerHandle extends Rectangle {
@@ -273,6 +275,26 @@ export class ContextLayer implements IContextSystem {
     }
   }
 
+  AddText(text: string, angle: number = 0) {
+    let activeShape = this.Content[0] as Shape;
+    if (activeShape) {
+      let shp = new Text(
+        activeShape.Id + 'text1001',
+        activeShape.Top + 3,
+        activeShape.Left + 3, 10, 10,
+        activeShape.StateName,
+        text, angle);
+      activeShape.AddShape(shp);
+    }
+  }
+
+  AddShape(shape: IShape) {
+    let activeShape = this.Content[0] as Shape;
+    if (activeShape) {
+      activeShape.AddShape(shape);
+    }
+  }
+
   RemoveAllContent() {
     while (this.RemoveContent());
   }
@@ -449,10 +471,11 @@ export class ActionLayer extends ContextLayer {// uses separate context
     return this._layer != null;
   }
 
-  EndEdit() {
-    if (!this._layer) { return; }
+  EndEdit(): boolean {
+    if (!this._layer) { return false; }
     this._sizer.Reset(this._layer.Content[0] as Shape);
     this._layer = null;
+    return true;
   }
 
   SetLayer(lyr: ContextLayer) {
@@ -520,6 +543,10 @@ export class ActionLayer extends ContextLayer {// uses separate context
     }
   }
 
+  AddShape(shape: IShape) {
+    this._layer.AddShape(shape);
+  }
+
   AddContent(content: IContextItem) {
     if (!this._layer) { return; }
     this._sizer.Reset(this._layer.Content[0] as Shape);
@@ -550,6 +577,7 @@ export class ActionLayer extends ContextLayer {// uses separate context
 }
 
 export class UnitCell {
+  _removedItems: string[] = [];
   constructor(
     private Id: string,
     private name: string,
@@ -560,6 +588,8 @@ export class UnitCell {
   get Name() { return this.name }
   get UpdatedBy() { return this.updatedBy; }
   get UpdatedOn() { return this.updatedOn; }
+  ItemRemoved(id: string) { this._removedItems.push(id); }
+
 }
 // manages context layers...
 export class ContextSystem implements IContextSystem {
@@ -591,7 +621,11 @@ export class ContextSystem implements IContextSystem {
   AddContent(content: IContextItem) { this.layers[0].AddContent(content); }
 
   RemoveContent(): IContextItem {
-    return this.layers[0].RemoveContent();
+
+    let item = this.layers[0].RemoveContent();
+    this._cells[0].ItemRemoved(item.Id);
+    return item;
+
   };
 
   get ActiveLayer() {
@@ -648,10 +682,13 @@ export class ContextSystem implements IContextSystem {
     }
     let ndx = this.layers.findIndex(l => l.Select(ssr));
     if (ndx < 0) {
-      this.activeLayer.EndEdit();
       ssr.id = '';
       ssr.layerId = '';
       ssr.itemCaptured = false;
+      if (this.activeLayer.EndEdit()) {
+        return true;
+      }
+
     }
     else {
       this.layers[ndx].MoveToTop(ssr.id);
@@ -687,6 +724,14 @@ export class ContextSystem implements IContextSystem {
 
   get Lines() {
     return this.layers[0].Lines;
+  }
+
+  AddText(text: string, angle: number = 0) {
+    this.layers[0].AddText(text, angle);
+  }
+
+  AddShape(shape: IShape) {
+    this.layers[0].AddShape(shape);
   }
 
   AddLine(result: any) {

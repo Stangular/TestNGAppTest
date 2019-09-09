@@ -1,5 +1,6 @@
 import { Shape } from './shape';
 import { IContextItem, ContextSystem } from '../IContextItem';
+import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 
 export class Ellipse extends Shape implements IContextItem {
 
@@ -51,13 +52,16 @@ export class Ellipse extends Shape implements IContextItem {
 
   DrawShape(context: any): void {
 
-    this.DrawEllipse(context);
-   // context.arc(500,500, 15, 0, 2 * Math.PI);
-    context.fillStyle = "yellow"; // DisplayValues.GetColor(this.state.Index[UIStates.background]);
-    context.fill();
-    context.lineWidth = 1.0; // DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
-    context.strokeStyle = "yellow"; //DisplayValues.GetColor(this.state.Index[UIStates.foreground]);
-    context.stroke();
+    if (this.StateIndex) {
+      this.DrawEllipse(context);
+      context.fillStyle = DisplayValues.GetColor(this.BackgroundColorIndex);
+      context.fill();
+      context.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+      context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
+      context.stroke();
+
+    }
+
   }
 
   Draw(context: any): void {

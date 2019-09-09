@@ -11,6 +11,8 @@ import { PortPath } from 'src/canvas/models/lines/line';
 import { Observable } from 'rxjs';
 import { IShape } from 'src/canvas/models/shapes/IShape';
 import { startWith, map } from 'rxjs/operators';
+import { Text } from '../../../models/shapes/content/text/text';
+import { ContentImage } from '../../../models/shapes/content/image/image';
 
 export interface IShapeData {
   name: string;
@@ -48,6 +50,9 @@ export class ShapePropertyDialogComponent implements OnInit{
   stateName = '';
   portName = new FormControl();
   pathName = new FormControl();
+  urlToImage = "";
+  textContent = "";
+  imageContentURL = "";
 
   @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();;
   fom = FreedomOfMotion;
@@ -94,6 +99,10 @@ export class ShapePropertyDialogComponent implements OnInit{
     }
   }
 
+  get ImagePostURL() {
+    return 'https://localhost:44314/' + 'api/ImageUploader/StreamImageLocally';
+  }
+
   private _filterPort(value: string): IShape[] {
 
     const v = value.toLowerCase();
@@ -117,6 +126,28 @@ export class ShapePropertyDialogComponent implements OnInit{
       this.pathName.setValue(list[0].Id);
     }
     return list;
+  }
+
+  onUploadFinished(e: any) {
+    if (e.serverResponse.status == 200) {
+      var url = JSON.parse(e.serverResponse._body);
+      this.urlToImage = url;
+    }
+    else {
+
+    }
+  }
+
+  onUploadStateChanged(e: any) {
+  }
+
+  AddText() {
+    this.canvasService.AddText(this.textContent, 0);
+  }
+
+  AddImage() {
+    this.canvasService.BaseSystem.AddShape(null);
+
   }
 
 }
