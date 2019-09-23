@@ -5,8 +5,8 @@ import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { Line, PortPath } from '../lines/line';
 import { ePortType, Port } from './port';
-import { Text } from './content/text/text';
 import { ContentImage } from './content/image/image';
+import { Content } from './content/Content';
 export enum FreedomOfMotion {
   full = 0,
   horizontal = 1,
@@ -33,30 +33,30 @@ export class ContainedShape {
 
 export abstract class Shape implements IShape {
 
+  protected _hit = false;
   protected _center: Point = new Point();
   protected _unitCell: string = '';
   protected _areaType: AreaType = AreaType.normal;
   protected _freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
   protected _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
   protected _shapes: IShape[] = [];
+  //protected _textContent: Text = null;
+  //protected _imageContent: ContentImage = null;
   protected _isSelected = false;
-  protected _stateIndex: StateIndex = null
+  protected _stateIndex: StateIndex = null;
   protected _ports: IShape[] = [];
   constructor(
     private id: string,
-    private top: number,
-    private left: number,
-    private width: number,
-    private height: number,
+    protected top: number,
+    protected left: number,
+    protected width: number,
+    protected height: number,
     private stateName: string) {
-
+    
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
     let self = this;
-    //  ports.forEach(function (p, i) {
-    //    self._ports.push(new Port(p.portId, p.offsetX, p.offsetY, self, ePortType.source, this.stateName, this.pathId));
-    //    });
   }
 
   SetProperties(properties: any) {
@@ -109,23 +109,41 @@ export abstract class Shape implements IShape {
   abstract DrawShape(context: any);
   abstract CopyShape(newID: string): Shape;
   abstract CopyItem(newID: string): IContextItem;
+  abstract Save(): any;
 
   LinePath(path: PortPath) {
     this._ports.forEach(p => path.AddPortPoint(p.Center));
   }
 
   Select(shapeSelectResult: ShapeSelectResult) {
-    if (this.SelectShape(shapeSelectResult)) {
+    this._hit = false;
+    let ndx = this._shapes.findIndex(s => s.Select(shapeSelectResult));
+    if (ndx >= 0) {
       shapeSelectResult.itemCaptured = true;
-      shapeSelectResult.id = this.Id;
+      shapeSelectResult.id = this._shapes[ndx].Id;
       return true;
     }
+    else {
+      if (this.SelectShape(shapeSelectResult)) {
+        shapeSelectResult.itemCaptured = true;
+        shapeSelectResult.id = this.Id;
+        this._hit = true;
+        return true;
+      }
+    }
+ 
     return false;
   }
 
   get StateName(): string {
     return this.stateName;
   }
+
+  public DrawContent(context: any) {
+    this._shapes.forEach(s => s.Draw(context));
+    
+    this._ports.forEach(p => p.Draw(context));
+}
 
   AddShape(shape: IShape) {
     if (shape) {
@@ -134,10 +152,20 @@ export abstract class Shape implements IShape {
   }
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
+
     return this.IsPointInShape(shapeSelectResult.point);
   }
 
+  get ChildShape(): Shape {
+    return this.Shapes.find(s => s.IsHit ) as Shape;
+  }
+
+  get IsHit() {
+    return this._hit;
+  }
+
   MoveBy(x: number, y: number) {
+   // this.
     switch (this._freedomOfMotion) {
       case FreedomOfMotion.horizontal: y = 0; break;
       case FreedomOfMotion.vertical: x = 0; break;
@@ -149,9 +177,9 @@ export abstract class Shape implements IShape {
     this._center.Offset(this.width / 2, this.height / 2);
     this._ports.forEach((p, i) => p.MoveBy(x, y));
     this._shapes.forEach((s, i) => s.MoveBy(x, y));
-  }
+ }
 
-  SizeBy(top: number, right: number, bottom: number, left: number) {
+  SizeBy(context: any,top: number, right: number, bottom: number, left: number) {
 
     let w = this.width;
     let h = this.height;
@@ -205,9 +233,9 @@ export abstract class Shape implements IShape {
 
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-    this._ports.forEach((p, i) => p.SizeBy(top, right, bottom, left));
-    this._shapes.forEach((s, i) => s.SizeBy(top, right, bottom, left));
 
+    this._ports.forEach((p, i) => p.SizeBy(context,top, right, bottom, left));
+  //  this._shapes.forEach((s, i) => s.SizeBy(context,top, right, bottom, left));
   }
 
   public get FreedomOfMotion() {
@@ -221,7 +249,6 @@ export abstract class Shape implements IShape {
   public get AreaType() {
     return this._areaType;
   }
-
 
   get IsSelected(): boolean { return this._isSelected };
 
@@ -280,6 +307,18 @@ export abstract class Shape implements IShape {
   get Ports() {
     return this._ports;
   }
+
+  get Shapes() {
+    return this._shapes;
+  }
+
+  //get TextContent() {
+  //  return this._textContent;
+  //}
+
+  //get ImageContent() {
+  //  return this._imageContent;
+  //}
 }
 
 //export class Shapes extends Shape {

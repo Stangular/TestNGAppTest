@@ -56,6 +56,7 @@ export class StateIndex {
 
 export class DisplayValues {
 
+  private static fgcolor: NamedValue<string>[] = [];
   private static color: NamedValue<string>[] = [];
   private static weight: NamedValue<number>[] = [];
   private static fonts: NamedValue<string>[] = [];
@@ -78,6 +79,10 @@ export class DisplayValues {
     return names;
   }
 
+  static FGColorIndex(name: string) {
+    return this.fgcolor.findIndex(c => c.Name == name);
+  }
+
   static ColorIndex(name: string) {
     return this.color.findIndex(c => c.Name == name);
   }
@@ -86,6 +91,16 @@ export class DisplayValues {
     return this.weight.findIndex(c => c.Name == name);
   }
 
+  static SetFGColor(name: string, color: string) {
+    if (!name || name.length <= 0 || !color || color.length <= 0) { return; }
+    let ndx = this.FGColorIndex(name);
+    if (ndx >= 0) {
+      this.fgcolor.splice(ndx, 1, new NamedValue(name, color));
+    }
+    else {
+      this.fgcolor.push(new NamedValue(name, color));
+    }
+  }
 
   static SetColor(name: string, color: string) {
     if (!name || name.length <= 0 || !color || color.length <= 0) { return; }
@@ -114,6 +129,14 @@ export class DisplayValues {
     this.fonts.push(new NamedValue(name, font));
   }
 
+  static GetFGColorByName(name: string): string {
+    let ndx = this.FGColorIndex(name);
+    if (ndx < 0) {
+      ndx = this.FGColorIndex('default.rect.foreground');
+    }
+    return this.GetFGColor(ndx);
+  }
+
   static GetColorByName(name: string) : string {
     let ndx = this.ColorIndex(name);
     if (ndx < 0) {
@@ -130,6 +153,14 @@ export class DisplayValues {
     }
     if (!index || index < 0) { index = 0; }
     return this.color[index].Value;
+  }
+
+  static GetFGColor(index: number) {
+    if (index >= this.fgcolor.length) {
+      return this.GetFGColor(index - 1);
+    }
+    if (!index || index < 0) { index = 0; }
+    return this.fgcolor[index].Value;
   }
 
   static GetColorStateName(index: number) {
@@ -203,7 +234,7 @@ export class DisplayValues {
   }
 
   static GetShapeIndex(name: string, background: string = '', border: string = ''): StateIndex {
-    if (name.length <= 0) { return null; }
+    if (name.length <= 0) { name = 'DefaultBG'; }
     if (background.length <= 0) { background = name; }
     if (border.length <= 0) { border = background; }
     let stateIndex = new StateIndex(name);

@@ -5,46 +5,37 @@ import { DisplayValues, StateIndex, UIStates } from '../../../DisplayValues'
 import { Point } from '../../primitives/point';
 import { ShapeSelectResult } from '../../shapeSelected';
 import { Rectangle } from '../../rectangle';
-import { faDrawPolygon } from '@fortawesome/free-solid-svg-icons';
+import { Content } from '../Content';
 
+export class ContentImage extends Shape {
 
-export class ContentImage extends Shape implements IContextItem {
+  _container: Shape;
 
-  container: Shape;
   private _ready = false;
   private _image: HTMLImageElement;
   private _context : any;
-  constructor(id: string,
+  constructor(
     top: number,
     left: number,
     width: number,
     height: number,
-    stateName: string,
-    protected content: string,
-    private angle: number = 0) {
-    super(id,
-      top,
-      left,
-      width,
-      height,
-      stateName);
-
-    this._image = new Image()
-    this._image.onload = (() => this.imageReady());
-    this._image.src = content;
-
-    this.container = new Rectangle(id + "_containerRect", top, left, width, height, stateName);
+    protected content: Content) {
+    super(content.ID, top, left, width, height, content.State);
   }
 
   DrawShape(context: any): void {
 
-    this.container.Draw(context);
+    this._container.Draw(context);
     context.drawImage(this._image, this.Left + 5, this.Top + 5, this.Width - 10, this.Height - 10);
 
   }
 
+  Select(shapeSelectResult: ShapeSelectResult) {
+    return this._container.Select(shapeSelectResult);
+  }
+
   protected SetContainerState(state: StateIndex) {
-    this.container.SetState(state);
+    this._container.SetState(state);
   }
 
   Draw(context: any): void {
@@ -60,13 +51,37 @@ export class ContentImage extends Shape implements IContextItem {
     this.Draw(this._context);
   }
 
-  CopyShape(newID: string): Shape {
+  CopyShape(newID: string): ContentImage {
 
-    return new ContentImage(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName, this.content, this.angle);
+    return new ContentImage(this.Top + 10, this.Left + 10, this.Width, this.Height,this.content);
   }
 
   CopyItem(newID: string) {
     return this.CopyShape(newID);
   }
 
+  Save(): any {
+
+    return {
+      Id: this.Id,
+      Top: Math.ceil(this.Top),
+      Left: Math.ceil(this.Left),
+      Width: Math.ceil(this.width),
+      Height: Math.ceil(this.height),
+      Type: 0,
+      CornerRadius: 0,
+      Shadow: 0,
+      DisplayValueId: '',
+      Ports: [],
+      Shapes: [],
+      Content: {
+        Id: this.content.ID,
+        Content: this.content.Content,
+        Code: this.content.Code,
+        ParentShapeId: '',
+        DisplayValueId: this.content.State,
+        angle: this.content.Angle
+      }
+    }
+  }
 }

@@ -25,7 +25,7 @@ import { ShapePropertyDialogComponent } from '../../dialogs/shape/shapePropertyD
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { UnitCell } from 'src/canvas/models/IContextItem';
 import { GraphicsModel } from 'src/canvas/service/graphicsModel';
-import { WaitDialogComponent } from 'src/ui/components/views/form/dialogs/wait/wait.component';
+//import { WaitDialogComponent } from 'src/ui/components/views/form/dialogs/wait/wait.component';
 
 
 
@@ -332,8 +332,11 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   }
 
   SaveUnitCell() {
+    if (this.selectedUnitCellId.length <= 0) { return; }
     let ucell = this.Cells.find(c => c.ID == this.selectedUnitCellId);
-    this.canvasService.UpdateSystem(ucell.ID,ucell.Name);
+    if (ucell) {
+      this.canvasService.UpdateSystem(ucell.ID, ucell.Name);
+    }
   }
 
   RemoveShape() {

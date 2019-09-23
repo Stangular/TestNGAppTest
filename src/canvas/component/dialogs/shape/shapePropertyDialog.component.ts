@@ -11,8 +11,6 @@ import { PortPath } from 'src/canvas/models/lines/line';
 import { Observable } from 'rxjs';
 import { IShape } from 'src/canvas/models/shapes/IShape';
 import { startWith, map } from 'rxjs/operators';
-import { Text } from '../../../models/shapes/content/text/text';
-import { ContentImage } from '../../../models/shapes/content/image/image';
 
 export interface IShapeData {
   name: string;
@@ -53,7 +51,7 @@ export class ShapePropertyDialogComponent implements OnInit{
   urlToImage = "";
   textContent = "";
   imageContentURL = "";
-
+  textState = "";
   @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();;
   fom = FreedomOfMotion;
   ot = objectTypes;
@@ -74,6 +72,10 @@ export class ShapePropertyDialogComponent implements OnInit{
 
   OnNameChange(value: string) {
     this.data.name = value;
+  }
+
+  OnTextStateChange(select: any) {
+    this.textState = select.value;
   }
 
   OnStateChange(select: any) {
@@ -142,12 +144,11 @@ export class ShapePropertyDialogComponent implements OnInit{
   }
 
   AddText() {
-    this.canvasService.AddText(this.textContent, 0);
+    this.canvasService.AddText(this.textContent, this.textState, 0);
   }
 
   AddImage() {
     this.canvasService.BaseSystem.AddShape(null);
-
   }
 
 }

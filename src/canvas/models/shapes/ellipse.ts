@@ -31,6 +31,25 @@ export class Ellipse extends Shape implements IContextItem {
 
   }
 
+  Save(): any {
+    let model = {
+      Id: this.Id,
+      Top: Math.ceil(this.Top),
+      Left: Math.ceil(this.Left),
+      Width: Math.ceil(this.width),
+      Height: Math.ceil(this.height),
+      Type: 1,
+      CornerRadius: 0,
+      Shadow: 0,
+      DisplayValueId: '',
+      Ports: [],
+      Shapes: [],
+      Content: {}
+    }
+    this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
+    this.Shapes.forEach((s, i) => model.Shapes.push(s.Save()));
+    return model;
+  }
   private DrawEllipse(context: any) {
 
     var width = this.Width / 2;

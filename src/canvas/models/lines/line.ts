@@ -195,6 +195,20 @@ export class Line implements ILine {
     this.type = type;
   }
 
+  Save(): any {
+    let model = {
+      LineId: this.id,
+      DisplayValueId: this.state,
+      LineType: this.type,
+      OffsetX1: 0,
+      OffsetY1: 0,
+      OffsetX2: 0,
+      OffsetY2: 0
+    }
+    return model;
+  }
+
+
   get Type() {
     return this.type;
   }

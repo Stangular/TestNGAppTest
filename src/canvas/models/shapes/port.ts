@@ -38,6 +38,18 @@ export class Port implements IShape, IContextItem {
     this.internalShape.CenterOn(x, y);
   }
 
+
+  Save(): any {
+    let model = {
+      ShapeId: this._parentShapeId,
+      PathId: this.pathId,
+      PortId: this.id,
+      OffsetX: this.offsetX,
+      OffsetY: this.offsetY
+    }
+    return model;
+  }
+
   SetProperties(properties: any) {
 
   }
@@ -101,7 +113,7 @@ export class Port implements IShape, IContextItem {
     return this._parentShapeId;
   }
 
-  SizeBy(top: number, right: number, bottom: number, left: number) {
+  SizeBy(context : any,top: number, right: number, bottom: number, left: number) {
     this.SetPortToParent(top, right, bottom, left);
   }
 

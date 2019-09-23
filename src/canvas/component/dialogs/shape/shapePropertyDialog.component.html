@@ -71,14 +71,7 @@
               <label style="padding-right:6px">State</label>
             </mat-grid-tile>
             <mat-grid-tile [colspan]="8" [rowspan]="1" style="text-align:left">
-              <mat-form-field [floatLabel]="'never'">
-                <mat-select [(ngModel)]="data.state">
-                  <mat-option *ngFor="let state of States" [value]="state">
-                    {{state}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              <!--     <display-state-selector [stateName]="lineState" (stateChange)="OnStateChange($event)"></display-state-selector>-->
+              <display-state-selector [stateName]="data.state" (stateChange)="OnStateChange($event)"></display-state-selector>
             </mat-grid-tile>
             <mat-grid-tile [colspan]="3" [rowspan]="1">
               <label>Height</label>
@@ -234,7 +227,6 @@
               </div>
             </div>
           </mat-grid-tile>
-
           <mat-grid-tile [colspan]="16" [rowspan]="1">
           </mat-grid-tile>
         </mat-grid-list>
@@ -259,8 +251,27 @@
             <button mat-stroked-button color="warn" (click)="AddText()">
               Add
             </button>
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+            </mat-grid-tile>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="2" [rowspan]="1">
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <label class="xLabel">State</label>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="6" [rowspan]="1">
+            <display-state-selector [stateName]="data.state" (stateChange)="OnTextStateChange($event)"></display-state-selector>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <label class="xLabel">Angle</label>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="4" [rowspan]="1">
+            <mat-form-field class="full-width" [floatLabel]="'never'">
+              <input matInput type="number" min="0" max="90"
+                     [(ngModel)]="textAngle">
+            </mat-form-field>
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+            </mat-grid-tile>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="1" [rowspan]="1">
             <div style="width:100%; text-align:left">
@@ -281,7 +292,13 @@
               Add
             </button>
           </mat-grid-tile>
-          <mat-grid-tile [colspan]="2" [rowspan]="1">
+          <mat-grid-tile [colspan]="16" [rowspan]="1">
+            <mat-select>
+              <mat-option *ngFor="let image of canvasService.AvailableImages" [value]="image.Name">
+                <img with="20" height="20" src={{image.Path}}>
+                {{image.Name}}
+              </mat-option>
+            </mat-select>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="16" [rowspan]="5">
             <image-upload [url]="ImagePostURL"

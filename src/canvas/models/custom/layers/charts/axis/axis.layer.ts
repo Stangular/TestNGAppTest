@@ -3,7 +3,7 @@ import { Point } from '../../../../shapes/primitives/point';
 import { Size } from '../../../../shapes/primitives/size';
 import { Margin } from '../../../../shapes/primitives/margin';
 import { Line } from '../../../../lines/line';
-import { Text, TextCenter } from '../../../../shapes/content/text/text';
+import { TextShape, TextCenter } from '../../../../shapes/content/text/text';
 import { StateIndex, UIStates } from '../../../../DisplayValues'
 import * as moment from 'moment';
 

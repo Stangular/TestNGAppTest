@@ -44,7 +44,7 @@ export class CanvasContextModel {
     '(window:resize)': 'onResize($event)'
   }
 })
-export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges, DoCheck{
+export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck{
 
   mouseCaptured: boolean = false;
   subscription: Subscription;
@@ -72,7 +72,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     switch (message.text) {
       case 11: break;
       case 10: this.editSystem.Draw(this.ActiveContext); break;
-      case 1001: this.Draw(); break;
+      case 1001:
+        this.onResize(null);
+        this.Draw(); break;
    //   default: this.ReDraw(); break;
     }
   }
@@ -105,9 +107,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
   //}
 
   ngAfterViewInit(): void {
-    setTimeout(() =>
-      this.SetActiveLayer()
-      , 10);
+    //setTimeout(() =>
+    //  this.SetActiveLayer()
+    //  , 10);
 
   }
 
@@ -183,7 +185,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     if (this.canvasService.SSR.itemCaptured) {
 
       this.PositionFromEvent(e);
-      this.canvasService.BaseSystem.Move(this.canvasService.shapeSelectResult);
+      this.canvasService.BaseSystem.Move(this.ActiveContext,this.canvasService.shapeSelectResult);
       this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
       this.move.emit(this.canvasService.shapeSelectResult);
     }

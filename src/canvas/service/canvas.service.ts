@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult, eContentType } from '../models/shapes/shapeSelected';
 import { BaseDesignerModel, EditModel } from '../models/designer/base.model';
-import { ContextSystem, ContextLayer, ActionLayer, UnitCell } from '../models/IContextItem';
+import { ContextSystem, ContextLayer, ActionLayer, UnitCell, IContextItem } from '../models/IContextItem';
 import { PathService } from '../models/shapes/service/path.service';
 import { Line, PortPath, lineTypes } from '../models/lines/line';
 import { DisplayValues } from '../models/DisplayValues';
 import { Shape } from '../models/shapes/shape';
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
-import { DisplayValueModel, GraphicsModel, LineModel, PathModel, PortModel, ShapeModel } from './graphicsModel';
+import { DisplayValueModel, GraphicsModel, LineModel, PathModel, PortModel, ShapeModel, ContentModel } from './graphicsModel';
 import { Point } from '../models/shapes/primitives/point';
 import { Port, ePortType } from '../models/shapes/port';
 import { MatDialog, MatDialogRef, MatDialogConfig, MAT_DIALOG_DATA } from '@angular/material';
@@ -16,6 +16,9 @@ import { Rectangle } from '../models/shapes/rectangle';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Path } from '../models/lines/path';
 import { Ellipse } from '../models/shapes/ellipse';
+import { Content } from '../models/shapes/content/Content';
+import { TextShape } from '../models/shapes/content/text/text';
+import { ImageModel } from '../models/shapes/content/image/image.model';
 
 export enum objectTypes {
   rectangle = 0,
@@ -35,6 +38,7 @@ export class CanvasService {
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   selectedType: eContentType = eContentType.rectangle;
   chartContent: ChartContentModel[] = [];
+  private availableImages: ImageModel[] = [];
   private _loadingData: boolean = false;
   private contextSystems: ContextSystem[] = [];
   readonly datapath: string = 'https://localhost:44328/api/canvas';
@@ -42,7 +46,11 @@ export class CanvasService {
     private pathService: PathService,
     public httpService: DataHTTPService,
     public dialog: MatDialog,
-    private messageService: MessageService) { }
+    private messageService: MessageService) {
+
+    this.GetImageList();
+
+  }
 
   AddPort(portData: any) {
     if (!portData) { return; }
@@ -114,6 +122,14 @@ export class CanvasService {
     }
   }
 
+  GetImageList() {
+    let path = "https://localhost:44314/api/ImageUploader/GetAvailableImageList?=" + 'images';
+    this.httpService.getContent(null, path)
+      .subscribe(
+        data => { this.RetrieveImageListSuccess(data) },
+        err => { this.Fail(err) });
+  }
+
   RetrieveState() {
     let path = "https://localhost:44328/api/state";
     this.httpService.getContent(null, path)
@@ -126,7 +142,7 @@ export class CanvasService {
     let path = "https://localhost:44328/api/shape/" + unitCellId;
     this.httpService.getContent(null, path)
       .subscribe(
-        data => { this.RetrieveShapeSuccess(data) },
+      data => { this.RetrieveShapeSuccess(data) },
         err => { this.Fail(err) });
   }
 
@@ -146,6 +162,7 @@ export class CanvasService {
   }
 
   RetrieveInitial() {
+    this.AddLayer();
     this._loadingData = true;
     let paths: string[] = [];
     paths.push("https://localhost:44328/api/state");
@@ -189,31 +206,12 @@ export class CanvasService {
   }
 
   UpdateSystem(unitCellId: string, unitCellName: string) {
+    let self = this;
     let model: GraphicsModel = new GraphicsModel();
     model.UnitCellId = unitCellId;
     model.UnitCellName = unitCellName;
     this.BaseSystem.Content.forEach(function (c, i) {
-      let shapeModel = new ShapeModel();
-      let s = c as Shape;
-      shapeModel.DisplayValueId = s.StateName;
-      shapeModel.Id = s.Id;
-      shapeModel.Top = s.Top;
-      shapeModel.Left = s.Left;
-      shapeModel.Width = s.Width;
-      shapeModel.Height = s.Height;
-      shapeModel.Shadow = 0;
-      shapeModel.Type = (s instanceof Ellipse) ? 1 : 0;
-      shapeModel.CornerRadius = 0;
-      s.Ports.forEach(function (p, j) {
-        let portModel = new PortModel();
-        portModel.ShapeId = c.Id;
-        portModel.PathId = (<Port>p).PathId;
-        portModel.PortId = p.Id;
-        portModel.OffsetX = (<Port>p).OffsetX;
-        portModel.OffsetY = (<Port>p).OffsetY;
-        shapeModel.Ports.push(portModel);
-      });
-      model.shapes.push(shapeModel);
+      self.UpdateModel(model, c);
     });
 
     this.httpService.postContent(model, this.datapath)
@@ -222,10 +220,14 @@ export class CanvasService {
         err => { this.Fail(err) });
   }
 
+  UpdateModel(model: GraphicsModel, content: IContextItem) {
+    let s = content as Shape;
+    model.shapes.push(s.Save());
+  }
+
   RemoveUnitCell(unitCellName: string) {
 
   }
-
 
   UpdateShape(result: any) {
     let model: GraphicsModel = new GraphicsModel();
@@ -277,24 +279,44 @@ export class CanvasService {
 
   RetrieveShapeSuccess(data: any[]) {
     let self = this;
-    let s = null;
     data.forEach(function (d, i) {
-      switch (d.type) {
-        case 1:
-          s = new Ellipse(d.id, d.top, d.left, d.width, d.height, d.displayValueId);
-          break;
-        default:
-          s = new Rectangle(d.id, d.top, d.left, d.width, d.height, d.displayValueId);
-          break;
-        
-      }
-      d.ports.forEach(function (p, i) {
-        let port = new Port(p.portId, p.offsetX, p.offsetY, s, ePortType.source, '', p.pathId);
-        s.AddPort(port);
-      });
-      self.BaseSystem.AddContent(s);
+      let shape = self.LoadShape(d);
+      self.BaseSystem.AddContent(shape);
     });
     setTimeout(() => this.messageService.sendMessage(1001), 0);
+  }
+
+  private LoadShape(shape: any, parent: Shape = null): Shape {
+    let self = this;
+    let s: Shape = null;
+    switch (shape.type) {
+      case 1:
+        s = new Ellipse(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId);
+        break;
+      default:
+        if (shape.content) {
+          let c = shape.content;
+          let content = new Content(
+            c.id,
+            c.displayValueId,
+            c.content,
+            c.contentType,
+            c.angle);
+          s = new TextShape(shape.id, shape.top, shape.left, shape.width, shape.height, content);
+        }
+        else {
+          s = new Rectangle(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId);
+        }
+        break;
+    }
+    shape.ports.forEach(function (p, i) {
+      let port = new Port(p.portId, p.offsetX, p.offsetY, s, ePortType.source, '', p.pathId);
+      s.AddPort(port);
+    });
+    shape.shapes.forEach(function (shp,i) {
+      s.AddShape(self.LoadShape(shp,s));
+    });
+    return s;
   }
 
   RetrieveCellsSuccess(data: any[]) {
@@ -306,8 +328,8 @@ export class CanvasService {
     this.FinishedLoading();
   }
 
-  AddText(textContent, angle) {
-    this.BaseSystem.AddText(textContent, angle);
+  AddText(textContent: any, textState: string, angle = 0) {
+    this.BaseSystem.AddText(textContent, textState, angle);
     setTimeout(() => this.messageService.sendMessage(1001), 0);
   }
 
@@ -317,9 +339,20 @@ export class CanvasService {
 
   }
 
+  get AvailableImages() {
+    return this.availableImages;
+  }
+
+  RetrieveImageListSuccess(data: any[]) {
+    let self = this;
+
+    data.forEach((d, i) => self.availableImages.push(new ImageModel(d)));
+  }
+
   RetrieveStateSuccess(data: any[]) {
     data.forEach(function (d, i) {
       DisplayValues.SetColor(d.displayValueId, d.bgColor);
+      DisplayValues.SetFGColor(d.displayValueId, d.fgColor);
       DisplayValues.SetWeight(d.displayValueId, d.weight);
       DisplayValues.SetFont(d.displayValueId, d.font);
     });

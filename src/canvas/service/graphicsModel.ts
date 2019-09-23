@@ -1,3 +1,5 @@
+import { ContentImage } from "../models/shapes/content/image/image";
+import { TextShape } from "../models/shapes/content/text/text";
 
 export class DisplayValueModel {
   DisplayValueId: string = '';
@@ -30,6 +32,15 @@ export class PortModel {
   PathId: string = '';
 }
 
+export class ContentModel {
+  Id: string = '';
+  Content: string = '';
+  Code: number = 0;
+  ParentShapeId: string = '';
+  DisplayValueId: string = '';
+  angle: number = 0;
+}
+
 export class ShapeModel {
   Id: string = '';
   Top: Number = 0;
@@ -41,6 +52,9 @@ export class ShapeModel {
   Shadow: number = 0;
   DisplayValueId: string = '';
   Ports: PortModel[] = [];
+  Shapes: ShapeModel[] = [];
+  TextContent: ContentModel[] = [];
+  ImageContent: ContentModel[] = [];
 }
 
 export class GraphicsModel {

@@ -13,11 +13,13 @@ export interface IShape extends IContextItem {
   Height: number;
 
   Center: Point;
+  IsHit: boolean;
   DrawShape(context: any);
   MoveBy(x: number, y: number);
-  SizeBy(top: number, right: number, bottom: number, left: number);
+  SizeBy(context: any,top: number, right: number, bottom: number, left: number);
   CenterOn(x: number, y: number);
   SetProperties(properties: any);
+  Select(criteria: any): boolean;
  // Track(point: TrackingPoint);
 //  SetToPosition(point: TrackingPoint);
 }

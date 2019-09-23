@@ -3,7 +3,7 @@ import { Point } from "../shapes/primitives/point";
 import { StateIndex, UIStates, DisplayValues } from "../DisplayValues";
 import { Rectangle } from "../shapes/rectangle";
 import { Shape } from "../shapes/shape";
-import { Text, TextCenter } from "../shapes/content/text/text";
+import { TextShape, TextCenter } from "../shapes/content/text/text";
 import { ContextLayer, IContextItem } from "../IContextItem";
 import { ShapeSelectResult } from "../shapes/shapeSelected";
 import { ContentImage } from "../shapes/content/image/image";
@@ -125,7 +125,7 @@ export class EditModel extends ContextLayer {
     return shape as Shape;
   }
 
-  MoveItem(shapeSelectResult: ShapeSelectResult, ports: Port[]) {
+  MoveItem(context,shapeSelectResult: ShapeSelectResult, ports: Port[]) {
     let self = this;
     let shpPorts = ports.filter(p => p.ParentShapeId == shapeSelectResult.id);
     let dx = shapeSelectResult.point.X - this.contactPoint.X;
@@ -138,14 +138,14 @@ export class EditModel extends ContextLayer {
         this._sizer.forEach(function (s, i) {
           s.MoveByXXX(dx, dy, self._sizer[sid].Side);
         });
-        shape.SizeBy(
+        shape.SizeBy(context,
           this._sizer[1].Center.Y,
           this._sizer[3].Center.X,
           this._sizer[5].Center.Y,
           this._sizer[7].Center.X);
         this.ResetSizer(shape);
         shpPorts.forEach(function (p, i) {
-          p.SizeBy(shape.Top, shape.Right, shape.Bottom, shape.Left);
+          p.SizeBy(context,shape.Top, shape.Right, shape.Bottom, shape.Left);
         });
       }
     }
@@ -249,7 +249,7 @@ export class BaseDesignerModel extends ContextLayer {
 
   point: Point;
   shapes: Shape[] = [];
-  text: Text[] = [];
+  text: TextShape[] = [];
   tooltype: tooltypes = tooltypes.typecount;
   // images
   private designerpad = new StateIndex('designerpad');
