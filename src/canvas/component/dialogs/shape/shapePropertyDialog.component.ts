@@ -11,6 +11,7 @@ import { PortPath } from 'src/canvas/models/lines/line';
 import { Observable } from 'rxjs';
 import { IShape } from 'src/canvas/models/shapes/IShape';
 import { startWith, map } from 'rxjs/operators';
+import { ImageModel } from 'src/canvas/models/shapes/content/image/image.model';
 
 export interface IShapeData {
   name: string;
@@ -51,6 +52,8 @@ export class ShapePropertyDialogComponent implements OnInit{
   urlToImage = "";
   textContent = "";
   imageContentURL = "";
+  imageFromDataSource: boolean = false;
+  selectedImage: string = "";
   textState = "";
   @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();;
   fom = FreedomOfMotion;
@@ -62,6 +65,9 @@ export class ShapePropertyDialogComponent implements OnInit{
     @Inject(MAT_DIALOG_DATA) public data: IShapeData
     , public dialog: MatDialog) {}
 
+  get SelectedImage() {
+    return '../Images/' + this.selectedImage;
+  }
   get States() {
     return DisplayValues.StateNames;
   }
@@ -101,8 +107,17 @@ export class ShapePropertyDialogComponent implements OnInit{
     }
   }
 
+  ImageChange(image: any) {
+    this.imageContentURL = image.value;
+  }
+
+  handleChangeImageSource(event: any) {
+    this.imageContentURL = "";
+  //  this.imageFromDataSource = !this.imageFromDataSource;
+  }
+
   get ImagePostURL() {
-    return 'https://localhost:44314/' + 'api/ImageUploader/StreamImageLocally';
+    return 'https://localhost:44314/' + 'api/ImageUploader/StreamImageLocally?=S:\Projects\repos\Angular6Sandbox\TestNGApp2\images';
   }
 
   private _filterPort(value: string): IShape[] {
@@ -140,15 +155,14 @@ export class ShapePropertyDialogComponent implements OnInit{
     }
   }
 
-  onUploadStateChanged(e: any) {
-  }
+  onUploadStateChanged(e: any) {}
 
   AddText() {
     this.canvasService.AddText(this.textContent, this.textState, 0);
   }
 
   AddImage() {
-    this.canvasService.BaseSystem.AddShape(null);
+    this.canvasService.BaseSystem.AddImage(this.selectedImage, this.textState, 0);
   }
 
 }

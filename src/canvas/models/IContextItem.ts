@@ -15,6 +15,7 @@ import { LineService } from './lines/service/line.service';
 import { TextShape } from '../models/shapes/content/text/text';
 import { IShape } from './shapes/IShape';
 import { Content } from '../models/shapes/content/Content';
+import { ContentImage } from './shapes/content/image/image';
 
 class SizerHandle extends Rectangle {
   constructor(id: string,
@@ -283,6 +284,18 @@ export class ContextLayer implements IContextSystem {
         activeShape.Top + 3,
         activeShape.Left + 3, 10, 10,
         new Content('00000000-0000-0000-0000-000000000000', stateName, text, 0, angle));
+      activeShape.AddShape(shp);
+    }
+  }
+
+  AddImage(imageName: string, stateName: string, angle: number = 0) {
+    let activeShape = this.Content[0] as Shape;
+    if (activeShape) {
+      let shp = new ContentImage(
+        activeShape.Id + '_content_' + activeShape.Shapes.length + 1,
+        activeShape.Top + 3,
+        activeShape.Left + 3, 10, 10,
+        new Content('00000000-0000-0000-0000-000000000000', stateName, imageName, 0, angle));
       activeShape.AddShape(shp);
     }
   }
@@ -732,6 +745,9 @@ export class ContextSystem implements IContextSystem {
 
   AddText(text: string, textState:string, angle: number = 0) {
     this.layers[0].AddText(text, textState, angle);
+  }
+  AddImage(imageName: any, imageState: string, angle = 0) {
+    this.layers[0].AddImage(imageName, imageState, angle = 0);
   }
 
   AddShape(shape: IShape) {

@@ -40,7 +40,7 @@
               </div>
             </mat-grid-tile>
             <!--<mat-grid-tile [colspan]="6" [rowspan]="1">
-        </mat-grid-tile>-->
+            </mat-grid-tile>-->
             <mat-grid-tile [colspan]="2" [rowspan]="1">
               <label style="padding-right:6px">Name</label>
             </mat-grid-tile>
@@ -292,16 +292,26 @@
               Add
             </button>
           </mat-grid-tile>
-          <mat-grid-tile [colspan]="16" [rowspan]="1">
-            <mat-select>
-              <mat-option *ngFor="let image of canvasService.AvailableImages" [value]="image.Name">
-                <img with="20" height="20" src={{image.Path}}>
-                {{image.Name}}
-              </mat-option>
-            </mat-select>
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
+            <div *ngIf="selectedImage != null && !imageFromDataSource">
+              <img with="20" height="20" src='../images/icon.png'>
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="14" [rowspan]="1">
+            <div *ngIf="!imageFromDataSource" style="width:100%">
+              <mat-select [(ngModel)]="selectedImage" (selectionChange)="ImageChange($event)">
+                <mat-option *ngFor="let image of canvasService.AvailableImages" [value]="image.Name">
+                  <img with="20" height="20" src={{image.Path}}>
+                  {{image.Name}}
+                </mat-option>
+              </mat-select>
+            </div>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="16" [rowspan]="5">
             <image-upload [url]="ImagePostURL"
+                          [headers]="{path:'S:\\Projects\\repos\\Angular6Sandbox\\TestNGApp2\\images'}"
                           (uploadFinished)="onUploadFinished($event)"
                           (uploadStateChanged)="onUploadStateChanged($event)">
             </image-upload>

@@ -123,7 +123,7 @@ export class CanvasService {
   }
 
   GetImageList() {
-    let path = "https://localhost:44314/api/ImageUploader/GetAvailableImageList?=" + 'images';
+    let path = "https://localhost:44314/api/ImageUploader/GetAvailableImageList?=" + 'S:\\Projects\\repos\\Angular6Sandbox\\TestNGApp2\\images';
     this.httpService.getContent(null, path)
       .subscribe(
         data => { this.RetrieveImageListSuccess(data) },
@@ -332,6 +332,12 @@ export class CanvasService {
     this.BaseSystem.AddText(textContent, textState, angle);
     setTimeout(() => this.messageService.sendMessage(1001), 0);
   }
+
+  AddImage(imageName: any, imageState: string, angle = 0) {
+    this.BaseSystem.AddImage(imageName, imageState, angle);
+    setTimeout(() => this.messageService.sendMessage(1001), 0);
+  }
+
 
   AddLine(result: any) {
     this.BaseSystem.AddLine(result);

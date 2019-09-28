@@ -46,7 +46,6 @@ export class TextShape extends Shape {
     context.lineWidth = 1;
     context.stroke();
     context.restore();
-
   }
 
   SizeBy(context: any, top: number, right: number, bottom: number, left: number) {
