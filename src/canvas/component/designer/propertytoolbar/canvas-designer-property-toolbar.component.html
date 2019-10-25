@@ -21,76 +21,83 @@
         </button>
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <div mat-button class="designer_copy_image" (click)="CopyObject($event)"></div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <div mat-button class="designer_delete_image" (click)="DeleteObject($event)"></div>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <!--<mat-form-field class="shapeClassInput"
-                  [floatLabel]="'never'">-->
-        <mat-select (selectionChange)="RetrieveUnitCell($event)">
-          <mat-option *ngFor="let cell of Cells" [value]="cell">{{cell.Name}}</mat-option>
-        </mat-select>
-        <!--</mat-form-field>-->
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
         <button mat-flat-button color="accent" style="width:10px"
-                name="shapeColor"
-                (click)="SaveUnitCell()">
-          Save
+                name="newUnit"
+                (click)="NewUnitCell()">
+          New Unit
         </button>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-        <button mat-flat-button color="accent" style="width:30px"
-                name="shapeColor"
-                (click)="RemoveShape()">
-          Remove
-        </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <button mat-flat-button color="accent" style="width:100%"
-                name="shapeColor"
-                [disabled]="canvasService.ActiveShape == null"
-                (click)="ManageShape()">
-          Manage Shape
-        </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <!--<button mat-flat-button color="accent" style="width:20px"
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+          <div mat-button class="designer_copy_image" (click)="CopyObject($event)"></div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+          <div mat-button class="designer_delete_image" (click)="DeleteObject($event)"></div>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+          <!--<mat-form-field class="shapeClassInput"
+          [floatLabel]="'never'">-->
+          <mat-select (selectionChange)="RetrieveUnitCell($event)">
+            <mat-option *ngFor="let cell of Cells" [value]="cell">{{cell.UnitCell.Name}}</mat-option>
+          </mat-select>
+          <!--</mat-form-field>-->
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+          <button mat-flat-button color="accent" style="width:10px"
+                  name="shapeColor"
+                  (click)="SaveUnitCell()">
+            Save
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+          <button mat-flat-button color="accent" style="width:30px"
+                  name="shapeColor"
+                  (click)="RemoveShape()">
+            Remove
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+          <button mat-flat-button color="accent" style="width:100%"
+                  name="shapeColor"
+                  [disabled]="canvasService.ActiveShape == null"
+                  (click)="ManageShape()">
+            Manage Shape
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+          <!--<button mat-flat-button color="accent" style="width:20px"
               name="shapeColor"
               (click)="ManagePorts()">
         Manage Ports
       </button>-->
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <button mat-flat-button color="accent" style="width:20px"
-                name="shapeColor"
-                (click)="UpdateLine()">
-          Add Line
-        </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
-        <button mat-flat-button color="accent"
-                style="width:100%"
-                name="shapeColor"
-                (click)="UpdateState()">
-          Update Graphic State
-        </button>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-        <mat-slide-toggle (change)="canvasService.ToggleEdit()"
-                          [checked]="canvasService.EditOn">Edit</mat-slide-toggle>
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="1" [rowspan]="1">
-      </mat-grid-tile>
-      <!--<mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+          <button mat-flat-button color="accent" style="width:20px"
+                  name="shapeColor"
+                  (click)="UpdateLine()">
+            Add Line
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="4" [rowspan]="1" style="text-align:left">
+          <button mat-flat-button color="accent"
+                  style="width:100%"
+                  name="shapeColor"
+                  (click)="UpdateState()">
+            Update Graphic State
+          </button>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+          <mat-slide-toggle (change)="canvasService.ToggleEdit()"
+                            [checked]="canvasService.EditOn">Edit</mat-slide-toggle>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">
+        </mat-grid-tile>
+        <!--<mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
       <button mat-button [matMenuTriggerFor]="color" (menuOpened)="SetProperties()">Color</button>
       <mat-menu #color="matMenu" overlapTrigger="false"
                 style="background-color:steelblue;">
@@ -119,7 +126,7 @@
         </div>
       </mat-menu>
     </mat-grid-tile>-->
-      <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
       <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
         <button mat-button [matMenuTriggerFor]="area">Area Options</button>
         <mat-menu #area="matMenu" overlapTrigger="false">
@@ -134,7 +141,7 @@
         </mat-menu>
       </div>
     </mat-grid-tile>-->
-      <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
       <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
         <button mat-button [matMenuTriggerFor]="motion">Motion Range</button>
         <mat-menu #motion="matMenu" overlapTrigger="false">
@@ -152,7 +159,7 @@
         </mat-menu>
       </div>
     </mat-grid-tile>-->
-      <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
+        <!--<mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
       <div *ngIf="canvasService.selectedType == ot.rectangle || canvasService.selectedType == ot.ellipse">
         <button mat-button [matMenuTriggerFor]="sizing">Sizing</button>
         <mat-menu #sizing="matMenu" class="toolbar-menu" overlapTrigger="false" role="menuitemradio">

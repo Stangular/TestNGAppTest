@@ -1,6 +1,8 @@
 <div style="height:75vh">
-  <mat-sidenav-container class="example-container" style="height:75vh">
-    <mat-sidenav opened mode="side" position="end" style="width:80px; text-align:right">
+  <mat-grid-list cols="32" rowHeight="60px">
+    <mat-grid-tile [colspan]="2"
+                   [rowspan]="5"
+                   [style.background]="'transparent'">
       <div>
         <div class="action-button-row">
           <button mat-mini-fab color="default"
@@ -37,17 +39,15 @@
           </button>
         </div>
       </div>
-    </mat-sidenav>
-  
-      <mat-grid-list cols="1" rowHeight="60px">
-        <mat-grid-tile *ngFor="let elm of displayElements"
-                       [colspan]="1"
-                       [rowspan]="1"
-                       [style.background]="'transparent'">
-          <input-edit [element]="elm" (blur)="onBlur($event)"
-                      [form]="form"></input-edit>
-        </mat-grid-tile>
-      </mat-grid-list>
+    </mat-grid-tile>
 
-  </mat-sidenav-container>
+    <mat-grid-tile *ngFor="let elm of displayElements"
+                   [colspan]="4"
+                   [rowspan]="2"
+                   [style.background]="'transparent'">
+      <input-edit [element]="elm" (blur)="onBlur($event)"
+                  [form]="form"></input-edit>
+    </mat-grid-tile>
+  </mat-grid-list>
+
 </div>

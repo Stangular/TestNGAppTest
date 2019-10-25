@@ -19,6 +19,10 @@ import { Ellipse } from '../models/shapes/ellipse';
 import { Content } from '../models/shapes/content/Content';
 import { TextShape } from '../models/shapes/content/text/text';
 import { ImageModel } from '../models/shapes/content/image/image.model';
+import { ContextModel } from '../component/context.model';
+import { emptyGuid } from '../../const/constvalues.js';
+import { IShape } from '../models/shapes/IShape';
+import { ContentImage } from '../models/shapes/content/image/image';
 
 export enum objectTypes {
   rectangle = 0,
@@ -32,9 +36,11 @@ export enum objectTypes {
 @Injectable()
 export class CanvasService {
   editOn: boolean = false;
-
+  private contextModel: ContextModel;
+  private _activeShape: IShape = null;
   // protected lines: Line[] = []
   //  protected paths: PortPath[] = [];
+  private selectedUnitCellId: string = emptyGuid;
   shapeSelectResult: ShapeSelectResult = new ShapeSelectResult();
   selectedType: eContentType = eContentType.rectangle;
   chartContent: ChartContentModel[] = [];
@@ -49,8 +55,10 @@ export class CanvasService {
     private messageService: MessageService) {
 
     this.GetImageList();
-
+    this.contextModel = new ContextModel();
   }
+
+  get SelectedUnitCellId() { return this.selectedUnitCellId; }
 
   AddPort(portData: any) {
     if (!portData) { return; }
@@ -61,30 +69,49 @@ export class CanvasService {
       portData.path);
   }
 
-  get ActiveShape(): Shape {
-    if (this.contextSystems.length <= 0
-      || !this.contextSystems[0].ActiveLayer) {
-      return null;
-    }
-    return this.contextSystems[0].ActiveLayer.SelectedShape;
+  System(canvasId: string) {
+    return (this.BaseSystem.getLayers(canvasId));
   }
+
+  DrawSystem(canvasId: string) {
+    let lyrs = this.BaseSystem.Layers.filter(l => l.CanvasId == canvasId);
+    if (lyrs && lyrs.length) {
+      this.BaseSystem.Draw(this.contextModel);
+    }
+  }
+
+  MoveSystem() {
+    this.BaseSystem.Move(this.contextModel, this.shapeSelectResult);
+  }
+
+  SetActiveShape(shape: IShape) {
+    this._activeShape = shape;
+  }
+
+  get ActiveShape(): IShape {
+    return this._activeShape;
+  }
+
   get DataLoading() { return this._loadingData; }
 
   AddLayer() {
     let activeLayer: ActionLayer = null;
     let layers: ContextLayer[] = [];
-    layers.push(new ContextLayer("baseLayer", "displayState"));
-    activeLayer = new ActionLayer();
-    this.contextSystems.push(new ContextSystem(layers, activeLayer));
+  //  layers.push(new ContextLayer("baseLayer", "displayState"));
+  // activeLayer = new ActionLayer();
+   this.contextSystems.push(new ContextSystem(layers));
   }
 
   ToggleEdit() {
     this.editOn = !this.editOn;
   }
 
-
   get EditOn() {
     return this.editOn;
+  }
+
+  get ContextModel() {
+    return this.contextModel;
   }
 
   AddNewChartContent(id: string,
@@ -115,7 +142,8 @@ export class CanvasService {
   }
 
   Select() {
-    if (this.contextSystems.length > 0 && !this.contextSystems[0].Select(this.SSR)) {
+    if (this.contextSystems.length > 0
+    && !this.contextSystems[0].Select(this.SSR)) {
 
       this.SSR.shapeType = this.selectedType;
       this.contextSystems[0].AddNewContent(this.SSR);
@@ -139,10 +167,11 @@ export class CanvasService {
   }
 
   RetrieveShape(unitCellId: string) {
+    this.selectedUnitCellId = emptyGuid;
     let path = "https://localhost:44328/api/shape/" + unitCellId;
     this.httpService.getContent(null, path)
       .subscribe(
-      data => { this.RetrieveShapeSuccess(data) },
+      data => { this.RetrieveShapeSuccess(data,unitCellId) },
         err => { this.Fail(err) });
   }
 
@@ -162,16 +191,15 @@ export class CanvasService {
   }
 
   RetrieveInitial() {
-    this.AddLayer();
     this._loadingData = true;
     let paths: string[] = [];
     paths.push("https://localhost:44328/api/state");
     paths.push("https://localhost:44328/api/Line");
     paths.push(this.datapath + '/Cells');
     this.httpService.getCombined(paths).subscribe(results => {
+      this.RetrieveCellsSuccess(results[2]);
       this.RetrieveStateSuccess(results[0]);
       this.RetrieveLineSuccess(results[1]);
-      this.RetrieveCellsSuccess(results[2]);
       this.FinishedLoading();
     },
       err => { this.Fail(err) });
@@ -260,6 +288,7 @@ export class CanvasService {
   }
 
   RetrieveLineSuccess(data: any) {
+    if (!this.BaseSystem) { return;}
     let self = this;
     data.lines.forEach(function (d, i) {
       self.BaseSystem.Lines.push(new Line(d.lineId, d.displayValueId, d.lineType));
@@ -271,19 +300,23 @@ export class CanvasService {
   }
 
   RetrievePathSuccess(data: any[]) {
-    let self = this;
+    if (!this.BaseSystem) { return; }
+   let self = this;
     data.forEach(function (d, i) {
       self.BaseSystem.Paths.push(new PortPath(d.PathId, d.LineId))
     });
   }
 
-  RetrieveShapeSuccess(data: any[]) {
-    let self = this;
+  RetrieveShapeSuccess(data: any[], unitCellId: string) {
+    if (!this.BaseSystem) { return; }
+   let self = this;
     data.forEach(function (d, i) {
       let shape = self.LoadShape(d);
       self.BaseSystem.AddContent(shape);
     });
+    this.selectedUnitCellId = unitCellId || emptyGuid;
     setTimeout(() => this.messageService.sendMessage(1001), 0);
+
   }
 
   private LoadShape(shape: any, parent: Shape = null): Shape {
@@ -294,8 +327,8 @@ export class CanvasService {
         s = new Ellipse(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId);
         break;
       default:
-        if (shape.content) {
-          let c = shape.content;
+        if (shape.textContent) {
+          let c = shape.textContent;
           let content = new Content(
             c.id,
             c.displayValueId,
@@ -303,6 +336,18 @@ export class CanvasService {
             c.contentType,
             c.angle);
           s = new TextShape(shape.id, shape.top, shape.left, shape.width, shape.height, content);
+        }
+        else if (shape.imageContent) {
+          let c = shape.imageContent;
+          let content = new Content(
+            c.id,
+            c.displayValueId,
+            c.content,
+            c.contentType,
+            c.angle);
+          let imageIndex = this.contextModel.AddImage(c.content, this.messageService);
+
+          s = new ContentImage(shape.id, shape.top, shape.left, shape.width, shape.height, content, imageIndex);
         }
         else {
           s = new Rectangle(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId);
@@ -320,10 +365,13 @@ export class CanvasService {
   }
 
   RetrieveCellsSuccess(data: any[]) {
+    if (!this.BaseSystem) {
+      this.contextSystems.push(new ContextSystem());
+   }
     let self = this;
-    self.BaseSystem.ClearCells();
+    this.BaseSystem.ClearLayers();
     data.forEach(function (d, i) {
-      self.BaseSystem.AddCell(d.unitCellId, d.name, d.updatedBy, d.updatedOn);
+      self.BaseSystem.AddLayer(d.unitCellId, d.name, d.updatedBy, d.updatedOn, "displayState");
     });
     this.FinishedLoading();
   }

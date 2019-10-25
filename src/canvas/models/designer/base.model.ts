@@ -3,7 +3,7 @@ import { Point } from "../shapes/primitives/point";
 import { StateIndex, UIStates, DisplayValues } from "../DisplayValues";
 import { Rectangle } from "../shapes/rectangle";
 import { Shape } from "../shapes/shape";
-import { TextShape, TextCenter } from "../shapes/content/text/text";
+import { TextShape } from "../shapes/content/text/text";
 import { ContextLayer, IContextItem } from "../IContextItem";
 import { ShapeSelectResult } from "../shapes/shapeSelected";
 import { ContentImage } from "../shapes/content/image/image";
@@ -93,7 +93,7 @@ export class EditModel extends ContextLayer {
   private designerpad = new StateIndex('designerpad');
 
   constructor() {
-    super('edit', 'default');
+    super('edit','','');
     let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
     this.designerpad.setState(UIStates.background, bgNdx);
     this.designerpad.setState(UIStates.foreground, 1);
@@ -255,7 +255,7 @@ export class BaseDesignerModel extends ContextLayer {
   private designerpad = new StateIndex('designerpad');
 
   constructor() {
-    super('designer', 'default');
+    super('designer', 'default','');
 
     let bgNdx = DisplayValues.GetColorIndex('default.rect.background');
     this.designerpad.setState(UIStates.background, bgNdx);

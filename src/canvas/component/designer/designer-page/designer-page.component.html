@@ -20,12 +20,15 @@
   <mat-grid-tile [colspan]="32"
                  [rowspan]="11"
                  [style.background]="transparent">
-    <app-canvas [canvasID]="designerCanvas"
-                [width]="1000"
-                [height]="800"
-                (move)="ItemMoved($event)"
-                (edit)="ItemSelected($event)"
-                [editSystem]="canvasService.Editor"
-                [system]="canvasService.Designer"></app-canvas>
+    <static-canvas *ngIf="!canvasService.EditOn"
+                 [canvasID]="canvasService.SelectedUnitCellId"
+                 [width]="1000"
+                 [height]="800"></static-canvas>
+    <edit-canvas *ngIf="canvasService.EditOn"
+                 [canvasID]="canvasService.SelectedUnitCellId"
+                 (Select)="ShapeSelected($event)"
+                 [width]="1000"
+                 [height]="800">
+    </edit-canvas>
   </mat-grid-tile>
 </mat-grid-list>

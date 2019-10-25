@@ -3,13 +3,13 @@ import {
 } from '@angular/core';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FreedomOfMotion, AreaType, Shape } from 'src/canvas/models/shapes/shape';
+import { Shape } from 'src/canvas/models/shapes/shape';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
 import { FormControl } from '@angular/forms';
 import { ePortType, Port } from 'src/canvas/models/shapes/port';
 import { PortPath } from 'src/canvas/models/lines/line';
 import { Observable } from 'rxjs';
-import { IShape } from 'src/canvas/models/shapes/IShape';
+import { FreedomOfMotion, AreaType, IShape } from 'src/canvas/models/shapes/IShape';
 import { startWith, map } from 'rxjs/operators';
 import { ImageModel } from 'src/canvas/models/shapes/content/image/image.model';
 
@@ -98,8 +98,8 @@ export class ShapePropertyDialogComponent implements OnInit{
         startWith(''),
         map(value => this._filterPort(value))
       );
-    if (this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports.length > 0) {
-      let port = this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports[0];
+    if (this.canvasService.ActiveShape.Ports.length > 0) {
+      let port = this.canvasService.ActiveShape.Ports[0];
       this.portName.setValue(port.Id);
       this.data.port.offsetX = (<Port>port).OffsetX.toString();
       this.data.port.offsetY = (<Port>port).OffsetY.toString();
@@ -107,6 +107,10 @@ export class ShapePropertyDialogComponent implements OnInit{
     }
   }
 
+  get ImagePath() {
+    let image = this.imageContentURL || 'icon.png';
+    return '../images/' + image;
+  }
   ImageChange(image: any) {
     this.imageContentURL = image.value;
   }
@@ -126,7 +130,7 @@ export class ShapePropertyDialogComponent implements OnInit{
 
     this.data.port.name = value;
     this.data.port.paths = [];
-    let list = this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports
+    let list = this.canvasService.ActiveShape.Ports
       .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
     if (list.length == 1) {
       let port = list[0] as Port;

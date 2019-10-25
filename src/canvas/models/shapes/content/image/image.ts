@@ -6,59 +6,42 @@ import { Point } from '../../primitives/point';
 import { ShapeSelectResult } from '../../shapeSelected';
 import { Rectangle } from '../../rectangle';
 import { Content } from '../Content';
+import { ContextModel } from 'src/canvas/component/context.model';
 
 const localImagePath = '../images/';
 
 export class ContentImage extends Shape {
 
-  private _onloadSet = false;
-  private _ready = false;
-  private _image: HTMLImageElement;
-  private _context : any;
   constructor(
     id: string,
     top: number,
     left: number,
     width: number,
     height: number,
-    protected content: Content) {
+    protected content: Content,
+    private imageIndex: number = -1) {
     super(id, top, left, 100, 100, content.State);
-    this._image = new Image();
-    
-  }
-
-  DrawShape(context: any): void {
-
-    context.drawImage(this._image, this.Left + 5, this.Top + 5, this.Width - 10, this.Height - 10);
 
   }
-  
 
-  Draw(context: any): void {
+  DrawShape(context: ContextModel): void {
+   
+    context.DrawImage(this);
 
-    if (!this._ready && !this._onloadSet) {
-      let self = this;
-      this._onloadSet = true;
-      this._image.src = "";
-  //    this._image.addEventListener("load", this.Draw(context), false);
-      this._image.onload = function () {
-        self._ready = true;
-        self.Draw(context);
-      }
-      this._image.src = localImagePath + self.content.Content;
-      return;
-    }
+  }
+
+  Draw(context: ContextModel): void {
+
     this.DrawShape(context);
   }
 
-  imageReady() {
-    this._ready = true;
-    this.Draw(this._context);
+  get ImageIndex() {
+    return this.imageIndex;
   }
 
   CopyShape(newID: string): ContentImage {
 
-    return new ContentImage(newID, this.Top + 10, this.Left + 10, this.Width, this.Height,this.content);
+    return new ContentImage(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.content, this.imageIndex);
   }
 
   CopyItem(newID: string) {

@@ -45,6 +45,10 @@ export class Bar implements IContextItem{
 
   }
 
+  Save(): any {
+    return {};
+  }
+
   Draw(context: any): void {
     this.area.Draw(context);
   }

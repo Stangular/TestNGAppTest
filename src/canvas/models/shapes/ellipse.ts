@@ -1,6 +1,7 @@
 import { Shape } from './shape';
 import { IContextItem, ContextSystem } from '../IContextItem';
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
+import { ContextModel } from 'src/canvas/component/context.model';
 
 export class Ellipse extends Shape implements IContextItem {
 
@@ -50,46 +51,10 @@ export class Ellipse extends Shape implements IContextItem {
     this.Shapes.forEach((s, i) => model.Shapes.push(s.Save()));
     return model;
   }
-  private DrawEllipse(context: any) {
 
-    var width = this.Width / 2;
-    var height = this.Height / 2;
-    var centerX = this.Left + width;
-    var centerY = this.Top + height;
+  Draw(context: ContextModel): void {
 
-    var i = 0;
-    let xPos = this.getXPos(i, centerX, width, height);
-    let yPos = this.getYPos(i, centerY, width, height);
-    context.moveTo(xPos, yPos);
-
-    for (i = 0.01; i < 2 * Math.PI; i += 0.01) {
-      xPos = this.getXPos(i, centerX, width, height);
-      yPos = this.getYPos(i, centerY, width, height);
-      context.lineTo(xPos, yPos);
-    }
-  }
-
-  DrawShape(context: any): void {
-
-    if (this.StateIndex) {
-      this.DrawEllipse(context);
-      context.fillStyle = DisplayValues.GetColor(this.BackgroundColorIndex);
-      context.fill();
-      context.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
-      context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
-      context.stroke();
-
-    }
-
-  }
-
-  Draw(context: any): void {
-
-    context.beginPath();
-
-    this.DrawShape(context);
-
-    context.closePath();
+    context.DrawEllipse(this);
   }
 
   CopyShape(newID: string): Shape {

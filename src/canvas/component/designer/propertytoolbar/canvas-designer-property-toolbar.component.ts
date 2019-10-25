@@ -5,7 +5,7 @@ import {
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
-import { FreedomOfMotion, AreaType} from 'src/canvas/models/shapes/shape';
+import { FreedomOfMotion, AreaType } from 'src/canvas/models/shapes/IShape';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 import { map, startWith } from 'rxjs/operators';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
@@ -25,6 +25,7 @@ import { ShapePropertyDialogComponent } from '../../dialogs/shape/shapePropertyD
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { UnitCell } from 'src/canvas/models/IContextItem';
 import { GraphicsModel } from 'src/canvas/service/graphicsModel';
+import { UnitCellDialogComponent } from '../../dialogs/unitcell/unitCellPropertyDialog.component';
 //import { WaitDialogComponent } from 'src/ui/components/views/form/dialogs/wait/wait.component';
 
 
@@ -302,6 +303,14 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     });
   }
 
+  ManageUnitCell(): void {
+    const dialogRef = this.dialog.open(UnitCellDialogComponent, {
+      width: '450px',
+      data: {}});
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
 
   ManageShape(): void {
     const dialogRef = this.dialog.open(ShapePropertyDialogComponent, {
@@ -320,7 +329,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
 
     dialogRef.afterClosed().subscribe(result => {
       this.canvasService.ActiveShape.SetProperties(result);
-      this.canvasService.BaseSystem.Draw();
+      this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
     });
   }
 
@@ -328,20 +337,24 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     if (!this.canvasService.BaseSystem) {
       return [];
     }
-    return this.canvasService.BaseSystem.Cells || [];
+    return this.canvasService.BaseSystem.Layers || [];
   }
 
   SaveUnitCell() {
     if (this.selectedUnitCellId.length <= 0) { return; }
-    let ucell = this.Cells.find(c => c.ID == this.selectedUnitCellId);
+    let ucell = this.Cells.find(c => c.Id == this.selectedUnitCellId);
     if (ucell) {
-      this.canvasService.UpdateSystem(ucell.ID, ucell.Name);
+      this.canvasService.UpdateSystem(ucell.Id, ucell.UnitCell.Name);
     }
+  }
+
+  NewUnitCell() {
+    this.ManageUnitCell();
   }
 
   RemoveShape() {
     this.canvasService.BaseSystem.RemoveContent();
-    this.canvasService.BaseSystem.Draw();
+    this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
   }
 
   ManagePorts(): void {
@@ -355,6 +368,4 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
       if (result) { this.updatePort.emit(result); }
     });
   }
-
-
 }

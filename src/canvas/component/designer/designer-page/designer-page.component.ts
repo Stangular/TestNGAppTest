@@ -45,7 +45,9 @@ export class DesignerPageComponent implements OnInit {
     // this.editor = new EditModel();
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    let sss = 0;
+  }
 
   onSelect(item: any) {
     let sss = 0;
@@ -70,7 +72,7 @@ export class DesignerPageComponent implements OnInit {
     if (this.selectedId.length > 0) {
      // let s = this.canvasService.Editor.RemoveContentById(this.selectedId);
   //    this.canvasService.Designer.AddContent(s);
-      this.selectedId = ''; ``
+      this.selectedId = '';
     }
     else {
    //   let s = this.canvasService.Designer.RemoveContentById(e.id);
@@ -106,6 +108,10 @@ export class DesignerPageComponent implements OnInit {
     this.stateChange.emit();
   }
 
+  ShapeSelected(result: ShapeSelectResult) {
+    let sss = 0;
+  }
+
   SelectTool(e: ShapeSelectResult) {
  //   this.canvasService.Designer.SetTool(e.type);
   }
@@ -114,10 +120,10 @@ export class DesignerPageComponent implements OnInit {
 
   UpdatePort(portData: any) {
     this.canvasService.AddPort(portData);
-    this.canvasService.BaseSystem.Draw();
+    this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
   }
 
   ShapeChanged(sid:string) {
-    this.canvasService.BaseSystem.Draw();
+    this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
   }
 }

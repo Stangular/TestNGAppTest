@@ -19,8 +19,12 @@ import { PortService } from './models/shapes/service/port.service';
 import { PathService } from './models/shapes/service/path.service';
 import { DisplayStateSelectorComponent } from './component/displaystate/displayStateSelector.component';
 import { ShapePropertyDialogComponent } from './component/dialogs/shape/shapePropertyDialog.component';
+import { UnitCellDialogComponent } from './component/dialogs/unitcell/unitCellPropertyDialog.component';
 import { WaitComponent } from 'src/ui/components/views/form/wait/wait.component';
 import { ImageUploadModule } from "angular2-image-upload";
+import { StaticCanvasComponent } from 'src/canvas/component/layers/Static/staticCanvas.component';
+import { EditCanvasComponent } from 'src/canvas/component/layers/Edit/editCanvas.component';
+import { ActionCanvasComponent } from 'src/canvas/component/layers/Action/actionCanvas.component';
 
 library.add(
    faFilter
@@ -48,8 +52,12 @@ library.add(
     , UpdateLineDialog
     , WaitComponent
     , ShapePropertyDialogComponent
+    , UnitCellDialogComponent
     , ToolboxCanvasComponent
-    , DisplayStateSelectorComponent],
+    , DisplayStateSelectorComponent
+    , StaticCanvasComponent
+    , EditCanvasComponent
+    , ActionCanvasComponent],
 
   exports: [CanvasComponent
     , DashboardPageComponent
@@ -59,12 +67,17 @@ library.add(
     , CanvasGraphicStateDialogComponent
     , UpdateLineDialog
     , ShapePropertyDialogComponent
+    , UnitCellDialogComponent
     , DisplayStateSelectorComponent
-    , ToolboxCanvasComponent],
+    , ToolboxCanvasComponent
+    , StaticCanvasComponent
+    , EditCanvasComponent
+    , ActionCanvasComponent],
   entryComponents: [
     UpdatePortDialog
     , UpdateLineDialog
     , ShapePropertyDialogComponent
+    , UnitCellDialogComponent
     , CanvasGraphicStateDialogComponent],
   providers: [CanvasService
     , LineService

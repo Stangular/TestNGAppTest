@@ -1,5 +1,5 @@
 export class Images {
-  _images: Image[] = [];
+  _images: HTMLImageElement[] = [];
 
   constructor() { }
 

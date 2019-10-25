@@ -13,7 +13,7 @@ import { AppDataService } from '../dataManagement/service/appData.service';
 import { NAS_AppModule } from '../NAS_App/NAS_App.module';
 //import { NAS_APPPrimaryOutletPageComponent } from '../../src/NAS_App/NAS_APPPrimaryOutletPage.component';
 //import "@angular/material/prebuilt-themes/indigo-pink.css";
-import '../styles/styles.scss';
+//import '../styles/styles.scss';
 import '../styles/headings.css';
 import { TokenService } from './user/token/token.service';
 import { UserService } from './user/service/app-user.service';

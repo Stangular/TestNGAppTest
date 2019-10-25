@@ -5,6 +5,7 @@ import { Point } from './primitives/point';
 import { ShapeSelectResult } from './shapeSelected';
 import { Port } from './port';
 import { Path } from '../lines/path';
+import { ContextModel } from 'src/canvas/component/context.model';
 
 export class Rectangle extends Shape {
 
@@ -24,20 +25,8 @@ export class Rectangle extends Shape {
       stateName);
   }
 
-  DrawShape(context: any): void {
-
-    context.rect(this.Left, this.Top, this.Width, this.Height);
-    context.fillStyle = DisplayValues.GetColor(this.BackgroundColorIndex);
-    context.fill();
-    context.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
-    context.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
-    context.stroke();
-  }
-
-  Draw(context: any): void {
-    context.beginPath();
-    this.DrawShape(context);
-    context.closePath();
+  Draw(context: ContextModel): void {
+    context.DrawRectangle(this);
   }
 
   Save(): any {
@@ -140,4 +129,4 @@ export class Rectangle extends Shape {
 //    //context.fill();
 //    //context.stroke();
 //  }
-}
+

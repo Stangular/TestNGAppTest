@@ -4,9 +4,9 @@
                  [colspan]="c.ColSpan(layout.Layout.Size)"
                  [rowspan]="c.RowSpan(layout.Layout.Size)"
                  [style.background]="c.Color">
-    <app-canvas [canvasID]="c.contentName"
+    <static-canvas [canvasID]=""
                 [source]="source"
-                (select)="onSelect($event)"></app-canvas>
+                (select)="onSelect($event)"></static-canvas>
   </mat-grid-tile>
 </mat-grid-list>
 

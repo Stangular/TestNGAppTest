@@ -1,0 +1,8 @@
+<wait [Width]="TheCanvas.width" [Height]="TheCanvas.height" *ngIf="canvasService.DataLoading"></wait>
+<canvas #staticcanvas *ngFor="let layer of canvasService.System(canvasID).Layers"
+        class="actionCanvas"
+        [id]="canvasService.System(canvasID).ActiveLayerName"
+        (mousedown)="OnMousedown($event)"
+        (mouseup)="OnRelease($event)"
+        (mousemove)="OnMouseMove($event)">
+</canvas>

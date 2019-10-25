@@ -55,12 +55,11 @@ export class UpdatePortDialog implements OnInit {
         startWith(''),
         map(value => this._filterPort(value))
     );
-    if (this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports.length > 0) {
-      let port = this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports[0];
+    if (this.canvasService.ActiveShape.Ports.length > 0) {
+      let port = this.canvasService.ActiveShape.Ports[0];
       this.portName.setValue(port.Id);
     }
   }
-
 
   private _filterPort(value: string): IShape[] {
 
@@ -68,7 +67,7 @@ export class UpdatePortDialog implements OnInit {
      
     this.data.name = value;
     this.data.paths = [];
-    let list = this.canvasService.BaseSystem.ActiveLayer.SelectedShape.Ports
+    let list = this.canvasService.ActiveShape.Ports
       .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
     if (list.length == 1) {
       let port = list[0] as Port;

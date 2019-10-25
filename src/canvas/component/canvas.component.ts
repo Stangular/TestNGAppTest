@@ -27,6 +27,7 @@ import { MessageService } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
 import { EditModel, BaseDesignerModel } from '../models/designer/base.model';
 import { CanvasService } from '../service/canvas.service';
+import { ContextModel } from './context.model';
 
 
 export class CanvasContextModel {
@@ -44,7 +45,7 @@ export class CanvasContextModel {
     '(window:resize)': 'onResize($event)'
   }
 })
-export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck{
+export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
 
   mouseCaptured: boolean = false;
   subscription: Subscription;
@@ -75,10 +76,10 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
       case 1001:
         this.onResize(null);
         this.Draw(); break;
-   //   default: this.ReDraw(); break;
+      //   default: this.ReDraw(); break;
     }
   }
-  ngOnInit() {}
+  ngOnInit() { }
 
   get StaticCanvas() {
     return <HTMLCanvasElement>this.staticCanvas.nativeElement;
@@ -128,12 +129,12 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
 
   PositionFromEvent(e: any) {
     let rect = this.StaticCanvas.getBoundingClientRect();
-    this.canvasService.SSR.PositionFromEvent(e,rect);
+    this.canvasService.SSR.PositionFromEvent(e, rect);
   }
 
   private Clear() {
-    this.StaticContext.clearRect(0,0,this.StaticCanvas.width, this.StaticCanvas.height);
-    this.ActiveContext.clearRect(0,0,this.ActiveCanvas.width, this.ActiveCanvas.height);
+    this.StaticContext.clearRect(0, 0, this.StaticCanvas.width, this.StaticCanvas.height);
+    this.ActiveContext.clearRect(0, 0, this.ActiveCanvas.width, this.ActiveCanvas.height);
   }
 
   OnMousedown(e: any) {
@@ -141,9 +142,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
     if (this.canvasService.EditOn) {
       this.canvasService.Select();
       this.Clear();
-      this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+      this.canvasService.DrawSystem(this.canvasID);
     }
- }
+  }
 
   CopySelectedContent() {
     let itemId = this.canvasService.shapeSelectResult.id;
@@ -185,8 +186,8 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
     if (this.canvasService.SSR.itemCaptured) {
 
       this.PositionFromEvent(e);
-      this.canvasService.BaseSystem.Move(this.ActiveContext,this.canvasService.shapeSelectResult);
-      this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+      this.canvasService.MoveSystem();
+      this.canvasService.DrawSystem(this.canvasID);
       this.move.emit(this.canvasService.shapeSelectResult);
     }
   }
@@ -210,10 +211,10 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
     }
     this.Draw();
   }
-  
+
   Draw() {
     if (!this.canvasService.BaseSystem) { return; }
-    this.canvasService.BaseSystem.Draw(this.StaticContext, this.ActiveContext);
+    this.canvasService.DrawSystem(this.canvasID);
   }
 
   ngOnDestroy() {
@@ -224,9 +225,9 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.setSize();
-  //  this.ReDraw();
+    //  this.ReDraw();
   }
 
 
-  
+
 }

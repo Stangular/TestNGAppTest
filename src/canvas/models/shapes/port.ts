@@ -3,6 +3,7 @@ import { Point, TrackingPoint } from './primitives/point';
 import { Ellipse } from './ellipse';
 import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
+import { StateIndex, DisplayValues } from '../DisplayValues';
 
 export enum ePortType {
   source = 0,
@@ -12,7 +13,7 @@ export class Port implements IShape, IContextItem {
 
   internalShape: IShape;
   private _parentShapeId: string = '';
-
+  private _stateIndex: StateIndex;
 
   constructor(private id: string,
     private offsetX: number,
@@ -26,6 +27,12 @@ export class Port implements IShape, IContextItem {
     this.internalShape = new Ellipse(id + "_*", 0, 0, 5, 5, stateName);
     this._parentShapeId = parent.Id;
     this.SetPortToParent(parent.Top, parent.Right, parent.Bottom, parent.Left);
+    this._stateIndex = DisplayValues.GetShapeIndex(stateName);
+  }
+
+
+  get StateIndex(): StateIndex {
+    return this._stateIndex;
   }
 
   SetPortToParent(top: number, right: number, bottom: number, left: number) {
@@ -38,6 +45,9 @@ export class Port implements IShape, IContextItem {
     this.internalShape.CenterOn(x, y);
   }
 
+  get IsHit(): boolean{
+    return false;
+  }
 
   Save(): any {
     let model = {
@@ -48,6 +58,26 @@ export class Port implements IShape, IContextItem {
       OffsetY: this.offsetY
     }
     return model;
+  }
+
+  get StateName(): string {
+    return this.internalShape.StateName;
+  }
+
+  public get AreaType() {
+    return this.internalShape.AreaType;
+  }
+
+  public get FreedomOfMotion() {
+    return this.internalShape.FreedomOfMotion;
+  }
+
+  public get FreedomOfSizing() {
+    return this.internalShape.FreedomOfSizing;
+  }
+
+  public get Ports() {
+    return this.internalShape.Ports;
   }
 
   SetProperties(properties: any) {
@@ -96,9 +126,9 @@ export class Port implements IShape, IContextItem {
 
   DrawShape(context: any): void {
     // get line moveto/lineto
-    context.beginPath();
-    this.internalShape.DrawShape(context);
-    context.closePath();
+  //  context.beginPath();
+   this.internalShape.Draw(context);
+  //  context.closePath();
   }
 
   Draw(context: any): void {

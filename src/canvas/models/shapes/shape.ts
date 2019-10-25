@@ -1,4 +1,4 @@
-import { IShape } from './IShape';
+import { IShape, AreaType, FreedomOfMotion} from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
 import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
 import { IContextItem } from '../IContextItem';
@@ -7,16 +7,6 @@ import { Line, PortPath } from '../lines/line';
 import { ePortType, Port } from './port';
 import { ContentImage } from './content/image/image';
 import { Content } from './content/Content';
-export enum FreedomOfMotion {
-  full = 0,
-  horizontal = 1,
-  vertical = 2
-}
-export enum AreaType {
-  normal = 0, // width and height change independently
-  lockedRatio = 1, // Ratio between width and height remains constant as other dimension changes.
-  constantArea = 2 // Total area remains the same as width of height changes
-}
 
 export enum OffsetStyle {
   constane = 0,   // Does not change position as parent shape is resized
@@ -33,6 +23,7 @@ export class ContainedShape {
 
 export abstract class Shape implements IShape {
 
+  private _layerName = '';
   protected _hit = false;
   protected _center: Point = new Point();
   protected _unitCell: string = '';
@@ -75,7 +66,7 @@ export abstract class Shape implements IShape {
     return this._unitCell;
   }
 
-  get StateIndex() {
+  get StateIndex(): StateIndex {
     return this._stateIndex;
   }
 
@@ -106,13 +97,15 @@ export abstract class Shape implements IShape {
   get Center(): Point { return this._center; }
 
   abstract Draw(context: any): void;
-  abstract DrawShape(context: any);
+  //abstract DrawShape(context: any);
   abstract CopyShape(newID: string): Shape;
   abstract CopyItem(newID: string): IContextItem;
   abstract Save(): any;
 
   LinePath(path: PortPath) {
-    this._ports.forEach(p => path.AddPortPoint(p.Center));
+    if (path) {
+      this._ports.forEach(p => path.AddPortPoint(p.Center));
+    }
   }
 
   Select(shapeSelectResult: ShapeSelectResult) {
@@ -304,7 +297,7 @@ export abstract class Shape implements IShape {
   }
 
 
-  get Ports() {
+  get Ports() : IShape [] {
     return this._ports;
   }
 

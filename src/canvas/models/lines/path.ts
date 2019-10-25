@@ -50,17 +50,21 @@ export class Path implements IContextItem {
     //line.Draw(context);
   }
 
+  Save(): any {
+    return {};
+  }
+
   UpdateContextState() { }
 
   Draw(context: any): void {
 
-    context.beginPath();
+  //  context.beginPath();
 
    // this.segments.forEach(function (s, i) { s.DrawLine( context ) });
 
-    context.stroke();
+   // context.stroke();
 
-    context.closePath();
+   // context.closePath();
   }
 
   CopyItem(newId: string) {

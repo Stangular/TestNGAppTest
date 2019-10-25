@@ -6,6 +6,7 @@ import { IContextItem, ContextSystem } from '../IContextItem';
 import { ILine } from './Iline'
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { ShapeSelectResult } from '../shapes/shapeSelected';
+import { ContextModel } from 'src/canvas/component/context.model';
 
 export enum lineTypes {
   straight = 0,
@@ -135,44 +136,46 @@ export class PortPath implements IPortPath {
     }
   }
 
-  DrawLine(context: any) {
-    if (this.ports.length < 2) { return; }
-    context.moveTo(this.ports[0].X, this.ports[0].Y);
-    for (let j = this.ports.length - 1; j > 0; j = j - 1) {
-      context.lineTo(this.ports[j].X, this.ports[j].Y);
-    }
-  }
+  get Ports() { return this.ports; }
 
-  DrawBezierPath(context: any) {
-    if (this.ports.length < 4) { return; }
-    context.moveTo(this.ports[0].X, this.ports[0].Y);
-    for (let j = 1; j < this.ports.length; j = j + 3) {
-      context.bezierCurveTo(
-        this.ports[j + 1].X, this.ports[j + 1].Y,
-        this.ports[j + 2].X, this.ports[j + 2].Y,
-        this.ports[j].X, this.ports[j].Y);
-    }
-  }
+  //DrawLine(context: ContextModel) {
+  //  if (this.ports.length < 2) { return; }
+  //  context.moveTo(this.ports[0].X, this.ports[0].Y);
+  //  for (let j = this.ports.length - 1; j > 0; j = j - 1) {
+  //    context.lineTo(this.ports[j].X, this.ports[j].Y);
+  //  }
+  //}
 
-  DrawGradientPath(context: any) {
-    if (this.ports.length < 3) { return; }
-    try {
-      context.moveTo(this.ports[0].X, this.ports[0].Y);
-      for (let j = 1; j < this.ports.length - 1; j = j + 2) {
-        context.quadraticCurveTo(
-          this.ports[j + 1].X, this.ports[j + 1].Y,
-          this.ports[j].X, this.ports[j].Y);
-      }
-    }
-    catch (ex) {
-      let sss = ex;
-    }
+  //DrawBezierPath(context: ContextModel) {
+  //  if (this.ports.length < 4) { return; }
+  //  context.moveTo(this.ports[0].X, this.ports[0].Y);
+  //  for (let j = 1; j < this.ports.length; j = j + 3) {
+  //    context.bezierCurveTo(
+  //      this.ports[j + 1].X, this.ports[j + 1].Y,
+  //      this.ports[j + 2].X, this.ports[j + 2].Y,
+  //      this.ports[j].X, this.ports[j].Y);
+  //  }
+  //}
+
+  //DrawGradientPath(context: ContextModel) {
+  //  if (this.ports.length < 3) { return; }
+  //  try {
+  //    context.moveTo(this.ports[0].X, this.ports[0].Y);
+  //    for (let j = 1; j < this.ports.length - 1; j = j + 2) {
+  //      context.quadraticCurveTo(
+  //        this.ports[j + 1].X, this.ports[j + 1].Y,
+  //        this.ports[j].X, this.ports[j].Y);
+  //    }
+  //  }
+  //  catch (ex) {
+  //    let sss = ex;
+  //  }
  
-  }
+  //}
 
   ResetToPort(port: Port) {
     
- //   this.ports[port.PathPosition] = port.Center;
+    this.ports[port.PathPosition] = port.Center;
   }
 }
 
@@ -226,24 +229,20 @@ export class Line implements ILine {
 
   UpdateContextState() { }
 
-  public DrawPortPath(context: any, path: PortPath) {
-    if (!path) { return; }
-    context.beginPath();
-    switch (this.type) {
-      case lineTypes.gradient: path.DrawGradientPath(context); break;
-      case lineTypes.bezier: path.DrawBezierPath(context); break;
-      default: path.DrawLine(context); break;
-    }
-    this.Draw(context);
-    context.closePath();
-  }
+  //public DrawPortPath(context: ContextModel, path: PortPath) {
+  //  if (!path) { return; }
+  //  context.beginPath();
+  //  switch (this.type) {
+  //    case lineTypes.gradient: context.DrawGradientPath(path.Ports); break;
+  //    case lineTypes.bezier: context.DrawBezierPath(path.Ports); break;
+  //    default: context.DrawStraightLine(path.Ports); break;
+  //  }
+  //  this.Draw(context);
+  //  context.closePath();
+  //}
 
-  Draw(context: any): void {
-
-    context.strokeStyle = DisplayValues.GetColor(this._state.color);
-    context.lineWidth = DisplayValues.GetWeight(this._state.weight);
-    context.stroke();
-
+  Draw(context: ContextModel,path: Point [] = []): void {
+    context.DrawLine(this, path);
   }
 
   //public DrawPath(context: any, pathId: string) {

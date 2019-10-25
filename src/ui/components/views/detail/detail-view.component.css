@@ -1,8 +1,8 @@
 .example-container {
-  width: 100%;
+  width: 50%;
   height: 300px;
   margin: 10px;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
 }
 
 .action-button-row button {

@@ -1,0 +1,45 @@
+<div class="dialog-form">
+  <div class="dialog-header">
+    <h1 mat-dialog-title>Update Shape</h1>
+  </div>
+  <mat-grid-list cols="16" rowHeight="40px">
+    <mat-grid-tile [colspan]="2" [rowspan]="1">
+      <label style="padding-right:5px">Model</label>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="8" [rowspan]="1">
+      <mat-form-field [floatLabel]="'never'">
+        <input matInput
+               [matAutocomplete]="cellnames"
+               style="width:100%"
+               placeholder="name"
+               [formControl]="cellName">
+        <mat-autocomplete #cellnames="matAutocomplete">
+          <mat-option *ngFor="let cell of this.unitcells | async" [value]="cell.Id">
+            <span>{{cell.UnitCell.Name}}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </mat-grid-tile>
+
+  </mat-grid-list>
+
+  <mat-grid-list cols="16" rowHeight="40px">
+    <mat-grid-tile [colspan]="16" [rowspan]="2" style="text-align:left">
+      <div mat-dialog-actions class="button-row" style="padding-left:100px; width:100%">
+        <button mat-stroked-button color="warn"
+                [mat-dialog-close]="data" cdkFocusInitial>
+          Remove
+        </button>
+        <button mat-stroked-button color="primary"
+                [mat-dialog-close]="data" cdkFocusInitial>
+          {{okMessage}}
+        </button>
+        <button mat-stroked-button
+                color="basic" (click)="onNoClick()">
+          {{cancelMessage}}
+        </button>
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
+

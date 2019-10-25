@@ -5,7 +5,7 @@ import { IContextItem } from "../IContextItem";
 import { StateIndex } from "../DisplayValues";
 
 export interface ILine extends IContextItem {
-  DrawPortPath(context: any, path: PortPath);
+ // DrawPortPath(context: any, path: PortPath);
  // ResetPath(ports: Port[]);
   State: StateIndex;
   Type: lineTypes;

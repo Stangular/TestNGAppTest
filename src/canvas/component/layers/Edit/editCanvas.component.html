@@ -1,0 +1,9 @@
+<canvas #staticcanvas
+        class="staticCanvas"
+        [id]="canvasID"></canvas>
+<canvas #activeCanvas
+        class="activeCanvas"
+        (mousedown)="OnMousedown($event)"
+        (mouseup)="OnRelease($event)"
+        (mousemove)="OnMouseMove($event)"
+        [id]="'activeCanvas'"></canvas>
