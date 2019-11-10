@@ -42,13 +42,17 @@ export class Ellipse extends Shape implements IContextItem {
       Type: 1,
       CornerRadius: 0,
       Shadow: 0,
-      DisplayValueId: '',
+      DisplayValueId: this.StateName,
       Ports: [],
+      Text: [],
+      Images: [],
       Shapes: [],
       Content: {}
     }
     this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
-    this.Shapes.forEach((s, i) => model.Shapes.push(s.Save()));
+    this.TextContent.forEach((s, i) => model.Text.push(s.Save()));
+    this.ImageContent.forEach((s, i) => model.Images.push(s.Save()));
+    this.GeneralContent.forEach((s, i) => model.Shapes.push(s.Save()));
     return model;
   }
 

@@ -75,7 +75,15 @@ export class UnitCellDialogComponent implements OnInit {
     return this.canvasService.BaseSystem.Layers || [];
   }
 
-  onNoClick(): void {
+  onRemoveClick(): void {
+    this.dialogRef.close();
+  }
+
+  onUpdateClick(): void {
+    this.dialogRef.close();
+  }
+
+  onCancelClick(): void {
     this.dialogRef.close();
   }
 
@@ -91,35 +99,14 @@ export class UnitCellDialogComponent implements OnInit {
   private _filterCells(value: string): ContextLayer[] {
 
     const v = value.toLowerCase();
-
+    this.data.name = value;
     let list = this.canvasService.BaseSystem.Layers
       .filter(option => option.UnitCell.Name.toLowerCase().indexOf(v) >= 0);
     if (list.length == 1 && list[0].Id == value) {}
     if (list.length <= 0) {
+
       return [];
     }
     return list;
   }
-  ImageChange(image: any) {
-    this.imageContentURL = image.value;
-  }
-
-  handleChangeImageSource(event: any) {
-    this.imageContentURL = "";
-    //  this.imageFromDataSource = !this.imageFromDataSource;
-  }
-  
-  onUploadFinished(e: any) {
-    if (e.serverResponse.status == 200) {
-      var url = JSON.parse(e.serverResponse._body);
-      this.urlToImage = url;
-    }
-    else {
-
-    }
-  }
-
-  onUploadStateChanged(e: any) { }
-  
-
 }

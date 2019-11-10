@@ -30,7 +30,6 @@ export class Port implements IShape, IContextItem {
     this._stateIndex = DisplayValues.GetShapeIndex(stateName);
   }
 
-
   get StateIndex(): StateIndex {
     return this._stateIndex;
   }

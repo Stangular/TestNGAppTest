@@ -69,6 +69,7 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.Draw();
         break;
       case 1001:
+        this.canvasService.ContextModel.RemoveAllContext();
         this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.TheContext);
         this.onResize(null);
         this.Draw(); break;
@@ -77,11 +78,16 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.TheContext);
-    this.setSize();
+    this.SetActiveLayer();
   }
 
   get TheCanvas() {
     return <HTMLCanvasElement>this.theCanvas.nativeElement;
+  }
+
+  SetActiveLayer() {
+    this.setSize();
+    this.canvasService.AddLayer();
   }
 
   ngAfterViewInit(): void {

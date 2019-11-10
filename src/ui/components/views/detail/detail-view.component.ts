@@ -22,7 +22,6 @@ export class DetailViewComponent {
   value = 50;
   diameter = 30;
 
-
   actionType = ActionType;
   @Input() formDirty: boolean = false;
   @Input() servicing: boolean = false;

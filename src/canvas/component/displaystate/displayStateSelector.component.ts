@@ -1,5 +1,5 @@
 import {
-  Component, Input, Output, EventEmitter, OnInit
+  Component, Input, Output, EventEmitter, OnInit, DoCheck
 } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
@@ -13,9 +13,8 @@ import { DisplayValues } from 'src/canvas/models/DisplayValues';
   }
 })
 
-export class DisplayStateSelectorComponent implements  OnInit {
+export class DisplayStateSelectorComponent implements OnInit, DoCheck{
 
- // statesss = "redState";
   stateNameFG: FormGroup;
   @Input() stateName: string = "DefaultFG";
   @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();
@@ -33,6 +32,11 @@ export class DisplayStateSelectorComponent implements  OnInit {
     });
     this.stateNameFG.get('stateNameSSS').setValue(this.stateName);
   }
+
+  ngDoCheck() {
+   // this.stateNameFG.get('stateNameSSS').setValue(this.stateName);
+  }
+
   get States() {
     return DisplayValues.StateNames;
   }

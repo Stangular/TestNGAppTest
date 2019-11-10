@@ -19,13 +19,13 @@ export interface LineData {
   state: string;
 }
 const LineTypessss = [
-  { namex: "Straight", valuex: "0"},
-  { namex: "Gradient", valuex: "1"},
-  { namex: "Bezier", valuex: "2"},
-  { namex: "Vertical to Vertical", valuex: "3"},
-  { namex: "Horizontal to Horizontal", valuex: "4"},
-  { namex: "Vertical to Horizontal", valuex: "5"},
-  { namex: " Horizontal to Vertical", valuex: "6"}
+  { namex: "Straight", valuex: 0},
+  { namex: "Gradient", valuex: 1},
+  { namex: "Bezier", valuex: 2},
+  { namex: "Vertical to Vertical", valuex: 10},
+  { namex: "Horizontal to Horizontal", valuex: 11},
+  { namex: "Vertical to Horizontal", valuex: 12},
+  { namex: "Horizontal to Vertical", valuex: 13}
 ]
 @Component({
 
@@ -35,6 +35,7 @@ const LineTypessss = [
 })
 export class UpdateLineDialog implements OnInit {
   lineTypesss = LineTypessss;
+  lineType: string = "Straight";
   lt = lineTypes;
   savedLineSelected: boolean = false;
   selectedColor: string = '';
@@ -55,6 +56,8 @@ export class UpdateLineDialog implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: LineData
     , public dialog: MatDialog) {
     this.data.paths = [];
+    this.data.type = lineTypes.straight;
+    this.data.state = '';
   }
 
   onNoClick(): void {
@@ -149,7 +152,7 @@ export class UpdateLineDialog implements OnInit {
  
     this.data.name = value;
     this.data.paths = [];
-  //  this.data.state = this.States[0];
+    this.data.state = this.States[0];
     this.data.type = lineTypes.straight;
     this.savedLineSelected = false;
     let list = this.canvasService.BaseSystem.Lines

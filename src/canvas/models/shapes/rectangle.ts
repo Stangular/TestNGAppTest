@@ -38,15 +38,17 @@ export class Rectangle extends Shape {
       Height: Math.ceil(this.height),
       Type: 0,
       CornerRadius: 0,
-      Shadow:  0,
-      DisplayValueId: '',
-      Ports:  [],
+      Shadow: 0,
+      DisplayValueId: this.StateName,
+      Ports: [],
       Shapes: [],
       Content: {}
     }
     this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
-    this.Shapes.forEach((s, i) => model.Shapes.push(s.Save()));
-    return model;
+    this.TextContent.forEach((s, i) => model.Shapes.push(s.Save()));
+    this.ImageContent.forEach((s, i) => model.Shapes.push(s.Save()));
+    this.GeneralContent.forEach((s, i) => model.Shapes.push(s.Save()));
+   return model;
   }
 
   ShapeType(): number {

@@ -71,7 +71,7 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
       message => { this.AcceptMessage(message) });
 
     this._actionLayer = new ActionLayer('editor');
-    this._staticLayer = this.canvasService.BaseSystem.Layers[0];
+    this._staticLayer = this.canvasService.BaseSystem.getLayer(this.canvasID);
   }
 
   AcceptMessage(message: any) {
@@ -82,19 +82,19 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
         this.onResize(null);
         this.Draw();
         break;
-        case 1001:
-        this.onResize(null);
+      case 1001:
         this.Draw();
-        this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.StaticContext);
         break;
-     //   default: this.ReDraw(); break;
     }
   }
+
   ngOnInit() {
     this.canvasService.ContextModel.AddLayerContext('editor', this.ActiveContext);
     this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.StaticContext);
-    this._actionLayer.SetLayer(this.canvasService.BaseSystem.Layers[0]);
- }
+    this._actionLayer.SetLayer(this.canvasService.BaseSystem.getLayer(this.canvasID));
+ //   this.Draw();
+ //  this._actionLayer.Reset(this.canvasService.ContextModel);
+}
 
   get StaticCanvas() {
     return <HTMLCanvasElement>this.staticCanvas.nativeElement;
@@ -187,9 +187,15 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
   OnMousedown(e: any) {
     this.PositionFromEvent(e);
     if (this.canvasService.EditOn) {
-      this._actionLayer.Select(this.canvasService.SSR);
+      let selected = this._actionLayer.ShapeSelected;
       this.Clear();
-      this.Draw();
+      if (this._actionLayer.Select(this.canvasService.SSR)) {
+        this.Draw();
+      }
+      else if (!selected) {
+        this._actionLayer.AddNewContent(this.canvasService.SSR);
+        this.Draw();
+      }
       this._actionLayer.Reset(this.canvasService.ContextModel);
       this.canvasService.SetActiveShape(this._actionLayer.SelectedShape);
       this.Select.emit(this.canvasService.SSR);
@@ -232,7 +238,9 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
         this.ActiveCanvas.height = this.StaticCanvas.height;
       }
       this.Draw();
-      this._staticLayer.Draw(this.canvasService.ContextModel);
+      this._actionLayer.Reset(this.canvasService.ContextModel);
+
+     // this._staticLayer.Draw(this.canvasService.ContextModel);
     }
 
   }

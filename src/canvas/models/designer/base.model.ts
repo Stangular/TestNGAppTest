@@ -6,7 +6,7 @@ import { Shape } from "../shapes/shape";
 import { TextShape } from "../shapes/content/text/text";
 import { ContextLayer, IContextItem } from "../IContextItem";
 import { ShapeSelectResult } from "../shapes/shapeSelected";
-import { ContentImage } from "../shapes/content/image/image";
+import { ImageShape } from "../shapes/content/image/image";
 import { Ellipse } from "../shapes/ellipse";
 import { Port } from "../shapes/port";
 import { Size } from "src/d3/services/d3.common.model";

@@ -5,8 +5,11 @@ import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { Line, PortPath } from '../lines/line';
 import { ePortType, Port } from './port';
-import { ContentImage } from './content/image/image';
-import { Content } from './content/Content';
+import { ImageShape } from './content/image/image';
+import { IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
+import { Content, TextContent } from './content/Content';
+import { ContentShape } from './content/ContentShape';
+import { TextShape } from './content/text/text';
 
 export enum OffsetStyle {
   constane = 0,   // Does not change position as parent shape is resized
@@ -23,16 +26,18 @@ export class ContainedShape {
 
 export abstract class Shape implements IShape {
 
-  private _layerName = '';
   protected _hit = false;
   protected _center: Point = new Point();
   protected _unitCell: string = '';
   protected _areaType: AreaType = AreaType.normal;
   protected _freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
   protected _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
-  protected _shapes: IShape[] = [];
+  protected _textContent: TextShape[] = [];
+  protected _imageContent: ImageShape[] = [];
+  protected _generalContent: Shape[] = [];
+
   //protected _textContent: Text = null;
-  //protected _imageContent: ContentImage = null;
+  //protected _imageContent: ImageShape = null;
   protected _isSelected = false;
   protected _stateIndex: StateIndex = null;
   protected _ports: IShape[] = [];
@@ -47,7 +52,6 @@ export abstract class Shape implements IShape {
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
-    let self = this;
   }
 
   SetProperties(properties: any) {
@@ -70,19 +74,6 @@ export abstract class Shape implements IShape {
     return this._stateIndex;
   }
 
-  //UpdateContextState() {
-  //  //let bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + 'bg');
-  //  ////if (bgNdx <= 0) {
-  //  ////  bgNdx = DisplayValues.GetColorIndex(this.Id + '_' + this.Class + "_" + 'bg');
-  //  ////}
-  //  //if (bgNdx >= 0) {
-  //  //  this._bgNdx = bgNdx;
-  //  //  this._stateIndex.setState(UIStates.background, bgNdx);
-  //  //}
-  //  //else {
-  //  //  this._bgNdx = this._stateIndex.Index[UIStates.background];
-  //  //}
-  //}
   get BackgroundColorIndex() { return this._stateIndex.Index[UIStates.background]; }
 
   get Id(): string { return this.id; }
@@ -110,10 +101,22 @@ export abstract class Shape implements IShape {
 
   Select(shapeSelectResult: ShapeSelectResult) {
     this._hit = false;
-    let ndx = this._shapes.findIndex(s => s.Select(shapeSelectResult));
+    let ndx = this._textContent.findIndex(s => s.Select(shapeSelectResult));
     if (ndx >= 0) {
       shapeSelectResult.itemCaptured = true;
-      shapeSelectResult.id = this._shapes[ndx].Id;
+      shapeSelectResult.id = this._textContent[ndx].Id;
+      return true;
+    }
+    ndx = this._imageContent.findIndex(s => s.Select(shapeSelectResult));
+    if (ndx >= 0) {
+      shapeSelectResult.itemCaptured = true;
+      shapeSelectResult.id = this._imageContent[ndx].Id;
+      return true;
+    }
+    ndx = this._generalContent.findIndex(s => s.Select(shapeSelectResult));
+    if (ndx >= 0) {
+      shapeSelectResult.itemCaptured = true;
+      shapeSelectResult.id = this._generalContent[ndx].Id;
       return true;
     }
     else {
@@ -133,15 +136,35 @@ export abstract class Shape implements IShape {
   }
 
   public DrawContent(context: any) {
-    this._shapes.forEach(s => s.Draw(context));
-    
+    this._textContent.forEach(s => s.Draw(context));
+    this._imageContent.forEach(s => s.Draw(context));
+    this._generalContent.forEach(s => s.Draw(context));
+
     this._ports.forEach(p => p.Draw(context));
 }
 
-  AddShape(shape: IShape) {
+  AddTextShape(shape: TextShape) {
     if (shape) {
-      this._shapes.push(shape);
+      this._textContent.push(shape);
     }
+  }
+
+  AddImageShape(shape: ImageShape) {
+    if (shape) {
+      this._imageContent.push(shape);
+    }
+  }
+
+  AddShape(shape: Shape) {
+    if (shape) {
+      this._generalContent.push(shape);
+    }
+  }
+
+  get ChildShape(): Shape {
+    return this.TextContent.find(s => s.IsHit) as Shape
+      || this.ImageContent.find(s => s.IsHit) as Shape
+      || this.GeneralContent.find(s => s.IsHit) as Shape;
   }
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
@@ -149,9 +172,9 @@ export abstract class Shape implements IShape {
     return this.IsPointInShape(shapeSelectResult.point);
   }
 
-  get ChildShape(): Shape {
-    return this.Shapes.find(s => s.IsHit ) as Shape;
-  }
+  //get ChildShape(): Shape {
+  //  return this.Shapes.find(s => s.IsHit ) as Shape;
+  //}
 
   get IsHit() {
     return this._hit;
@@ -169,7 +192,9 @@ export abstract class Shape implements IShape {
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._ports.forEach((p, i) => p.MoveBy(x, y));
-    this._shapes.forEach((s, i) => s.MoveBy(x, y));
+    this._textContent.forEach((s, i) => s.MoveBy(x, y));
+    this._imageContent.forEach((s, i) => s.MoveBy(x, y));
+    this._generalContent.forEach((s, i) => s.MoveBy(x, y));
  }
 
   SizeBy(context: any,top: number, right: number, bottom: number, left: number) {
@@ -301,8 +326,16 @@ export abstract class Shape implements IShape {
     return this._ports;
   }
 
-  get Shapes() {
-    return this._shapes;
+  get TextContent() {
+    return this._textContent;
+  }
+
+  get ImageContent() {
+    return this._imageContent;
+  }
+
+  get GeneralContent() {
+    return this._generalContent;
   }
 
   //get TextContent() {

@@ -4,7 +4,7 @@ import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult, eContentType } from "./shapes/shapeSelected";
 import { Shape } from "./shapes/shape";
 import { forEach } from "@angular/router/src/utils/collection";
-import { Line, PortPath } from './lines/line';
+import { Line, PortPath, lineTypes } from './lines/line';
 import { Port, ePortType } from './shapes/port';
 import { Rectangle } from './shapes/rectangle';
 import { StateIndex, UIStates, DisplayValues } from './DisplayValues';
@@ -14,8 +14,8 @@ import { Path } from './lines/path';
 import { LineService } from './lines/service/line.service';
 import { TextShape } from '../models/shapes/content/text/text';
 import { IShape, FreedomOfMotion, AreaType } from './shapes/IShape';
-import { Content } from '../models/shapes/content/Content';
-import { ContentImage } from './shapes/content/image/image';
+import { Content, TextContent, ImageContent } from '../models/shapes/content/Content';
+import { ImageShape } from './shapes/content/image/image';
 import { ContextModel } from '../component/context.model';
 import { emptyGuid } from '../../const/constvalues.js';
 
@@ -179,7 +179,7 @@ export class ContextLayer implements IContextSystem {
     context.ClearLayer(this.id);
     this.content.forEach(s => self.DrawShape(context, s as Shape));
     this.content.forEach(s => (<Shape>s).DrawContent(context));
-    this.lines.forEach(l => self.DrawPaths(context, l));
+    //   this.lines.forEach(l => self.DrawPaths(context, l));
   }
 
   DrawPaths(context: ContextModel, line: Line) {
@@ -220,7 +220,7 @@ export class ContextLayer implements IContextSystem {
     shape.Ports.forEach(function (p, i) {
       let pp = self.paths.find(px => px.Id == (<Port>p).PathId);
       if (pp) {
-        pp.AddPortPoint(p.Center);
+        pp.AddPortPoint(p.Center, (<Port>p).PathPosition);
       }
       //     self.paths.push();
     });
@@ -249,19 +249,20 @@ export class ContextLayer implements IContextSystem {
   }
   AddPath() { }
 
-  ResetPath(shape: Shape) {
-    let self = this;
-    shape.Ports.forEach(function (p, i) {
-      let path = self.Paths.find(pp => pp.Id == (<Port>p).PathId);
-      if (path) {
-        path.ResetToPort(p as Port);
-        let line = self.lines.find(l => l.Id == path.LineId);
-        if (line) {
-          path.SetInterimPorts(line.Type);
+  ResetPaths() {
+    this.content.forEach((s, i) => this.ResetPath(s as Shape));
+  }
 
-        }
-      }
-    });
+  ResetPath(shape: Shape) {
+    //let self = this;
+    //this.Paths.forEach((p, i) => {
+    //  if (p) {
+    //    let line = self.lines.find(l => l.Id == p.LineId);
+    //    p.SetInterimPorts(line.Type || lineTypes.straight);
+    //  }
+    //});
+
+    ////   });
     shape.MoveBy(0, 0);
   }
 
@@ -308,39 +309,46 @@ export class ContextLayer implements IContextSystem {
     if (content) {
       this.content.unshift(content);
       this.AddPortPath(content as Shape);
-      this.ResetPath(content as Shape);
     }
   }
 
-  AddText(text: string, stateName: string, angle: number = 0) {
+  AddText(text: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0) {
     let activeShape = this.Content[0] as Shape;
     if (activeShape) {
+      let id = '_text_content_' + activeShape.TextContent.length;
       let shp = new TextShape(
-        activeShape.Id + '_content_' + activeShape.Shapes.length + 1,
+        activeShape.Id + id,
         activeShape.Top + 3,
-        activeShape.Left + 3, 10, 10,
-        new Content(emptyGuid, stateName, text, 0, angle));
-      activeShape.AddShape(shp);
+        activeShape.Left + 3, 0, 10,
+        containerStateName,
+        new TextContent(emptyGuid, contentStateName, text, fromSource, angle));
+      activeShape.AddTextShape(shp);
     }
   }
 
-  AddImage(imageName: string, stateName: string, angle: number = 0) {
+  AddImage(imageName: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0, imageIndex = 0) {
     let activeShape = this.Content[0] as Shape;
     if (activeShape) {
-      let shp = new ContentImage(
-        activeShape.Id + '_content_' + activeShape.Shapes.length + 1,
+      let id = '_image_content_' + activeShape.ImageContent.length;
+      let shp = new ImageShape(
+        activeShape.Id + id,
         activeShape.Top + 3,
         activeShape.Left + 3, 10, 10,
-        new Content(emptyGuid, stateName, imageName, 0, angle)
-        , 0);
-      activeShape.AddShape(shp);
+        containerStateName,
+        new ImageContent(emptyGuid, contentStateName, imageName, fromSource, angle, imageIndex));
+      activeShape.AddImageShape(shp);
     }
+  }
+
+  AddGeneralShape(name: string, state: string) {
+    let activeShape = this.Content[0] as Shape;
+    this.AddShape(new Rectangle(name, activeShape.Top + 10, activeShape.Left + 10, 100, 100, state));
   }
 
   AddShape(shape: IShape) {
     let activeShape = this.Content[0] as Shape;
     if (activeShape) {
-      activeShape.AddShape(shape);
+      activeShape.AddShape(shape as Shape);
     }
   }
 
@@ -522,6 +530,7 @@ class Sizer implements IContextItem {
 }
 
 export class ActionLayer extends ContextLayer {// uses separate context
+  private _shapeSelected: boolean = false;
   private designerpad = new StateIndex('designerpad');
   private _sizer: Sizer;
   private _layer: ContextLayer;
@@ -551,15 +560,21 @@ export class ActionLayer extends ContextLayer {// uses separate context
       if (this._layer && lyr.Id == this._layer.Id) { return; }
       this._layer = lyr;
       this._sizer.Reset(this._layer.Content[0] as Shape);
+      this._shapeSelected = true;
     }
   }
 
-  Select(ssr: ShapeSelectResult): boolean {
+  get ShapeSelected() {
+    return this._shapeSelected;
+  }
 
+  Select(ssr: ShapeSelectResult): boolean {
+    this._shapeSelected = false;
     let result = (this._layer && (this._sizer.Select(ssr) || this._layer.Select(ssr)));
     if (result) {
       let c = (<Shape>this._layer.Content[0]).ChildShape;
       this._sizer.Reset(c || this._layer.Content[0] as Shape);
+      this._shapeSelected = true;
     }
     return result;
   }
@@ -606,6 +621,7 @@ export class ActionLayer extends ContextLayer {// uses separate context
   AddContent(content: IContextItem) {
     if (!this._layer) { return; }
     this._sizer.Reset(this._layer.Content[0] as Shape);
+    this._shapeSelected = true;
   }
 
   get SelectedShape(): Shape {
@@ -613,8 +629,44 @@ export class ActionLayer extends ContextLayer {// uses separate context
     return this._layer.Content[0] as Shape;
   }
 
+  AddNewContent(
+    ssr: ShapeSelectResult,
+    shapeName: string = '') {
+
+    //    if (!this.activeLayer) { return false; }
+
+    if (shapeName.length <= 0) {
+      shapeName = 'item_' + this._layer.Content.length.toString();
+    }
+    if (this._layer.Content.findIndex(c => c.Id == shapeName) >= 0) {
+      return false;
+    }
+    let shp: Shape = null;
+    switch (ssr.shapeType) {
+      case eContentType.typeCount:
+      case eContentType.rectangle:
+        shp = new Rectangle(shapeName, ssr.point.Y, ssr.point.X, 30, 30, ssr.stateName);
+        break;
+      case eContentType.ellipse:
+        shp = new Ellipse(shapeName, ssr.point.Y, ssr.point.X, 30, 30, ssr.stateName);
+        break;
+    }
+    if (shp) {
+      this._layer.AddContent(shp);
+      this._sizer.Reset(this._layer.Content[0] as Shape);
+      this._shapeSelected = true;
+      return true;
+    }
+    return false;
+  }
+
   Reset(context: ContextModel) {
-    this.DrawPartial(context);
+    if (this._shapeSelected) {
+      this.DrawPartial(context);
+    }
+    else {
+      this._layer.Draw(context);
+    }
   }
 
   DrawPartial(context: ContextModel) {
@@ -632,7 +684,7 @@ export class ActionLayer extends ContextLayer {// uses separate context
   DrawLayerPortPath(context: ContextModel, port: Port) {
     let self = this;
     let paths = this._layer.Paths.filter(p => p.Id == port.PathId);
-    paths = paths.filter(p => (<Shape>this._layer.Content[0]).Ports.findIndex( pt => (<Port>pt).PathId == p.Id ) < 0 );
+    paths = paths.filter(p => (<Shape>this._layer.Content[0]).Ports.findIndex(pt => (<Port>pt).PathId == p.Id) < 0);
     paths.forEach(function (p, i) {
       let lines = self._layer.Lines.filter(l => l.Id == p.LineId);
       lines.forEach(l => l.Draw(context, p.Ports));
@@ -646,8 +698,8 @@ export class ActionLayer extends ContextLayer {// uses separate context
     this._layer.Content[0].Draw(context);
     let shp = (<Shape>this._layer.Content[0]);
     if (shp) {
-      shp.DrawContent(context);
       shp.Ports.forEach(p => this._layer.DrawPortPath(context, p as Port));
+      shp.DrawContent(context);
     }
     this._sizer.Draw(context);
     let I = this;
@@ -681,46 +733,58 @@ export class ActionLayer extends ContextLayer {// uses separate context
 export class ContextSystem implements IContextSystem {
 
   ssr: ShapeSelectResult;
+  _selectedLayer: number = 0;
   _activeLayer: ActionLayer = null;
   constructor(
     private layers: ContextLayer[] = []) {
   }
 
-  get Id() { return this.layers[0].Id; }
+  get Id() { return this.SelectedLayer.Id; }
 
   get Layers() { return this.layers; }
+  SetSelectedLayer(id: string) {
+    this._selectedLayer = this.layers.findIndex(l => l.Id == id);
+  }
+
+  get SelectedLayer() {
+    return this.layers[this._selectedLayer] || this.layers[0];
+  }
+  getLayer(unitcellID: string) {
+    return this.layers.find(l => l.UnitCell.ID == unitcellID);
+  }
 
   Draw(contextModel: ContextModel) {
     this.layers.reverse().forEach(l => l.Draw(contextModel));
   }
 
-  get Content(): IContextItem[] { return this.layers[0].Content; }
+  get Content(): IContextItem[] { return this.SelectedLayer.Content; }
 
-  AddContent(content: IContextItem) { this.layers[0].AddContent(content); }
-
+  AddContent(content: IContextItem) { this.SelectedLayer.AddContent(content); }
+  ResetPaths() {
+    this.layers.forEach((l, i) => l.ResetPaths());
+  }
   RemoveContent(): IContextItem {
 
-    let item = this.layers[0].RemoveContent();
+    let item = this.SelectedLayer.RemoveContent();
     // this._cells[0].ItemRemoved(item.Id);
     return item;
 
   };
 
   RemoveAllContent() {
-    return this.layers[0].RemoveAllContent();
+    return this.SelectedLayer.RemoveAllContent();
   }
 
   RemoveContentById(id: string) {
-    return this.layers[0].RemoveContentById(id);
+    return this.SelectedLayer.RemoveContentById(id);
   }
 
   CopyItem(itemId: string, newId: string = ''): string {
-    return this.layers[0].CopyItem(itemId, newId);
+    return this.SelectedLayer.CopyItem(itemId, newId);
   }
 
   AddLayer(id: string, name: string, updatedBy: string, updatedOn: Date, displayState: string, content: IContextItem[] = []) {
     this.layers.unshift(new ContextLayer(id, name, updatedBy, updatedOn, displayState, content));
-    //     this.Draw();
   }
 
   SelectLayer(index: number) {
@@ -768,7 +832,7 @@ export class ContextSystem implements IContextSystem {
     }
     let lyr = this.layers.find(l => l.Id == layerId);
     if (!lyr) {
-      lyr = this.layers[0];
+      lyr = this.SelectedLayer;
     }
     return lyr;
   }
@@ -784,33 +848,38 @@ export class ContextSystem implements IContextSystem {
   }
 
   get Paths() {
-    return this.layers[0].Paths;
+    return this.SelectedLayer.Paths;
   }
 
   get Lines() {
-    return this.layers[0].Lines;
+    return this.SelectedLayer.Lines;
   }
 
-  AddText(text: string, textState: string, angle: number = 0) {
-    this.layers[0].AddText(text, textState, angle);
+  AddText(text: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0) {
+    this.SelectedLayer.AddText(text, containerStateName, contentStateName, fromSource, angle);
   }
-  AddImage(imageName: any, imageState: string, angle = 0) {
-    this.layers[0].AddImage(imageName, imageState, angle = 0);
+
+  AddImage(imageName: any, containerStateName: string, contentStateName: string, fromSource: boolean, angle = 0, imageIndex = 0) {
+    this.SelectedLayer.AddImage(imageName, containerStateName, contentStateName, fromSource, angle = 0, imageIndex);
+  }
+
+  AddGeneralShape(id: string, state: string) {
+    this.SelectedLayer.AddGeneralShape(id, state);
   }
 
   AddShape(shape: IShape) {
-    this.layers[0].AddShape(shape);
+    this.SelectedLayer.AddShape(shape);
   }
 
   AddLine(result: any) {
-    this.layers[0].AddLine(result);
+    this.SelectedLayer.AddLine(result);
   }
 
   ClearLayers() {
     this.layers = [];
   }
   RemoveLine(lineName: string) {
-    this.layers[0].RemoveLine(lineName);
+    this.SelectedLayer.RemoveLine(lineName);
   }
 
   AddNewContent(
@@ -838,8 +907,8 @@ export class ContextSystem implements IContextSystem {
         break;
     }
     if (shp) {
-      this.layers[0].AddContent(shp);
-      //      this.activeLayer.SetLayer(this.layers[0]);
+      this.SelectedLayer.AddContent(shp);
+      //      this.activeLayer.SetLayer(this.SelectedLayer);
       return true;
     }
     else {

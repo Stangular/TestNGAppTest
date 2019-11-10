@@ -7,6 +7,7 @@ export enum FreedomOfMotion {
   horizontal = 1,
   vertical = 2
 }
+
 export enum AreaType {
   normal = 0, // width and height change independently
   lockedRatio = 1, // Ratio between width and height remains constant as other dimension changes.

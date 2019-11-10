@@ -124,9 +124,9 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
     if (this.canvasService.EditOn) {
       this.canvasService.Select();
       this.Clear();
-      this.canvasService.DrawSystem(canvasID);
+      this.canvasService.DrawSystem(this.canvasID);
     }
-  }
+  } 
 
   CopySelectedContent() {
     let itemId = this.canvasService.shapeSelectResult.id;

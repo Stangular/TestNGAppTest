@@ -27,7 +27,7 @@
       </mat-grid-tile>
       <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
         <mat-form-field>
-          <mat-select [(ngModel)]="selectedType">
+          <mat-select [(ngModel)]="data.type">
             <mat-option *ngFor="let type of lineTypesss" [value]="type.valuex">
               {{type.namex}}
             </mat-option>
@@ -41,13 +41,12 @@
       </mat-grid-tile>
       <mat-grid-tile [colspan]="12" [rowspan]="1" style="text-align:left">
         <mat-form-field [floatLabel]="'never'">
-          <mat-select [(ngModel)]="stateName">
+          <mat-select [(ngModel)]="data.state">
             <mat-option *ngFor="let state of States" [value]="state">
               {{state}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <!--     <display-state-selector [stateName]="lineState" (stateChange)="OnStateChange($event)"></display-state-selector>-->
       </mat-grid-tile>
       <mat-grid-tile [colspan]="1" [rowspan]="1">
       </mat-grid-tile>

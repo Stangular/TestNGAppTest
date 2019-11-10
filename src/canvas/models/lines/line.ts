@@ -56,10 +56,10 @@ export class PortPath implements IPortPath {
     return false;
   }
 
-  AddPortPoint(pt: Point): number {
+  AddPortPoint(pt: Point,position:number = 0): number {
     //switch (type) {
     //}
-    this.ports.push(pt);
+    this.ports.splice(position,0,pt);
     return this.ports.length - 1;
   }
 
@@ -81,26 +81,26 @@ export class PortPath implements IPortPath {
     switch (type) {
 
       case lineTypes.bezier:
-        p = dx / 4;
-        if (this.ports.length < 4) {
-          this.ports.push(new Point());
-          this.ports.push(new Point());
-        }
-        if (dx > 0) {
-          this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
-          this.ports[3].SetToPosition(this.ports[0].X + (p * 3), this.ports[3].Y + 10);
-        }
-        else {
-          this.ports[2].SetToPosition(this.ports[3].X + p, this.ports[3].Y - 10);
-          this.ports[3].SetToPosition(this.ports[3].X + (p * 3), this.ports[0].Y + 10);
-        }
+        //p = dx / 4;
+        //if (this.ports.length < 4) {
+        //  this.ports.push(new Point());
+        //  this.ports.push(new Point());
+        //}
+        //if (dx > 0) {
+        //  this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
+        //  this.ports[3].SetToPosition(this.ports[0].X + (p * 3), this.ports[3].Y + 10);
+        //}
+        //else {
+        //  this.ports[2].SetToPosition(this.ports[3].X + p, this.ports[3].Y - 10);
+        //  this.ports[3].SetToPosition(this.ports[3].X + (p * 3), this.ports[0].Y + 10);
+        //}
         break;
       case lineTypes.gradient:
-        p = dx / 2;
-        if (this.ports.length < 3) {
-          this.ports.push(new Point());
-        }
-        this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
+        //p = dx / 2;
+        //if (this.ports.length < 3) {
+        //  this.ports.push(new Point());
+        //}
+        //this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
         break;
       case lineTypes.VtoV:
         if (this.ports.length < 4) {
@@ -188,7 +188,7 @@ export class Line implements ILine {
     private type: lineTypes = lineTypes.straight) {
     //   let t = this.type;
     //   this._paths = paths.concat([]);
-    this._state = DisplayValues.GetLineIndex(this.Id + "_state", state);
+    this._state = DisplayValues.GetLineIndex(this.StateName, state);
     // paths.forEach(function (p, i) { p.SetInterimPorts(t); });
   }
 

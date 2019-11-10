@@ -167,8 +167,7 @@
               <input matInput
                      [matAutocomplete]="portnames"
                      [formControl]="portName">
-              <mat-autocomplete #portnames="matAutocomplete"
-                                (closed)="PortSelected()">
+              <mat-autocomplete #portnames="matAutocomplete">
                 <mat-option *ngFor="let port of ports | async" [value]="port.Id">
                   <span>{{port.Id}}</span>
                 </mat-option>
@@ -183,7 +182,7 @@
             </div>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="5" [rowspan]="1">
-            <mat-select placeholder="Select Path" [(ngModel)]="data.port.path">
+            <mat-select placeholder="Select Path" [(ngModel)]="data.port.path" (selectionChange)="PathChange($event)">
               <mat-option *ngFor="let path of canvasService.BaseSystem.Paths" [value]="path.Id">
                 {{path.Id + ' : '+ path.LineId}}
               </mat-option>
@@ -191,7 +190,7 @@
           </mat-grid-tile>
           <mat-grid-tile [colspan]="1" [rowspan]="1">
           </mat-grid-tile>
-          <mat-grid-tile [colspan]="16" [rowspan]="1">
+          <mat-grid-tile [colspan]="8" [rowspan]="1">
             <div style="width:100%; text-align:left;padding:5px">
               <label style="font-size:12px; font-weight:bold">Offset from center</label>
               <div style="width:100%; margin-top:5px">
@@ -233,22 +232,43 @@
       </mat-tab>
       <mat-tab label="Content">
         <mat-grid-list cols="16" rowHeight="40px">
-          <mat-grid-tile [colspan]="1" [rowspan]="1">
+          <mat-grid-tile [colspan]="2" [rowspan]="1">
             <div style="width:100%; text-align:left">
-              <label>Text</label>
+              <label>Content</label>
             </div>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="8" [rowspan]="2">
+            <mat-radio-group name="freedomOfMotion" [(ngModel)]="contentType" class="toolbar-radio-group">
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="contentType==ct.text"
+                                [value]="ct.text">Text</mat-radio-button>
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="contentType==ct.image"
+                                [value]="ct.image">Image</mat-radio-button>
+              <mat-radio-button class="toolbar-radio-button"
+                                [checked]="contentType==ct.general"
+                                [value]="ct.general">General</mat-radio-button>
+            </mat-radio-group>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="5" [rowspan]="1">
             <mat-form-field class="full-width" [floatLabel]="'never'">
               <input matInput
-                     [(ngModel)]="textContent">
+                     [matAutocomplete]="contentText"
+                     style="width:100%"
+                     placeholder="name"
+                     [formControl]="textContentItem">
+              <mat-autocomplete #contentText="matAutocomplete">
+                <mat-option *ngFor="let shape of textContentItems | async" [value]="shape.Content.content">
+                  <span>{{shape.Content.content}}</span>
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="5" [rowspan]="1">
-            <mat-checkbox [(ngModel)]="textFromDataSource">From Data Source</mat-checkbox>
+            <mat-checkbox [(ngModel)]="fromDataSource">From Data Source</mat-checkbox>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="3" [rowspan]="1">
-            <button mat-stroked-button color="warn" (click)="AddText()">
+            <button mat-stroked-button color="warn" (click)="AddContent()">
               Add
             </button>
             <mat-grid-tile [colspan]="2" [rowspan]="1">
@@ -257,50 +277,85 @@
           <mat-grid-tile [colspan]="2" [rowspan]="1">
           </mat-grid-tile>
           <mat-grid-tile [colspan]="1" [rowspan]="1">
-            <label class="xLabel">State</label>
+            <label class="xLabel">Content State</label>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="6" [rowspan]="1">
-            <display-state-selector [stateName]="data.state" (stateChange)="OnTextStateChange($event)"></display-state-selector>
+            <div *ngIf="contentType != ct.general"></div>
+            <mat-form-field [floatLabel]="'never'">
+              <mat-select [(ngModel)]="contentState">
+                <mat-option *ngFor="let state of States" [value]="state">
+                  {{state}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="1" [rowspan]="1">
-            <label class="xLabel">Angle</label>
+            <label class="xLabel">Container State</label>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="6" [rowspan]="1">
+            <mat-form-field [floatLabel]="'never'">
+              <mat-select [(ngModel)]="containerState">
+                <mat-option *ngFor="let state of States" [value]="state">
+                  {{state}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </mat-grid-tile>
+          <mat-grid-tile [colspan]="1" [rowspan]="1">
+            <div *ngIf="contentType != ct.general">
+              <label class="xLabel">Angle</label>
+            </div>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="4" [rowspan]="1">
-            <mat-form-field class="full-width" [floatLabel]="'never'">
-              <input matInput type="number" min="0" max="90"
-                     [(ngModel)]="textAngle">
-            </mat-form-field>
+            <div *ngIf="contentType != ct.general">
+              <mat-form-field class="full-width" [floatLabel]="'never'">
+                <input matInput type="number" min="0" max="90"
+                       [(ngModel)]="contentAngle">
+              </mat-form-field>
+            </div>
             <mat-grid-tile [colspan]="2" [rowspan]="1">
             </mat-grid-tile>
           </mat-grid-tile>
-          <mat-grid-tile [colspan]="1" [rowspan]="1">
-            <div style="width:100%; text-align:left">
-              <label class="xLabel">Image</label>
-            </div>
-          </mat-grid-tile>
-          <mat-grid-tile [colspan]="5" [rowspan]="1">
-            <mat-form-field class="full-width" [floatLabel]="'never'">
-              <input matInput
-                     [(ngModel)]="imageContentURL">
-            </mat-form-field>
-          </mat-grid-tile>
-          <mat-grid-tile [colspan]="5" [rowspan]="1">
-            <mat-checkbox [(ngModel)]="imageFromDataSource">From Data Source</mat-checkbox>
-          </mat-grid-tile>
-          <mat-grid-tile [colspan]="3" [rowspan]="1">
-            <button mat-stroked-button color="warn" (click)="AddImage()">
-              Add
-            </button>
-          </mat-grid-tile>
+          <!--<mat-grid-tile [colspan]="1" [rowspan]="1">
+    <div style="width:100%; text-align:left">
+      <label class="xLabel">Image</label>
+    </div>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="5" [rowspan]="1">
+    <mat-form-field class="full-width" [floatLabel]="'never'">
+      <input matInput
+             [matAutocomplete]="contentImage"
+             style="width:100%"
+             placeholder="name"
+             [formControl]="imageContentItem">
+      <mat-autocomplete #contentImage="matAutocomplete">
+        <mat-option *ngFor="let shape of imageContentItems | async" [value]="shape.Content.content">
+          <span>{{shape.Content.content}}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>-->
+          <!--<mat-form-field class="full-width" [floatLabel]="'never'">
+    <input matInput
+           [(ngModel)]="imageContentURL">
+  </mat-form-field>-->
+          <!--</mat-grid-tile>-->
+          <!--<mat-grid-tile [colspan]="5" [rowspan]="1">
+    <mat-checkbox [(ngModel)]="imageFromDataSource">From Data Source</mat-checkbox>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="3" [rowspan]="1">
+    <button mat-stroked-button color="warn" (click)="AddImage()">
+      Add
+    </button>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="2" [rowspan]="1">
+  </mat-grid-tile>-->
           <mat-grid-tile [colspan]="2" [rowspan]="1">
-          </mat-grid-tile>
-          <mat-grid-tile [colspan]="2" [rowspan]="1">
-            <div *ngIf="selectedImage != null && !imageFromDataSource">
+            <div *ngIf="selectedImage != null && !imageFromDataSource && contentType == ct.image">
               <img with="20" height="20" src={{ImagePath}}>
             </div>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="14" [rowspan]="1">
-            <div *ngIf="!imageFromDataSource" style="width:100%">
+            <div *ngIf="!imageFromDataSource && contentType == ct.image" style="width:100%">
               <mat-select [(ngModel)]="selectedImage" (selectionChange)="ImageChange($event)">
                 <mat-option *ngFor="let image of canvasService.AvailableImages" [value]="image.Name">
                   <img with="20" height="20" src={{image.Path}}>
@@ -310,12 +365,14 @@
             </div>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="16" [rowspan]="5">
-            <image-upload [url]="ImagePostURL"
-                          [headers]="{path:'S:\\Projects\\repos\\Angular6Sandbox\\TestNGApp2\\images'}"
-                          (uploadFinished)="onUploadFinished($event)"
-                          (uploadStateChanged)="onUploadStateChanged($event)">
-            </image-upload>
-            <div class="ui one wide column">
+            <div *ngIf="contentType == ct.image">
+              <image-upload [url]="ImagePostURL"
+                            [headers]="{path:'S:\\Projects\\repos\\Angular6Sandbox\\TestNGApp2\\images'}"
+                            (uploadFinished)="onUploadFinished($event)"
+                            (uploadStateChanged)="onUploadStateChanged($event)">
+              </image-upload>
+            </div>
+            <div *ngIf="contentType == ct.image" class="ui one wide column">
               <img class="ui image small" style="margin-right: 10px;" src="{{urlToImage}}" />
             </div>
           </mat-grid-tile>

@@ -306,9 +306,10 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   ManageUnitCell(): void {
     const dialogRef = this.dialog.open(UnitCellDialogComponent, {
       width: '450px',
-      data: {}});
+      data: {name:''}});
 
     dialogRef.afterClosed().subscribe(result => {
+      this.canvasService.UpdateCell(result);
     });
   }
 
@@ -329,7 +330,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
 
     dialogRef.afterClosed().subscribe(result => {
       this.canvasService.ActiveShape.SetProperties(result);
-      this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
+      this.canvasService.UpdateCanvas();
     });
   }
 

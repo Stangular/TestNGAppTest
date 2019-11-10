@@ -27,15 +27,15 @@
     <mat-grid-tile [colspan]="16" [rowspan]="2" style="text-align:left">
       <div mat-dialog-actions class="button-row" style="padding-left:100px; width:100%">
         <button mat-stroked-button color="warn"
-                [mat-dialog-close]="data" cdkFocusInitial>
+                [mat-dialog-close]="data" cdkFocusInitial >
           Remove
         </button>
         <button mat-stroked-button color="primary"
-                [mat-dialog-close]="data" cdkFocusInitial>
+                [mat-dialog-close]="data" cdkFocusInitial >
           {{okMessage}}
         </button>
         <button mat-stroked-button
-                color="basic" (click)="onNoClick()">
+                color="basic" (click)="onCancelClick()">
           {{cancelMessage}}
         </button>
       </div>
