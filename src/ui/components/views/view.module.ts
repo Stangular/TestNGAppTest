@@ -20,6 +20,7 @@ import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 import { SelectListComponent } from '../select/form-list-select.component';
 import { CanvasShapePropertyDialogComponent } from './form/dialogs/canvas-shape-property-dialog/canvas-shape-property-dialog.component';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { MapModule } from 'src/Maps/map.module';
 
 library.add(
   faCoffee
@@ -30,6 +31,7 @@ library.add(
 @NgModule({
   imports: [
     CommonModule
+    , MapModule
     , FormsModule
     , ReactiveFormsModule
     , CanvasModule

@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { DataHTTPService } from '../../../dataManagement/service/dataHTTP.service';
 //import { Observable, Subject } from 'rxjs';
 import { TokenService } from '../token/token.service';
+import * as moment from 'moment';
+
 @Injectable()
 export class UserService {
   //private subject = new Subject<any>();
@@ -20,6 +22,11 @@ export class UserService {
     let u = window.localStorage.getItem('user');
     if (u) {
       this.userModel = JSON.parse(u);
+      let m1 = moment();
+      let m2 = moment(this.userModel.expiration);
+      if (m1 > m2) {
+        this.userModel.token = '';
+      }
       this.tokenService.Token = this.userModel.token;
     }
   }

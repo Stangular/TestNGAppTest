@@ -79,10 +79,9 @@ export class DataHTTPService {
    // let options = new RequestOptions({ headers: this._headers, params: myParams });
 
     let self = this;
-    return this.http.get(restPath, this.httpOptions(myParams))
-      .pipe(map(response => this.processData(response), catchError(this.handleError)));
+    return this.http.get(restPath)
+      .pipe(map(response => self.processData(response), catchError(self.handleError)));
   }
-
 
   startUpPromise(restPath: string): Promise<any> {
     this._startupData = null;

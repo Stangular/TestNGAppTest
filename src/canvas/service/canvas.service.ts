@@ -353,7 +353,13 @@ export class CanvasService {
     let s: Shape = null;
     switch (shape.type) {
       case 1:
-        s = new Ellipse(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId);
+        s = new Ellipse(
+          shape.id,
+          shape.top,
+          shape.left,
+          shape.width,
+          shape.height,
+          shape.displayValueId);
         break;
       default:
         if (shape.textContent) {
@@ -364,7 +370,14 @@ export class CanvasService {
             c.content,
             c.fromSource || false,
             c.angle);
-          s = new TextShape(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId, content);
+          s = new TextShape(
+            shape.id,
+            shape.top,
+            shape.left,
+            shape.width,
+            shape.height,
+            shape.displayValueId,
+            content);
         }
         else if (shape.imageContent) {
           let c = shape.imageContent;
@@ -374,18 +387,38 @@ export class CanvasService {
             c.displayValueId,
             c.content,
             c.fromSource || false,
-            c.angle,
+            c.angle, 
             imageIndex);
 
-          s = new ImageShape(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId, content);
+          s = new ImageShape(
+            shape.id,
+            shape.top,
+            shape.left,
+            shape.width,
+            shape.height,
+            shape.displayValueId,
+            content);
         }
         else {
-          s = new Rectangle(shape.id, shape.top, shape.left, shape.width, shape.height, shape.displayValueId);
+          s = new Rectangle(
+            shape.id,
+            shape.top,
+            shape.left,
+            shape.width,
+            shape.height,
+            shape.displayValueId);
         }
         break;
     }
     shape.ports.forEach(function (p, i) {
-      let port = new Port(p.portId, p.offsetX, p.offsetY, s, ePortType.source, '', p.pathId, p.pathOrder);
+      let port = new Port(
+        p.portId,
+        p.offsetX,
+        p.offsetY, s,
+        ePortType.source,
+        '',
+        p.pathId,
+        p.pathOrder);
       s.AddPort(port);
     });
     shape.shapes.forEach(function (shp, i) {
@@ -466,4 +499,7 @@ export class CanvasService {
     this.FinishedLoading();
   }
 
+  AddPath() {
+   // this.BaseSystem.AddPathSegment()
+  }
 }

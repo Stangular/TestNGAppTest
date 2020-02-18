@@ -30,7 +30,7 @@ export class TextShape extends ContentShape {
   
   CopyShape(newID: string): TextShape {
 
-    return new TextShape(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.content as TextContent);
+    return new TextShape(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName, this.content as TextContent);
   }
 
   CopyItem(newID: string) {

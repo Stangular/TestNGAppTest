@@ -2,23 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\app",
-    "\\src\\app\\user",
-    "\\src\\app\\user\\app-user-component",
-    "\\src\\app\\user\\service",
-    "\\src\\canvas",
-    "\\src\\canvas\\dashboard",
-    "\\src\\canvas\\dashboard\\dashboard-page",
-    "\\src\\canvas\\dashboard\\dashboard-page\\models",
-    "\\src\\canvas\\models\\lines",
-    "\\src\\canvas\\models\\lines\\service",
-    "\\src\\ui",
-    "\\src\\ui\\components",
-    "\\src\\ui\\components\\views",
-    "\\src\\ui\\components\\views\\form",
-    "\\src\\ui\\components\\views\\form\\dialogs",
-    "\\src\\ui\\components\\views\\form\\dialogs\\addline"
+    "\\src\\Maps"
   ],
-  "SelectedNode": "\\src\\canvas\\component\\dialogs\\unitcell\\unitCellPropertyDialog.component.html",
+  "SelectedNode": "\\src\\Maps",
   "PreviewInSolutionExplorer": false
 }

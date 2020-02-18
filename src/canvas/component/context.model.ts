@@ -145,7 +145,7 @@ export class ContextModel {
       return;
     }
     let ctx = this._context[this._currentLayer].Context;
-    
+
     if (!ctx) { return; }
     ctx.beginPath();
     ctx.save();
@@ -153,14 +153,11 @@ export class ContextModel {
       let w = this.MeasureText(content.Content, shape.Height, content.StateIndex);
       shape.SizeBy(this, shape.Top, shape.Left + w, shape.Bottom, shape.Left);
     }
-    // let w = context.measureText(this.content.Content).width;
-    // this._container.SizeBy(this._container.Top, w + (w / 10)) = w + (w / 10);
     ctx.translate(shape.Left, shape.Top);
-    ctx.rotate(content.Angle);
+    ctx.rotate(content.Angle * Math.PI / 180);
     ctx.rect(0, 0, shape.Width, shape.Height);
     ctx.fillStyle = DisplayValues.GetColor(shape.StateIndex.Index[UIStates.background]);
     ctx.fill();
-    //  context.lineWidth = 5; //DisplayValues.GetWeight(this.state.Index[UIStates.weight]);
     ctx.strokeStyle = DisplayValues.GetColor(content.StateIndex.Index[UIStates.foreground]);
 
     ctx.font = shape.Height + "px " + DisplayValues.GetFont(content.StateIndex.Index[UIStates.fontFace]);
