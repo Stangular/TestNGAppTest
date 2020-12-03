@@ -32,31 +32,31 @@ import Feature from 'ol/Feature.js';
 import * as geom from 'ol/geom';
 import * as proj from 'ol/proj';
 
-@Component({
-  selector: 'ol-map',
-  templateUrl: './USHistoricData.component.html',
-  styleUrls: ['./USHistoricData.component.css']
-})
+//@Component({
+//  selector: 'ol-map',
+//  templateUrl: './USHistoricData.component.html',
+//  styleUrls: ['./USHistoricData.component.css']
+//})
 
-export class USHistoryDataComponent implements OnInit {
+//export class USHistoryDataComponent implements OnInit {
 
 
-  constructor() {
-  }
+//  constructor() {
+//  }
 
-  ngOnInit() {
+//  ngOnInit() {
 
-  }
-  //onMoveEnd(event: any) {
-  //  var zoom = this._map.getView().getZoom();
-  //  var sss = 0;
-  //}
+//  }
+//  //onMoveEnd(event: any) {
+//  //  var zoom = this._map.getView().getZoom();
+//  //  var sss = 0;
+//  //}
 
-  ngAfterViewInit() {
+//  ngAfterViewInit() {
 
     
-  }
-}
+//  }
+//}
 
     //new Tile({
     //  source: new XYZ({

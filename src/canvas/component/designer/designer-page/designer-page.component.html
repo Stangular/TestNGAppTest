@@ -2,7 +2,7 @@
                [rowHeight]="60">
   <mat-grid-tile [colspan]="32"
                  [rowspan]="1"
-                 [style.background]="yellow">
+                 [style.background]="bgColor">
     <div style="width:100%; text-align:center">
       <app-canvas-designer-property-toolbar [PropertyId]="selectedId"
                                             [selectedItemTop]="editTop"
@@ -19,7 +19,7 @@
   </mat-grid-tile>
   <mat-grid-tile [colspan]="32"
                  [rowspan]="11"
-                 [style.background]="transparent">
+                 [style.background]="transparentBG">
     <static-canvas *ngIf="!canvasService.EditOn"
                  [canvasID]="canvasService.SelectedUnitCellId"
                  [width]="1000"

@@ -61,7 +61,7 @@ export class CanvasGraphicStateDialogComponent implements OnInit {
    // this.stateName.setValue("");
   }
 
-  private get StateIndex() {
+  public get StateIndex() {
     return DisplayValues.GetColorIndex(this.data.state);
   }
 

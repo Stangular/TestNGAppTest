@@ -7,9 +7,9 @@
                [rowHeight]="47">
   <mat-grid-tile [colspan]="32"
                  [rowspan]="16"
-                 [style.background]="red">
+                 [style.background]="bgColor">
     <mat-drawer-container class="map-container" [hasBackdrop]="false">
-      <mat-drawer #drawer [mode]="side">
+      <mat-drawer #drawer [mode]="mode">
 
         <div style="display:inline-block; padding-right:5px">
           <button mat-icon-button (click)="drawer.toggle()">
@@ -20,6 +20,7 @@
           <mat-label>US History</mat-label>
         </div>
         <div>    </div>
+        <mat-slide-toggle [(ngModel)]="showTopo" (change)="ToggleTopo($event)">Show Topo</mat-slide-toggle>
         <div style="padding-left:5px; padding-right:5px">
           <mat-label>Year</mat-label>
         </div>

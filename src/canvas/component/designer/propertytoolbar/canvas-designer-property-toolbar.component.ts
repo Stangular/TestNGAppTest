@@ -88,7 +88,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
     public portService: PortService,
     public pathService: PathService,
     public vcRef: ViewContainerRef
-    , private canvasService: CanvasService
+    , public canvasService: CanvasService
     , private cpService: ColorPickerService
     , public dialog: MatDialog
     , fb: FormBuilder

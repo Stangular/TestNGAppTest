@@ -2,8 +2,14 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\Maps"
+    "\\src\\app",
+    "\\src\\app\\popup",
+    "\\src\\const",
+    "\\src\\FamilyLineage",
+    "\\src\\Maps",
+    "\\src\\ui",
+    "\\src\\ui\\components"
   ],
-  "SelectedNode": "\\src\\Maps",
+  "SelectedNode": "\\src\\app\\app.module.ts",
   "PreviewInSolutionExplorer": false
 }

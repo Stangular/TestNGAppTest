@@ -30,8 +30,8 @@ export class AppDataService {
     }
 
     HasContent(type: string) {
-        let list = this._appData.Lists.find(l => l.listName == type);
-        return (!!list && list.items.length > 0);
+        //let list = this._appData.Lists.find(l => l.listName == type);
+        //return (!!list && list.items.length > 0);
     }
 
     PromiseLoad(appName: string = ''): Promise<any> {

@@ -49,7 +49,7 @@ export class FormPagingComponent implements OnInit {
     let options = [5, 10, 25, 50, 100, 200];
     options = options.filter(i => i <= this.recordCount);
     let i = options.findIndex(i => i == this.recordCount);
-    if (i < 0) {
+    if (i < 0) {-
       options.push(this.recordCount);
     }
     return options;

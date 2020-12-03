@@ -71,13 +71,13 @@ export class ShapePropertyDialogComponent implements OnInit{
   contentState = '';
   containerState = '';
   fromDataSource = false;
-  @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();;
+  @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();
   fom = FreedomOfMotion;
   ot = objectTypes;
   at = AreaType;
   ct = ContentType;
 
-  constructor(private canvasService: CanvasService,
+  constructor(public canvasService: CanvasService,
     public dialogRef: MatDialogRef<ShapePropertyDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IShapeData
     , public dialog: MatDialog) {}

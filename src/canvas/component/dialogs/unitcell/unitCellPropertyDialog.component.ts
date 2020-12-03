@@ -40,7 +40,7 @@ export class UnitCellDialogComponent implements OnInit {
   textState = "";
   @Output() stateChange: EventEmitter<string> = new EventEmitter<string>();
 
-  constructor(private canvasService: CanvasService,
+  constructor(public canvasService: CanvasService,
     public dialogRef: MatDialogRef<UnitCellDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ICellData
     , public dialog: MatDialog) { }

@@ -19,7 +19,7 @@
                  [formControl]="portName">
           <mat-autocomplete #portnames="matAutocomplete" 
                  (closed)="PortSelected()">
-            <mat-option *ngFor="let port of ports | async" [value]="port.Id">
+            <mat-option *ngFor="let port of ports" [value]="port.Id">
               <span>{{port.Id}}</span>
             </mat-option>
           </mat-autocomplete>

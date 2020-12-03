@@ -21,6 +21,10 @@ import { SelectListComponent } from '../select/form-list-select.component';
 import { CanvasShapePropertyDialogComponent } from './form/dialogs/canvas-shape-property-dialog/canvas-shape-property-dialog.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { MapModule } from 'src/Maps/map.module';
+import { SandboxComponent } from '../../../app/sandbox/sandbox.component';
+import { PlaceComponent } from 'src/components/place/place.component';
+import { PlaceTreeComponent } from 'src/components/placetree/placetree.component';
+import { FamilyLineageModule } from 'src/FamilyLineage/family-lineage.module';
 
 library.add(
   faCoffee
@@ -38,6 +42,7 @@ library.add(
     , ngMaterialModule
     , FontAwesomeModule
     , ColorPickerModule
+    , FamilyLineageModule
     , Ng4LoadingSpinnerModule.forRoot()
   ],
 
@@ -53,6 +58,9 @@ library.add(
     , SelectListComponent
     , AcknowlegeDeleteDialog
     , CanvasShapePropertyDialogComponent
+    , PlaceComponent
+    , PlaceTreeComponent
+    , SandboxComponent
   ],
   exports: [
     DetailViewComponent
@@ -62,6 +70,9 @@ library.add(
     , FormFilteringComponent
     , SaveFormSuccessSnackComponent
     , AcknowlegeDeleteDialog
+    , SandboxComponent
+    , PlaceComponent
+    , PlaceTreeComponent
     , CanvasShapePropertyDialogComponent],
   entryComponents: [
     AcknowlegeDeleteDialog

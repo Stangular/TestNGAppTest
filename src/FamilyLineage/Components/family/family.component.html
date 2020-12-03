@@ -1,0 +1,16 @@
+<p>
+  <app-auto-complete-edit
+                          [label]="'Surname:'"
+                          [source]="surnames"
+                          [control]="surnameControl"
+                          (AddNew)="AddSurname($event)"
+                          (RemoveSelection)="RemoveSurname($event)"
+                          (SearchSelection)="SearchSurname($event)"
+                          (ClearSelection)="ClearSelection($event)">
+  </app-auto-complete-edit>
+  <app-auto-complete-edit
+                          [label]="'Members:'"
+                          [source]="members"
+                          [control]="personControl">
+  </app-auto-complete-edit>
+</p>

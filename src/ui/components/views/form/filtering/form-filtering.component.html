@@ -30,7 +30,7 @@
           </div>
         </mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">
-          <div style="text-align:left" *ngIf="selectedLowerElement.Type == 'text'">
+          <div style="text-align:left" *ngIf="selectedLowerElement.Type() == 'text'">
             <mat-slide-toggle class="example-margin"
                               [(ngModel)]="asContent"
                               [checked]="asContent">

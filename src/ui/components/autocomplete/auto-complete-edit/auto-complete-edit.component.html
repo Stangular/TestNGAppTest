@@ -1,0 +1,68 @@
+<mat-grid-list cols="32" rowHeight="35px">
+  <mat-grid-tile [colspan]="8"
+                 [rowspan]="1">
+    <label style="padding-right:25px">{{label}}</label>
+    <mat-form-field class="shapeClassInput"
+                    style="width:90%"
+                    [floatLabel]="'never'">
+      <input matInput
+             id="stateName"
+             [matAutocomplete]="itemauto"
+             [formControl]="control">
+      <mat-autocomplete #itemauto="matAutocomplete">
+        <mat-option *ngFor="let item of items | async" [value]="item.Content()">
+          <span>{{item.Content()}}</span>
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="24">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="6"
+                 [rowspan]="1">
+    <div style="padding-left:80px">
+      <button [disabled]="State != 1"
+              (click)="Add()"
+              style="background-color:transparent;border-color:transparent;">
+        <mat-icon aria-label="Ascending"
+                  style="cursor:pointer">
+          add
+        </mat-icon>
+      </button>
+      <button [disabled]="State != 2"
+              (click)="Remove()"
+              style="background-color:transparent;border-color:transparent;">
+        <mat-icon aria-label="Ascending"
+                  style="cursor:pointer">
+          remove
+        </mat-icon>
+      </button>
+      <button [disabled]="State == 0"
+              (click)="Search()"
+              style="background-color:transparent;border-color:transparent;">
+        <mat-icon aria-label="Ascending"
+                  style="cursor:pointer">
+          search
+        </mat-icon>
+      </button>
+      <button [disabled]="State == 0"
+              (click)="Clear()"
+              style="background-color:transparent;border-color:transparent;">
+        <mat-icon aria-label="Ascending"
+                  style="cursor:pointer">
+          cancel
+        </mat-icon>
+      </button>
+      <button [disabled]="State == 0"
+              (click)="Sort()"
+              style="background-color:transparent;border-color:transparent;">
+        <mat-icon aria-label="Ascending"
+                  style="cursor:pointer">
+          sort
+        </mat-icon>
+      </button>
+    </div>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="26">
+  </mat-grid-tile>
+</mat-grid-list>

@@ -9,11 +9,6 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:4220/",
-            "runtimeArgs": [
-              "--disable-web-security",
-              "--user-data-dir",
-              "--remote-debugging-port=9222"
-            ],
             "sourceMaps": true,
             "webRoot": "${workspaceFolder}"
         }

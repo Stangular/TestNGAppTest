@@ -1,0 +1,70 @@
+<form [formGroup]="pForm">
+  <mat-grid-list [cols]="16" [rowHeight]="60">
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <button mat-icon-button color="accent" aria-label="" (click)="ParentToChild()">
+        <mat-icon aria-hidden="false" style="color:lightblue;cursor:pointer" aria-label="Make Parent">arrow_downward</mat-icon>
+      </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="15" [rowspan]="1">
+      <mat-form-field floatlabel="'never'">
+        <mat-label>Parent:</mat-label>
+        <input type="text"
+               matInput
+               style="width:50%"
+               [formControl]="parentName"
+               [matAutocomplete]="parent" />
+        <mat-autocomplete #parent="matAutocomplete" (closed)="ParentClosed($event)" (optionSelected)="ParentSelected($event)">
+          <mat-option *ngFor="let place of parentItems | async" [value]="place.Name">
+            {{place.Name}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <button mat-icon-button color="accent" aria-label="" (click)="ChildToParent()">
+        <mat-icon aria-hidden="false" style="color:lightcoral;cursor:pointer" aria-label="Make Parent">arrow_upward</mat-icon>
+      </button>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="15" [rowspan]="1">
+      <mat-form-field floatlabel="'never'">
+        <mat-label>Name:</mat-label>
+        <input type="text"
+               matInput
+               style="width:50%"
+               [formControl]="childName"
+               [matAutocomplete]="name" />
+        <mat-autocomplete #name="matAutocomplete">
+          <mat-option *ngFor="let place of childItems | async" [value]="place.Name">
+            {{place.Name}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="15" [rowspan]="1">
+      <mat-form-field floatlabel="never">
+        <mat-label>Type:</mat-label>
+        <input type="text"
+               aria-label="Number"
+               matInput
+               style="width:50%;"
+               [formControl]="placetype"
+               [matAutocomplete]="type">
+        <mat-autocomplete #type="matAutocomplete">
+          <mat-option *ngFor="let option of types" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="15" [rowspan]="1">
+      <div style="width:100%; height:50px; padding-left:5%">
+        <button mat-raised-button color="primary" (click)="SavePlace()">Update</button>
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+</form>
+.

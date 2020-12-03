@@ -15,7 +15,8 @@ import { PortService } from 'src/canvas/models/shapes/service/port.service';
   styleUrls: ['./designer-page.component.css']
 })
 export class DesignerPageComponent implements OnInit {
-
+  bgColor: string = 'yellow';
+  transparentBG: string = 'transparent';
   editTop: number = 0;
   editLeft: number = 0;
   editWidth: number = 0;
@@ -31,7 +32,7 @@ export class DesignerPageComponent implements OnInit {
   constructor(
     private portService: PortService,
     private lineService: LineService,
-    private canvasService: CanvasService
+    public canvasService: CanvasService
     , private messageService: MessageService
   ) {
 

@@ -50,7 +50,7 @@ export class UpdateLineDialog implements OnInit {
   selectedType = "0";
   constructor(
     public lineService: LineService,
-    private canvasService: CanvasService,
+    public canvasService: CanvasService,
     public pathService: PathService,
     public dialogRef: MatDialogRef<UpdateLineDialog>,
     @Inject(MAT_DIALOG_DATA) public data: LineData

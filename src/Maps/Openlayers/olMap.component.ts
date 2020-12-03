@@ -34,25 +34,249 @@ import * as geom from 'ol/geom';
 import * as proj from 'ol/proj';
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { CanvasService } from 'src/canvas/service/canvas.service';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
-export class Place{
-  constructor(private _name: string, private _type: string, private _parent: string) { }
+export interface IListItem {
+  SelectItemById(id: any): boolean;
+  SelectItem(searchData: any): boolean;
+}
+
+export interface IIndexer {
+  SelectItemById(id: any): boolean;
+  SelectItem(searchData: any): boolean;
+  ValidItem(): boolean;
+  SelectedItem(): any;
+  AddItem(item: any): boolean ;
+  RemoveItem(index: any): boolean;
+  First(): boolean;
+  Last(): boolean;
+  Next(): boolean;
+  Previous(): boolean;
+  Set(index: number): boolean;
+}
+
+export class Indexer implements IIndexer{
+  private _index = -1;
+  private _count: number = -1;
+  constructor(protected _items: IListItem[] = []) {
+    this._count = this._items.length;
+    this.Last();
+  }
+
+  SelectItemById(id: any): boolean {
+    this._index = this._items.findIndex(i => i.SelectItemById(id));
+    return this.ValidItem();
+ };
+
+  SelectItem(searchData: any): boolean {
+    this._index = this._items.findIndex(i => i.SelectItem(searchData));
+    return this.ValidItem();
+  }
+
+
+  ValidItem() : boolean {
+    return (this._index >= 0 && this._index < this._count);
+  }
+
+  SelectedItem(): IListItem {
+    return (this.ValidItem) ? this._items[this._index] : null;
+  }
+
+  AddItem(item: IListItem): boolean {
+    if (item) {
+      this._items.push(item);
+      this._count = this._count + 1;
+      this._index = this._count - 1;
+      return true;
+    }
+    return false;
+  }
+
+  RemoveItem(): boolean {
+    if (this.ValidItem()) {
+      this._items = this._items.slice(this._index,1);
+      this._count = this._count - 1;
+      if (this._index >= this._count) { this._index = this._count - 1; }
+      return true;
+    }
+    return false;
+  }
+
+  First(): boolean { return this.Set(0); }
+  Last(): boolean { return this.Set(this._count - 1); }
+  Next(): boolean { return this.Set(this._index + 1); }
+  Previous(): boolean{ return this.Set(this._index - 1); }
+  Set(index: number) : boolean {
+    if (this.ValidItem()) {
+      this._index = index;
+      return true;
+    }
+    return false;
+  }
+}
+export class PlaceType {
+  constructor(private _name: string, private parentType: string) { }
 
   get Name() { return this._name; }
-  get Parent() { return this._parent; }
-  get Type() { return this._type;}
-
+  get Parent() { return this.parentType; }
 }
-export class Event {
-  
-  constructor(private _id: string, private _year: number, private _description: string, private _place: Place) {}
+
+class PlaceA implements IListItem {
+  constructor(
+    private _idsss: string,
+    private _name: string,
+    private _type: PlaceType,
+    private _parentID: string,
+    private _lat = 0.0,
+    private _lon = 0.0,
+    private _aka: string[] = []) { }
+
+  SelectItemById(id: any): boolean { return this.ID == <string>id; }
+  SelectItem(searchData: any): boolean {
+    return this.IsPlace(searchData as string);
+  }
+  get ID() { return this._idsss; }
+  get Name() { return this._name; }
+  get Parent() { return this._parentID; }
+  get Type() { return this._type; }
+  IsPlace(name: string): boolean {
+    let n = name.toLowerCase();
+    return (
+      this._name.toLowerCase() == n ||
+      this._aka.findIndex(a => a.toLowerCase() == n) >= 0);
+  }
+}
+
+export class Places extends PlaceA implements IIndexer {
+  _indexer: IIndexer;
+  constructor(
+    id: string,
+    name: string,
+    type: PlaceType,
+    parentID: string,
+    lat = 0.0,
+    lon = 0.0,
+    aka: string[] = [],
+    places: PlaceA[] = []) {
+    super(id, name, type, parentID, lat, lon, aka);
+    this._indexer = new Indexer(places);
+  }
+
+  AddPlace(id: string, name: string, type: PlaceType, parentID: string) {
+    this.AddItem(new PlaceA(id, name, type, parentID));
+  }
+
+  SelectItemById(id: any): boolean { return this._indexer.SelectItemById(id); }
+  SelectItem(searchData: any): boolean { return this._indexer.SelectItemById(searchData); }
+
+  ValidItem(): boolean { return this._indexer.ValidItem(); }
+  SelectedItem(): any { return this._indexer.SelectedItem(); }
+  AddItem(item: any): boolean { return this._indexer.AddItem(item); }
+  RemoveItem(index: any): boolean { return this._indexer.RemoveItem(index); }
+  First(): boolean { return this._indexer.First(); }
+  Last(): boolean { return this._indexer.Last(); }
+  Next(): boolean { return this._indexer.Next(); }
+  Previous(): boolean { return this._indexer.Previous(); }
+  Set(index: number): boolean { return this._indexer.Set(index); }
+}
+
+export class HistoricEvent implements IListItem {
+  constructor(
+    protected _id: string,
+    protected _year: number,
+    protected _description: string,
+    protected _where: string[] = [],
+    protected _citation: string = '') { }
+
+  SelectItemById(id: any): boolean { return this._id == <string>id; }
+  SelectItem(searchData: any): boolean {
+    let data = searchData as { year: number, where: string[] };
+    if (this._year != data.year) {
+      return false;
+    }
+    let result = true;
+    this._where.forEach(function (p, i) {
+      if (data.where[i] != p) {
+        result == false;
+      }
+    });
+    return result;
+  }
 
   get ID() { return this._id; }
   get Year() { return this._year; }
   get Description() { return this._description; }
-  get PlaceName() { return this._place; }
-
+  get Where() { return this._where; }
+  get Citation() { return this._citation; }
 }
+
+export class HistoricEvents extends HistoricEvent implements IIndexer {
+  _indexer: IIndexer ;
+  constructor(id: string,
+    year: number,
+    description: string,
+    where: string[] = [],
+    citation: string = '',
+    events: HistoricEvent[] = []) {
+    super(id, year, description, where, citation);
+    this._indexer = new Indexer(events);
+  }
+
+  private get Event() {
+    return this.SelectedItem() as HistoricEvent;
+  }
+
+  AddEvent(id: string,
+    year: number,
+    description: string,
+    where: string[] = [],
+    citation: string = '') {
+    this.AddItem(new HistoricEvent(id, year, description, where, citation));
+  }
+
+  SelectItemById(id: any): boolean { return this._indexer.SelectItemById(id); }
+  SelectItem(searchData: any): boolean { return this._indexer.SelectItemById(searchData); }
+
+  SelectEventById(id: string): boolean {
+
+    return this.SelectItemById(id);
+  }
+
+  SelectEventByTimeAndPlace(year: number, where: string[] = []): boolean {
+    return this.SelectItem({year: year,where: where});
+  }
+
+  get ID() {
+    let e = this.Event;
+    return e ? e.ID : this._id;
+  }
+  get Year() {
+    let e = this.Event;
+    return e ? e.Year : this._year;
+  }
+  get Description() {
+    let e = this.Event;
+    return e ? e.Description : this._description;
+  }
+  get Where() {
+    let e = this.Event;
+    return e ? e.Where : this._where;
+  }
+  get Citation() {
+    let e = this.Event;
+    return e ? e.Citation : this._citation;
+  }
+  ValidItem(): boolean { return this._indexer.ValidItem(); }
+  SelectedItem(): any { return this._indexer.SelectedItem(); }
+  AddItem(item: any): boolean {return this._indexer.AddItem(item);}
+  RemoveItem(index: any): boolean { return this._indexer.RemoveItem(index); }
+  First(): boolean { return this._indexer.First(); }
+  Last(): boolean { return this._indexer.Last(); }
+  Next(): boolean { return this._indexer.Next(); }
+  Previous(): boolean { return this._indexer.Previous(); }
+  Set(index: number): boolean { return this._indexer.Set(index); }
+}
+
 export class USState {
   _name: string = "";
   _selected: boolean = false;
@@ -82,8 +306,10 @@ export class USState {
 })
 
 export class OlMapComponent implements AfterViewInit {
-
+  bgColor: string = 'red';
+  mode: string = 'side';
   // _states: string[] = [];
+  showTopo: boolean = false;
   _map: Map;
   _mapWidth: number = 0;
   _mapHeight: number = 0;
@@ -93,16 +319,17 @@ export class OlMapComponent implements AfterViewInit {
   _stylesState = [];
   _stylesCounties = [];
   _stylesSelectedCounties = [];
+  _historyIndex: any = null;
   _historylayer: VectorLayer = null;
   geolabel: string = "States"
-  _events: Event[] = [];
-
+  _events: HistoricEvent[] = [];
+  _topoLayer: VectorLayer = null;
   constructor(
-    private canvasService: CanvasService,
+    public canvasService: CanvasService,
+    private http: HttpClient,
     private httpService: DataHTTPService) {
-    this._events.push(new Event('shannon001', 1880, '1880 Census', new Place("Arkansas", "State", "USA")));
-    this._events.push(new Event('shannon001', 1880, '1880 Census', new Place("Drew", "County", "Arkansas")));
-   // this.canvasService.A()
+    this._events.push(new HistoricEvent('shannonCTS4528_census_1880', 1880, '1880 Census', ["USA", "Arkansas", "Drew"]));
+    // this.canvasService.A()
   }
 
   //onMoveEnd(event: any) {
@@ -131,8 +358,8 @@ export class OlMapComponent implements AfterViewInit {
     ];
   }
 
-  get PLSSStyles(){
- //   let name = feature.get('Name');
+  get PLSSStyles() {
+    //   let name = feature.get('Name');
     let fill = 'rgba(140, 140, 140, 0.5)';
     //if (name == 'John C. Shannon') {
     //  fill == 'rgba(140, 20, 140, 0.9)';
@@ -156,8 +383,10 @@ export class OlMapComponent implements AfterViewInit {
       })
     ];
   }
+
   ngAfterViewInit() {
 
+    let self = this;
     let source: any;
     let layer: any;
     let tilelayer: any;
@@ -288,7 +517,7 @@ export class OlMapComponent implements AfterViewInit {
       maxZoom: mapMaxZoom
     });
 
-    let topoLayer = new TileLayer({
+    this._topoLayer = new TileLayer({
       extent: mapExtent,
       source: source
     });
@@ -301,7 +530,7 @@ export class OlMapComponent implements AfterViewInit {
       })
     });
     shorelinelayer.setVisible(true);
-    topoLayer.setVisible(false);
+    this._topoLayer.setVisible(false);
     let riverlayer = new VectorLayer({
       style: stylesRiver,
       source: new VectorSource({
@@ -389,7 +618,7 @@ export class OlMapComponent implements AfterViewInit {
     this._map = new Map({
       target: 'map',
       layers: [
-        topoLayer,
+        this._topoLayer,
         shorelinelayer,
         lakelayer,
         riverlayer,
@@ -407,7 +636,13 @@ export class OlMapComponent implements AfterViewInit {
     //  err => { this.Fail(err) });
     let msz = this._map.getSize();
     let ext = this._map.getView().calculateExtent();
-
+    let historyIndex;
+    this.http.get("../naturalearth2geojson/ushistory/historyindex.json")
+      .subscribe((success) => {
+        // 'naturalearth2/GeoJson/'
+        //this.navItems = success.json();
+        self._historyIndex = success;
+      });
 
   }
 
@@ -418,6 +653,7 @@ export class OlMapComponent implements AfterViewInit {
   Fail(data: any) {
     let sss = 0;
   }
+
   @HostListener('click') onClick() {
     var zoom = this._map.getView().getZoom();
     var sss = 0;
@@ -455,8 +691,108 @@ export class OlMapComponent implements AfterViewInit {
       case "South Carolina": abr = "SC"; break;
       default: abr = stateName; break;
     }
+    //Alabama - AL
+
+    //Alaska - AK
+
+    //Arizona - AZ
+
+    //Arkansas - AR
+
+    //California - CA
+
+    //Colorado - CO
+
+    //Connecticut - CT
+
+    //Delaware - DE
+
+    //Florida - FL
+
+    //Georgia - GA
+
+    //Hawaii - HI
+
+    //Idaho - ID
+
+    //Illinois - IL
+
+    //Indiana - IN
+
+    //Iowa - IA
+
+    //Kansas - KS
+
+    //Kentucky - KY
+
+    //Louisiana - LA
+
+    //Maine - ME
+
+    //Maryland - MD
+
+    //Massachusetts - MA
+
+    //Michigan - MI
+
+    //Minnesota - MN
+
+    //Mississippi - MS
+
+    //Missouri - MO
+
+    //Montana - MT
+
+    //Nebraska - NE
+
+    //Nevada - NV
+
+    //New Hampshire - NH
+
+    //New Jersey - NJ
+
+    //New Mexico - NM
+
+    //New York - NY
+
+    //North Carolina - NC
+
+    //North Dakota - ND
+
+    //Ohio - OH
+
+    //Oklahoma - OK
+
+    //Oregon - OR
+
+    //Pennsylvania - PA
+
+    //Rhode Island - RI
+
+    //South Carolina - SC
+
+    //South Dakota - SD
+
+    //Tennessee - TN
+
+    //Texas - TX
+
+    //Utah - UT
+
+    //Vermont - VT
+
+    //Virginia - VA
+
+    //Washington - WA
+
+    //West Virginia - WV
+
+    //Wisconsin - WI
+
+    //Wyoming - WY
     return abr;
   }
+
   ParseFeatureProperies(feature: any) {
     let p = feature.getProperties();
     let state = this.States.find(s => s._name === p.Name);
@@ -469,7 +805,7 @@ export class OlMapComponent implements AfterViewInit {
     }
     else {
       state.Update(this.Year, null);
-    }    
+    }
   }
 
 
@@ -528,24 +864,48 @@ export class OlMapComponent implements AfterViewInit {
     });
   }
 
-  AddCountyLayer(state: USState) {
-    let vlayer = new VectorLayer({
-      style: this._stylesCounties,
-      source: new VectorSource({
-        url: 'naturalearth2/GeoJson/' + state._abbreviation + '_Historical_Counties_' + this.Year + '.geojson',
-        format: new GeoJSON()
-      }),
-      maxResolution: 5000
-    });
-    vlayer.set('name', state._name + "_counties");
-    vlayer.set('year', this.Year);
-    this._map.addLayer(vlayer);
+  AddCountyLayers(state: string, year: number) {
     let self = this;
-    vlayer.getSource().on('change', function (evt) {
-      var source = evt.target;
-      var features = source.getFeatures();
-      features.forEach(f => self.ParseFeatureProperies(f));
+    let results = this._historyIndex.filter(f => f.SourceFile.indexOf(state + "_") == 0);
+    results.forEach(function (f, i) {
+      let features = f.range.filter(r => r.Y1 <= year && year < r.Y2);
+      features.forEach(function (ff, j) {
+        let vlayer = new VectorLayer({
+          style: self._stylesCounties,
+          source: new VectorSource({
+            url: 'naturalearth2GeoJson/ushistory/' + f.SourceFile + '/' + ff.File + '.geojson',
+            format: new GeoJSON()
+          }),
+          maxResolution: 5000
+        });
+        vlayer.set('name', state + "_counties");
+        vlayer.set('year', year);
+        self._map.addLayer(vlayer);
+      });
     });
+
+  }
+
+  AddCountyLayer(state: USState) {
+
+    this.AddCountyLayers(state._abbreviation, this.Year);
+    //let vlayer = new VectorLayer({
+    //  style: this._stylesCounties,
+    //  source: new VectorSource({
+    //    url: 'naturalearth2/GeoJson/' + state._abbreviation + '_Historical_Counties_' + this.Year + '.geojson',
+    //    format: new GeoJSON()
+    //  }),
+    //  maxResolution: 5000
+    //});
+    //vlayer.set('name', state._name + "_counties");
+    //vlayer.set('year', this.Year);
+    //this._map.addLayer(vlayer);
+    //let self = this;
+    //vlayer.getSource().on('change', function (evt) {
+    //  var source = evt.target;
+    //  var features = source.getFeatures();
+    //  features.forEach(f => self.ParseFeatureProperies(f));
+    //});
   }
   //https://www.legallandconverter.com/p43.html
   //https://mygeodata.cloud/converter/latlong-to-geojson
@@ -553,7 +913,7 @@ export class OlMapComponent implements AfterViewInit {
   // https://publications.newberry.org/ahcbp/downloads/index.html
   IncrementYear(increment: number) {
     this.Year += increment;
-  //  this.States = [];
+    //  this.States = [];
     this.geolabel = (this.Year > 1770) ? "States" : "Colonies";
     this.RemoveAllCountyLayers();
     if (this._historylayer) {
@@ -682,6 +1042,7 @@ export class OlMapComponent implements AfterViewInit {
     this._mapWidth = sz[0];
     this._mapHeight = sz[1];
   }
+
   SelectState(event: any, item: number) {
     let state = this.States[item];
     state._selected = event.checked;
@@ -696,8 +1057,12 @@ export class OlMapComponent implements AfterViewInit {
     return state && state._selected;
   }
 
+  ToggleTopo(item: any) {
+    this._topoLayer.setVisible(this.showTopo);
+  }
+
   AddShape(lat: number, lon: number) {
-      
+
   }
 }
 

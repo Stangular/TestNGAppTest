@@ -25,6 +25,7 @@ import {
   , MatRadioModule
   , MatAutocompleteModule
   , MatCheckboxModule
+  , MatButtonToggleModule
 } from '@angular/material';
 
 @NgModule({
@@ -54,6 +55,7 @@ import {
     , MatRadioModule
     , MatAutocompleteModule
     , MatCheckboxModule
+    , MatButtonToggleModule
   ],
 
   declarations: [],
@@ -80,6 +82,7 @@ import {
     , MatRadioModule
     , MatAutocompleteModule
     , MatCheckboxModule
+    , MatButtonToggleModule
   ],
 
   providers: []

@@ -44,7 +44,8 @@ library.add(
     , AppUserComponent
     , FilerComponent
   ],
-  exports: [ngMaterialModule, d3Module],
+  exports: [ngMaterialModule
+    , d3Module],
 
   providers: [D3Service
     , FilterService

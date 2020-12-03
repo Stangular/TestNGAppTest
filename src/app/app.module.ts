@@ -23,6 +23,10 @@ import { LoginComponent } from './login/login.component';
 import { ContentUtilityComponent } from './common/content-utility/content-utility.component';
 import { MessageService } from './messaging/message.service';
 import { ActiveCanvasComponent } from './active-canvas/active-canvas.component';
+import { TreeviewComponent } from '../models/tree/treeview/treeview.component';
+import { TreeviewlistComponent } from '../models/tree/treeviewlist/treeviewlist.component';
+import { TreeviewnodeComponent } from '../models/tree/treeviewnode/treeviewnode.component';
+//import { TreeviewService } from '../models/tree/service/treeview.service';
 
 //import { UserLoginLibModule } from 'user-login-lib';
 @NgModule({
@@ -46,6 +50,9 @@ import { ActiveCanvasComponent } from './active-canvas/active-canvas.component';
     , LoginComponent
     , ContentUtilityComponent
     , ActiveCanvasComponent
+    , TreeviewComponent
+    , TreeviewlistComponent
+    , TreeviewnodeComponent
   ],
 
   exports: [
@@ -56,6 +63,7 @@ import { ActiveCanvasComponent } from './active-canvas/active-canvas.component';
     , TokenService
     , UserService
     , LayoutService
+   // , TreeviewService
     , MessageService],
 
   bootstrap: [AppComponent]

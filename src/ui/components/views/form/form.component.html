@@ -64,7 +64,7 @@
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">equalizer</mat-icon>
+          <mat-icon class="form-tab-icon">create</mat-icon>
           Designer
         </ng-template>
       </mat-tab>
@@ -72,6 +72,18 @@
         <ng-template mat-tab-label>
           <mat-icon class="form-tab-icon">map</mat-icon>
           Map
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">build_circle</mat-icon>
+          Workshop
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="form-tab-icon">people</mat-icon>
+          Family
         </ng-template>
       </mat-tab>
     </mat-tab-group>
@@ -95,13 +107,17 @@
                     (sortChange)="tableSort()"
                     (applyFilter)="applyFilter()"></table-view>
         <app-dashboard-page *ngIf="view == viewType.graphic"
-                    [layoutName]="'dashboardA'"
-                    [source]="source"
-                    (select)="onSelect($event)"></app-dashboard-page>
+                            [layoutName]="'dashboardA'"
+                            [source]="source"
+                            (select)="onSelect($event)"></app-dashboard-page>
         <app-designer-page *ngIf="view == viewType.design"
-                    (deleteItem)="OnDeleteItem()"
-                    (stateChange)="OnStateChange()">
+                           (deleteItem)="OnDeleteItem()"
+                           (stateChange)="OnStateChange()">
         </app-designer-page>
+        <app-sandbox *ngIf="view == viewType.sandbox">
+
+        </app-sandbox>
+        <family_manager *ngIf="view == viewType.familyLineage"></family_manager>
         <ol-map *ngIf="view == viewType.map">
 
         </ol-map>

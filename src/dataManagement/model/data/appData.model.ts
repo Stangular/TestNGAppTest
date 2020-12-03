@@ -1,4 +1,4 @@
-﻿export class ListItem {
+export class ListItem {
 
     constructor(public id: number, public value: number, public label: string) {
 
@@ -40,7 +40,7 @@ export class AppDataModel {
         //        new ListItem(2, 'Source type C'),
         //        new ListItem(2, 'and so on...')
         //    ]
-        //});
+      //  });
     }
 
     public SetLists(data: { query: '', content: any[] }) {

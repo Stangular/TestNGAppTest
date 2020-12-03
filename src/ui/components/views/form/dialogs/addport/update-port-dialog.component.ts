@@ -34,7 +34,7 @@ export class UpdatePortDialog implements OnInit {
   @Input() cancelMessage: string = 'Cancel';
   @Input() okMessage: string = 'Save';
   constructor(
-    private canvasService: CanvasService,
+    public canvasService: CanvasService,
     public dialogRef: MatDialogRef<UpdatePortDialog>,
     @Inject(MAT_DIALOG_DATA) public data: PortData
     , public dialog: MatDialog) {}

@@ -182,7 +182,7 @@
             </div>
           </mat-grid-tile>
           <mat-grid-tile [colspan]="5" [rowspan]="1">
-            <mat-select placeholder="Select Path" [(ngModel)]="data.port.path" (selectionChange)="PathChange($event)">
+            <mat-select placeholder="Select Path" [(ngModel)]="data.port.path" (httpget)="PathChange($event)">
               <mat-option *ngFor="let path of canvasService.BaseSystem.Paths" [value]="path.Id">
                 {{path.Id + ' : '+ path.LineId}}
               </mat-option>

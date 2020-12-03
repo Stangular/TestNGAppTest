@@ -102,9 +102,9 @@ export class CanvasService {
   AddLayer() {
     let activeLayer: ActionLayer = null;
     let layers: ContextLayer[] = [];
-  //  layers.push(new ContextLayer("baseLayer", "displayState"));
-  // activeLayer = new ActionLayer();
-   this.contextSystems.push(new ContextSystem(layers));
+    //  layers.push(new ContextLayer("baseLayer", "displayState"));
+    // activeLayer = new ActionLayer();
+    this.contextSystems.push(new ContextSystem(layers));
   }
 
   ToggleEdit() {
@@ -148,7 +148,7 @@ export class CanvasService {
 
   Select() {
     if (this.contextSystems.length > 0
-    && !this.contextSystems[0].Select(this.SSR)) {
+      && !this.contextSystems[0].Select(this.SSR)) {
 
       this.SSR.shapeType = this.selectedType;
       this.contextSystems[0].AddNewContent(this.SSR);
@@ -185,7 +185,7 @@ export class CanvasService {
     let path = "https://localhost:44328/api/shape/" + unitCellId;
     this.httpService.getContent(null, path)
       .subscribe(
-      data => { this.RetrieveShapeSuccess(data,unitCellId) },
+        data => { this.RetrieveShapeSuccess(data, unitCellId) },
         err => { this.Fail(err) });
   }
 
@@ -313,7 +313,7 @@ export class CanvasService {
   }
 
   RetrieveLineSuccess(data: any) {
-    if (!this.BaseSystem) { return;}
+    if (!this.BaseSystem) { return; }
     let self = this;
     data.lines.forEach(function (d, i) {
       self.BaseSystem.Lines.push(new Line(d.lineId, d.displayValueId, d.lineType));
@@ -326,7 +326,7 @@ export class CanvasService {
 
   RetrievePathSuccess(data: any[]) {
     if (!this.BaseSystem) { return; }
-   let self = this;
+    let self = this;
     data.forEach(function (d, i) {
       self.BaseSystem.Paths.push(new PortPath(d.PathId, d.LineId));
     });
@@ -334,9 +334,9 @@ export class CanvasService {
 
   RetrieveShapeSuccess(data: any[], unitCellId: string) {
     if (!this.BaseSystem) { return; }
-   let self = this;
+    let self = this;
     data.forEach(function (d, i) {
-      
+
       let shape = self.LoadShape(d);
       self.BaseSystem.AddContent(shape);
     });
@@ -387,7 +387,7 @@ export class CanvasService {
             c.displayValueId,
             c.content,
             c.fromSource || false,
-            c.angle, 
+            c.angle,
             imageIndex);
 
           s = new ImageShape(
@@ -439,7 +439,7 @@ export class CanvasService {
   RetrieveCellsSuccess(data: any[]) {
     if (!this.BaseSystem) {
       this.contextSystems.push(new ContextSystem());
-   }
+    }
     let self = this;
     this.BaseSystem.ClearLayers();
     data.forEach(function (d, i) {
@@ -448,13 +448,13 @@ export class CanvasService {
     this.FinishedLoading();
   }
 
-  AddText(textContent: any, containerState:string, contentState:string, fromSource:boolean, angle = 0) {
+  AddText(textContent: any, containerState: string, contentState: string, fromSource: boolean, angle = 0) {
     this.BaseSystem.AddText(textContent, containerState, contentState, fromSource, angle);
     setTimeout(() => this.messageService.sendMessage(1001), 0);
-    
+
   }
 
-  AddImage(imageName: any,containerState:string, contentState: string, fromSource: boolean, angle = 0) {
+  AddImage(imageName: any, containerState: string, contentState: string, fromSource: boolean, angle = 0) {
     let imageIndex = this.contextModel.AddImage(imageName, this.messageService);
     this.BaseSystem.AddImage(imageName, containerState, contentState, fromSource, angle, imageIndex);
     setTimeout(() => this.messageService.sendMessage(1001), 0);
@@ -500,6 +500,6 @@ export class CanvasService {
   }
 
   AddPath() {
-   // this.BaseSystem.AddPathSegment()
+    // this.BaseSystem.AddPathSegment()
   }
 }

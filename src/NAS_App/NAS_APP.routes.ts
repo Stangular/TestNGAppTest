@@ -11,7 +11,7 @@ const routes: Routes = [
     children: [
       { path: 'hrmproductionhistory', component: HRMProductionHistoryComponent },
       { path: 'systeminventory', component: SystemInventoryComponent },
-      {
+     {
         path: 'login', component: LoginComponent
       }
     ]

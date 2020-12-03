@@ -1,60 +1,60 @@
 
-    <mat-toolbar color="primary">
-      <span>{{pageTitle}}</span>
-      <span class="toolbar-spacer"></span>
-      <button mat-button [matMenuTriggerFor]="mes" *ngIf="userService.isLoggedIn">
-        MES
-      </button>
-      <button mat-button [matMenuTriggerFor]="hr" *ngIf="userService.isLoggedIn">
-        HR
-      </button>
-      <span class="toolbar-spacer"></span>
-      <span class="toolbar-spacer"></span>
-      <span class="toolbar-spacer"></span>
-      <span class="toolbar-spacer"></span>
-      <span class="toolbar-spacer"></span>
-      <span class="toolbar-spacer"></span>
-      <button mat-icon-button color="error">
-        <mat-icon aria-label="PDF">insert_photo</mat-icon>
-      </button>
-      <button mat-icon-button color="accent">
-        <mat-icon aria-label="Text">publish</mat-icon>
-      </button>
-      <button mat-icon-button color="default">
-        <mat-icon aria-label="Send as Email">email</mat-icon>
-      </button>
-      <button mat-icon-button color="default" routerLink="/login" *ngIf="!userService.isLoggedIn">
-        <mat-icon aria-label="Login">input</mat-icon>
-      </button>
-      <button mat-icon-button color="default" *ngIf="userService.isLoggedIn" [matMenuTriggerFor]="user">
-        <mat-icon aria-label="Login">person</mat-icon>
-      </button>
-      <mat-menu #user="matMenu" xPosition='before' yPosition='below' overlapTrigger="false">
-        <app-user-component></app-user-component>
-      </mat-menu>
-    </mat-toolbar>
+<mat-toolbar color="primary">
+  <span>{{pageTitle}}</span>
+  <span class="toolbar-spacer"></span>
+  <button mat-button [matMenuTriggerFor]="mes" *ngIf="userService.isLoggedIn">
+    MES
+  </button>
+  <button mat-button [matMenuTriggerFor]="hr" *ngIf="userService.isLoggedIn">
+    HR
+  </button>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <span class="toolbar-spacer"></span>
+  <button mat-icon-button color="error">
+    <mat-icon aria-label="PDF">insert_photo</mat-icon>
+  </button>
+  <button mat-icon-button color="accent">
+    <mat-icon aria-label="Text">publish</mat-icon>
+  </button>
+  <button mat-icon-button color="default">
+    <mat-icon aria-label="Send as Email">email</mat-icon>
+  </button>
+  <button mat-icon-button color="default" routerLink="/login" *ngIf="!userService.isLoggedIn">
+    <mat-icon aria-label="Login">input</mat-icon>
+  </button>
+  <button mat-icon-button color="default" *ngIf="userService.isLoggedIn" [matMenuTriggerFor]="user">
+    <mat-icon aria-label="Login">person</mat-icon>
+  </button>
+  <mat-menu #user="matMenu" xPosition='before' yPosition='below' overlapTrigger="false">
+    <app-user-component></app-user-component>
+  </mat-menu>
+</mat-toolbar>
 
-    <mat-menu #mes="matMenu" yPosition='below' overlapTrigger="false">
-      <button mat-menu-item [matMenuTriggerFor]="hotmill">Hot Mill</button>
-      <button mat-menu-item [matMenuTriggerFor]="tools">Tools</button>
-    </mat-menu>
+<mat-menu #mes="matMenu" yPosition='below' overlapTrigger="false">
+  <button mat-menu-item [matMenuTriggerFor]="hotmill">Hot Mill</button>
+  <button mat-menu-item [matMenuTriggerFor]="tools">Tools</button>
+</mat-menu>
 
-    <mat-menu #hotmill="matMenu" xPosition='after' yPosition='below' overlapTrigger="false">
-      <button mat-menu-item [matMenuTriggerFor]="productionreports">Production Reports</button>
-    </mat-menu>
+<mat-menu #hotmill="matMenu" xPosition='after' yPosition='below' overlapTrigger="false">
+  <button mat-menu-item [matMenuTriggerFor]="productionreports">Production Reports</button>
+</mat-menu>
 
-    <mat-menu #productionreports="matMenu" yPosition='below' overlapTrigger="false">
-      <button mat-menu-item routerLink="/hrmproductionhistory">HRM Production History</button>
-    </mat-menu>
+<mat-menu #productionreports="matMenu" yPosition='below' overlapTrigger="false">
+  <button mat-menu-item routerLink="/hrmproductionhistory">HRM Production History</button>
+</mat-menu>
 
-    <mat-menu #tools="matMenu" yPosition='below' overlapTrigger="false">
-      <button mat-menu-item routerLink="/systeminventory">System Inventory</button>
-    </mat-menu>
+<mat-menu #tools="matMenu" yPosition='below' overlapTrigger="false">
+  <button mat-menu-item routerLink="/systeminventory">System Inventory</button>
+</mat-menu>
 
-    <mat-menu #hr="matMenu" yPosition='below' overlapTrigger="false">
-      <button mat-menu-item>Employee Swipes Report</button>
-    </mat-menu>
-  
+<mat-menu #hr="matMenu" yPosition='below' overlapTrigger="false">
+  <button mat-menu-item>Employee Swipes Report</button>
+</mat-menu>
+
 <router-outlet></router-outlet>
 
 

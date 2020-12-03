@@ -69,18 +69,27 @@ export class DataHTTPService {
     return forkJoin(obs);
   }
 
-  getContent(filter: any, restPath: string = 'https://localhost:44336/api/data/GetFilteredContent'): Observable<any> {
+  getContent(filter: any, restPath: string = "https://localhost:44393/api/place"): Observable<any> {
     let f: any = { formName: 'charttestTableA', paging: { pageLength: 4, pageNumber: 1 }, filters: [{ FieldId: 'income', Sort: 2, Value: 0, Operation: 0 }] };
     this._headers.set('Content-Type', 'application/json');
     this._headers.set('Accept', 'application/json');
 
-    let myParams = new HttpParams();
-    myParams.set('filter', f);
+    let myParams = new HttpParams()
+      .set('id', "110")
+      .set('name','bob');
+    
+   // myParams.set('schoolId', "23434");
+   // myParams.append('schoolId', "345345");
    // let options = new RequestOptions({ headers: this._headers, params: myParams });
 
     let self = this;
-    return this.http.get(restPath)
-      .pipe(map(response => self.processData(response), catchError(self.handleError)));
+    return this.http.get(restPath, {
+      headers: this._headers,
+      params: myParams
+    })
+      .pipe(map(response =>
+        self.processData(response),
+        catchError(self.handleError)));
   }
 
   startUpPromise(restPath: string): Promise<any> {

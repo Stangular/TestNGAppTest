@@ -63,7 +63,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
   @Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   @Output() move: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   private point: Point = new Point();
-  constructor(private messageService: MessageService, private canvasService: CanvasService) {
+  constructor(private messageService: MessageService, public canvasService: CanvasService) {
 
     this.subscription = this.messageService.getMessage().subscribe(
       message => { this.AcceptMessage(message) });
