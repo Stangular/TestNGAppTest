@@ -1,18 +1,17 @@
 export interface IValidator {
 
     Message: string;
-    validate(v: string): boolean;
-    validateValue(v: string, fieldName: string): boolean;
+    validate(v: any): boolean;
+    validateValue(v: any): boolean;
 }
 
 export abstract class Validation implements IValidator {
 
-    abstract validate(v: string): boolean;
+    abstract validate(v: any): boolean;
     abstract get Message(): string;
 
     validateValue(
-        v: string,
-        fieldName: string): boolean {
+        v: any): boolean {
         let m = this.Message;
         if (!this.validate(v)) {
             if (m.length > 0) {

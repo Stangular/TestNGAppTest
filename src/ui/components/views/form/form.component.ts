@@ -12,6 +12,7 @@ import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { ChartLayer } from '../../../../canvas/models/custom/layers/charts/chart.layer';
 import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
 import { MessageService } from 'src/app/messaging/message.service';
+import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 
 export enum ViewType {
   detail = 0,
@@ -43,46 +44,53 @@ export class EntityRemoveModel {
 export class FormComponent implements OnInit, AfterContentInit {
 
  // barSystem: ChartLayer;
-  @Input() source: Records<string>;
+  @Input() sourceID: number;
+  @Input() sourceName: string;
 
-  form: any;
   elements: any;
   public viewType = ViewType;
   view: ViewType;
   activeView: number;
   saveing: boolean = false;
   pagingMode = PagingMode;
-
+  sourceIndex: number = -1;
   constructor(
-    private httpService: DataHTTPService
+    private edfs: ElementDefinitionFactoryService
+    , private httpService: DataHTTPService
     , public dialog: MatDialog
     , private snacker: MatSnackBar
     , private messageService: MessageService
     , private spinnerService: Ng4LoadingSpinnerService) {
     this.view = this.viewType.detail;
+    this.sourceIndex = edfs.getRecordsIndex(this.sourceName);
   }
+
+  get Form(): FormGroup { return this.Source.Form; }
 
   ngAfterContentInit() {}
 
+  get Source() {
+    return this.edfs.Source(this.sourceIndex);
+  }
+
   ngOnInit() {
     
-    this.form = this.source.Form;
-    this.elements = this.source.GetFormDefinition();
-    this.SetFormContent(this.source.PageSize);
+    this.elements = this.Source.GetFormDefinition();
+    this.SetFormContent(this.Source.PageSize);
   }
 
   public SetFormContent(pageSize: number = 10) {
 
     this.spinnerService.show();
-    this.httpService.postContent(this.source.Filter(pageSize)
+    this.httpService.postContent(this.Source.Filter(pageSize)
       , 'https://localhost:44336/api/data/GetFilteredContent').subscribe(
       data => { this.initSuccess(data) },
       err => { this.initFail(err) });
   }
 
   get metaInfo() {
-    const p = this.source.CurrentRecordNumber + 1;
-    const c = this.source.Total.toString();
+    const p = this.Source.CurrentRecordNumber + 1;
+    const c = this.Source.Total.toString();
     let page = p.toString();
     while (page.length < c.length) {
       page = '0' + page;
@@ -91,7 +99,7 @@ export class FormComponent implements OnInit, AfterContentInit {
   }
 
   tableSort() {
-    this.SetFormContent(this.source.PageSize);
+    this.SetFormContent(this.Source.PageSize);
   }
 
   viewChange(view: ViewType) {
@@ -103,36 +111,36 @@ export class FormComponent implements OnInit, AfterContentInit {
   } 
 
   applyFilter() {
-    this.SetFormContent(this.source.PageSize);
+    this.SetFormContent(this.Source.PageSize);
   }
 
-  action(a: ActionType, elmId = '') {
-    switch (a) {
-      case ActionType.undo: this.source.ResetToInitial(); break;
-      case ActionType.create: this.source.NewRecord(); break;
-      case ActionType.update: break;// TODO: put into edit mode.
-      case ActionType.remove:
-        if (!this.source.RemoveNewForm()) { this.acknowledgeDelete(); }
-        break;
-      case ActionType.save:
-        this.saveing = true;
-        let v = this.source.GetFieldValue('id');
-        if (v.length <= 0) {
+  //action(a: ActionType, elmId = '') {
+  //  switch (a) {
+  //    case ActionType.undo: this.source.ResetToInitial(); break;
+  //    case ActionType.create: this.source.NewRecord(); break;
+  //    case ActionType.update: break;// TODO: put into edit mode.
+  //    case ActionType.remove:
+  //      if (!this.source.RemoveNewForm()) { this.acknowledgeDelete(); }
+  //      break;
+  //    case ActionType.save:
+  //      this.saveing = true;
+  //      let v = this.source.GetFieldValue('id');
+  //      if (v.length <= 0) {
 
-          this.httpService.postContent(this.source.OutputCurrentValues()).subscribe(
-            data => { this.saveSuccess(data) },
-            err => { this.saveFail(err) });
-        }
-        else {
-          this.httpService.updateContent(this.source.OutputCurrentValues()).subscribe(
-            data => { this.saveSuccess(data) },
-            err => { this.saveFail(err) });
-        }
+  //        this.httpService.postContent(this.source.OutputCurrentValues()).subscribe(
+  //          data => { this.saveSuccess(data) },
+  //          err => { this.saveFail(err) });
+  //      }
+  //      else {
+  //        this.httpService.updateContent(this.source.OutputCurrentValues()).subscribe(
+  //          data => { this.saveSuccess(data) },
+  //          err => { this.saveFail(err) });
+  //      }
 
 
-        break;
-    }
-  }
+  //      break;
+  //  }
+  //}
 
   Snack(message: string) {
 
@@ -141,7 +149,7 @@ export class FormComponent implements OnInit, AfterContentInit {
 
   initSuccess(data: any) {
     this.spinnerService.hide();
-    this.source.LoadData(
+    this.Source.LoadData(
       data.content, [],
       data.recordCount,
       data.totalAvailableCount);
@@ -165,26 +173,26 @@ export class FormComponent implements OnInit, AfterContentInit {
     this.Snack('Form failed to initialize');
   }
 
-  saveSuccess(data: any) {
-    this.source.LoadData(data.content, [], data.recordCount);
-    this.saveing = false;
-    this.Snack('Save succeeded');
-  }
+  //saveSuccess(data: any) {
+  //  this.source.LoadData(data.content, [], data.recordCount);
+  //  this.saveing = false;
+  //  this.Snack('Save succeeded');
+  //}
 
-  saveFail(data: any) {
-    this.saveing = false;
-    this.Snack(data.error || 'Form save Failed for unknown reason');
-  }
+  //saveFail(data: any) {
+  //  this.saveing = false;
+  //  this.Snack(data.error || 'Form save Failed for unknown reason');
+  //}
 
   deleteSuccess(data: any) {
-    this.SetFormContent(this.source.PageSize);
-    this.source.LoadData(data.content, [], data.recordCount);
+    this.SetFormContent(this.Source.PageSize);
+    this.Source.LoadData(data.content, [], data.recordCount);
     this.saveing = false;
     this.Snack('Form removed');
   }
 
   onSelect(shapeSelectResult: ShapeSelectResult) {
-    if (this.source.SelectItemByField('Id', shapeSelectResult.id)) {
+    if (this.Source.SelectItemByField('Id', shapeSelectResult.id)) {
       this.SetTab(0);
     }
   }
@@ -229,19 +237,19 @@ export class FormComponent implements OnInit, AfterContentInit {
     //}
     switch (code) {
       case 0:
-        reload = !this.source.First();
+        reload = !this.Source.First();
         break;
       case 1:
         if (this.view == ViewType.detail) {
-          reload = !this.source.Previous();
+          reload = !this.Source.Previous();
         }
         else if (this.view == ViewType.table) {
           reload = true;
-          this.source.PreviousPage();
+          this.Source.PreviousPage();
         }
         else if (this.view == ViewType.graphic) {
           reload = true;
-          this.source.PreviousPage();
+          this.Source.PreviousPage();
         }
         break;
       case 2:
@@ -249,11 +257,11 @@ export class FormComponent implements OnInit, AfterContentInit {
           case ViewType.detail: reload = !this.source.Next(); break;
           case ViewType.table:
             reload = true;
-            this.source.NextPage();
+            this.Source.NextPage();
             break;
           case ViewType.graphic:
             reload = true;
-            this.source.NextPage();
+            this.Source.NextPage();
             break;
         }
         //if (this.view == ViewType.detail) {
@@ -265,11 +273,11 @@ export class FormComponent implements OnInit, AfterContentInit {
         //}
         break;
       case 3:
-        reload = !this.source.Final();
+        reload = !this.Source.Final();
         break;
     }
     if (reload) {
-      this.SetFormContent(this.source.PageSize);
+      this.SetFormContent(this.Source.PageSize);
     }
   }
 
@@ -293,7 +301,7 @@ export class FormComponent implements OnInit, AfterContentInit {
     dialogRef.afterClosed().subscribe(result => {
       if ('remove' == result.result) {
         let model = new EntityRemoveModel();
-        model.Id = this.source.GetFieldValue('id');
+        model.Id = this.Source.GetFieldValue('id');
         model.why = result.why;
         this.httpService.deleteContent(model).subscribe(
           data => { this.deleteSuccess(data) },

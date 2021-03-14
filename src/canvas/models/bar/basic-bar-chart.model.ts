@@ -16,8 +16,8 @@ export class BasicBarChartModel {
     chartName: string = '',
     source: Records<string>) {
 
-    let fx = source.Fields.find(f => f.FieldId == this.xField);  //'date'
-    let fy = source.Fields.find(f => f.FieldId == this.yField);   //'income'
+    let fx = source.Fields.find(f => f.ElementName == this.xField);  //'date'
+    let fy = source.Fields.find(f => f.ElementName == this.yField);   //'income'
 
     if (!fx || !fy) {
       return null;
@@ -27,17 +27,17 @@ export class BasicBarChartModel {
     let years: string[] = [];
     let months: string[] = [];
 
-    for (let i = 0; i < fx.Data.length; i++) {
+    for (let i = 0; i < fx..length; i++) {
       d = fx.Value(i);
       // calculate percentage of total height -  x/H = (d/500)* H 
     }
 
-    for (let i = 0; i < fx.Data.length; i++) {
-      d = fx.Value(i);
-      r = d.split('-')
-      years.push(years.findIndex(y => y == r[0]) >= 0 ? '' : r[0]);
-      months.push(r[1]);
-    }
+    //for (let i = 0; i < fx.Data.length; i++) {
+    //  d = fx.Value(i);
+    //  r = d.split('-')
+    //  years.push(years.findIndex(y => y == r[0]) >= 0 ? '' : r[0]);
+    //  months.push(r[1]);
+    //}
     let dateScale: any[] = [];
     dateScale.push({ scale: new Scale(months), width: 20, height: 16, angle: 0 });
     dateScale.push({ scale: new Scale(years), width: 20, height: 16, angle: 0 });

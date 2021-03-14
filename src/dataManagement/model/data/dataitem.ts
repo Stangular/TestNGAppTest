@@ -1,4 +1,4 @@
-﻿import { IListNavigator } from '../list/ListNavigator';
+import { IListNavigator } from '../list/ListNavigator';
 
 export interface IDataItem<T> {
     ID(): T;
@@ -8,9 +8,7 @@ export abstract class DataItem<T> implements IDataItem<T> {
 
     constructor(private _ID: T) { }
 
-    public ID(): T {
-        return this._ID;
-    }
+    public ID(): T { return this._ID; }
 }
 
 export abstract class DataItems<T> extends DataItem<T> implements IListNavigator<T> {

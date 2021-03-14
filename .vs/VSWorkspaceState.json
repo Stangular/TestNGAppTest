@@ -3,13 +3,13 @@
     "",
     "\\src",
     "\\src\\app",
-    "\\src\\app\\popup",
-    "\\src\\const",
-    "\\src\\FamilyLineage",
-    "\\src\\Maps",
-    "\\src\\ui",
-    "\\src\\ui\\components"
+    "\\src\\app\\services",
+    "\\src\\dataManagement",
+    "\\src\\dataManagement\\model",
+    "\\src\\dataManagement\\model\\data",
+    "\\src\\dataManagement\\model\\definitions",
+    "\\src\\dataManagement\\model\\form",
+    "\\src\\dataManagement\\model\\sequencing"
   ],
-  "SelectedNode": "\\src\\app\\app.module.ts",
   "PreviewInSolutionExplorer": false
 }

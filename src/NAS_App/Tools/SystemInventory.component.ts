@@ -11,7 +11,7 @@ import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
 })
 export class SystemInventoryComponent implements OnInit {
 
-  elements: IElementDefinition<any>[] = [];
+  elements: IElementDefinition[] = [];
   form: FormGroup;
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   _theCanvas: TheCanvasState = new TheCanvasState();

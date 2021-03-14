@@ -1,5 +1,6 @@
 import { Component, Input, Output, Renderer2, EventEmitter } from '@angular/core';
 import { IElementDefinition } from '../../../../dataManagement/model/definitions/ElementDefinition';
+import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 
 
 export enum ActionType {
@@ -26,18 +27,21 @@ export class DetailViewComponent {
   @Input() formDirty: boolean = false;
   @Input() servicing: boolean = false;
   @Input() formNew: boolean = false;
-  @Input() elements: IElementDefinition<any>[] = [];
+  @Input() formID: number;
+
+  // @Input() elements: IElementDefinition<any>[] = [];
   @Input() form;
   @Output() action: EventEmitter<ActionType> = new EventEmitter<ActionType>();
   @Output() blur: EventEmitter<{ id: string, value: string }> = new EventEmitter<{ id: string, value: string }>();
-  constructor() {}
+  constructor(private source: ElementDefinitionFactoryService) {}
 
   onAction(action: ActionType) {
     this.action.emit(action);
   }
 
   get displayElements() {
-    return this.elements.filter(e => e.Label() != ':');
+    let records = this.source.getRecords(this.formID);
+    return records.getElements();
   }
 
   onBlur(elmId = { id: '', value: '' }) {

@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ListItem, List} from 'src/dataManagement/model/list/list';
+import { Component, OnInit,Input} from '@angular/core';
+import { A_Term, A_Sequence } from 'src/dataManagement/model/sequencing/sequence';
 import { FormControl } from '@angular/forms';
+import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 
 @Component({
   selector: 'family_manager',
@@ -9,31 +10,31 @@ import { FormControl } from '@angular/forms';
 })
 export class FamilyComponent implements OnInit {
 
-  surnames: List;
-  members: List;
-  surnameControl = new FormControl();
-  personControl = new FormControl();
-  constructor() {
-    this.surnames = new List("surname", "0");
-    this.members = new List("familyMembers", "1");
+  surnames: A_Sequence<number,string,number>;
+  members: A_Sequence<number,string,  number>;
+ // surnameControl = new FormControl();
+ // personControl = new FormControl();
+  constructor(private edfs: ElementDefinitionFactoryService) {
+    this.surnames = new A_Sequence("surname", 0,0,0,"Surname");
+    this.members = new A_Sequence("familyMembers", 1,1,1,"Family");
   }
 
   ngOnInit() {
-    this.surnames.AddItem("111", "Shannon", 0);
-    this.surnames.AddItem("222", "Martin", 1);
-    this.surnames.AddItem("333", "Rowell", 2);
+    this.surnames.AddItem(0, "Shannon");
+    this.surnames.AddItem(1, "Martin");
+    this.surnames.AddItem(2, "Rowell");
     this.surnames.SortByContent();
     this.surnames
-    this.members.AddItem("111", "John",0);
-    this.members.AddItem("222", "William", 1);
-    this.members.AddItem("333", "Owen", 2);
+    this.members.AddItem(0, "John");
+    this.members.AddItem(1, "William");
+    this.members.AddItem(2, "Owen");
     this.members.SortByOrder();
   }
 
   AddSurname(surname: string) {
     this.ClearSelection('');
-    this.surnames.AddNewContent(surname);
-    this.surnameControl.setValue(surname);
+    this.surnames.AddNewContent(-1,surname);
+   // this.surnameControl.setValue(surname);
     //service
   }
 
@@ -44,8 +45,8 @@ export class FamilyComponent implements OnInit {
     alert(surnameId);
   }
   ClearSelection(surnameId: string) {
-    this.surnameControl.setValue('');
-    this.personControl.setValue('');
+ //   this.surnameControl.setValue('');
+  //  this.personControl.setValue('');
   }
 
 }

@@ -1,7 +1,7 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
-import { IListItem } from '../../../dataManagement/model/list/list';
+//import { IListItem } from '../../../dataManagement/model/list/list';
 import { AppDataService } from '../../../dataManagement/service/appData.service';
 import { AppDataModel, ListItem } from '../../../dataManagement/model/data/appData.model';
 import {

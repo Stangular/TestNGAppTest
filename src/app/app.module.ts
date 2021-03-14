@@ -26,6 +26,10 @@ import { ActiveCanvasComponent } from './active-canvas/active-canvas.component';
 import { TreeviewComponent } from '../models/tree/treeview/treeview.component';
 import { TreeviewlistComponent } from '../models/tree/treeviewlist/treeviewlist.component';
 import { TreeviewnodeComponent } from '../models/tree/treeviewnode/treeviewnode.component';
+import { CheckSelectorComponent } from 'src/ui/components/sequencing/check/check-selector/check-selector.component';
+import { RadioSelectorComponent } from 'src/ui/components/sequencing/radio/radio-selector/radio-selector.component';
+import { DropdownSelectorComponent } from 'src/ui/components/sequencing/select/dropdown-selector/dropdown-selector.component';
+import { TabSelectorComponent } from 'src/ui/components/sequencing/tab/tab-selector/tab-selector.component';
 //import { TreeviewService } from '../models/tree/service/treeview.service';
 
 //import { UserLoginLibModule } from 'user-login-lib';
@@ -52,7 +56,7 @@ import { TreeviewnodeComponent } from '../models/tree/treeviewnode/treeviewnode.
     , ActiveCanvasComponent
     , TreeviewComponent
     , TreeviewlistComponent
-    , TreeviewnodeComponent
+    , TreeviewnodeComponent, CheckSelectorComponent, RadioSelectorComponent, DropdownSelectorComponent, TabSelectorComponent
   ],
 
   exports: [

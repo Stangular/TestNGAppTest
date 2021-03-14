@@ -1,6 +1,7 @@
 import { Component, Input, Output, OnInit, EventEmitter, ElementRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
+import { IElementDefinition, ElementModel, IElementModel } from '../../../dataManagement/model/definitions/ElementDefinition';
+import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 
 @Component({
   selector: 'input-edit',
@@ -8,37 +9,31 @@ import { IElementDefinition } from '../../../dataManagement/model/definitions/El
 })
 
 export class FormInputElementComponent implements OnInit {
+  private mRef: IElementModel;
+  private eRef: IElementDefinition;
   value: string = '';
-  @Input() element: IElementDefinition<string>;
-  @Input() form: FormGroup;
-  @Input() actionClass = '';
-  @Output() action: EventEmitter<string> = new EventEmitter<string>();
-  @Output() blur: EventEmitter<{ id: string, value: string }> = new EventEmitter<{ id: string, value: string }>();
+  @Input() modelIndex: number;
+  @Input() formIndex: number;
+  @Input() fieldIndex: number;
   
-  constructor() {}
-
-  onAction(value: HTMLElement) {
-    this.action.emit(this.actionClass);
+  constructor(private edfs: ElementDefinitionFactoryService) {
+    this.mRef = this.edfs.Model(this.modelIndex);
+    this.eRef = this.edfs.Element(this.formIndex, this.fieldIndex);
   }
-
+ 
   get editMode() {
     return true;
   }
-  onblur() {
-    this.blur.emit({ id: this.element.FieldID(), value: this.value });
-    this.value = this.element.CurrentValue();
+
+  onUpdate() {
+    this.edfs.UpdateRecord(this.modelIndex, this.formIndex, this.fieldIndex);
   }
 
-  ngOnInit() {
-    this.value = this.element.CurrentValue();
-  }
+  ngOnInit() {}
 
-  Init() { }
+  //Init() { }
   //   mask = [/\d/, /\d/, /\d/, /\d/]; // ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   get isValid() {
-    let v = this.form.controls[this.element.FieldID()].value;
-    let valid = this.element.validateValue(v);
-
-    return valid;
+    return true; //this.edfs.IsValidValue(this.modelIndex, this.formIndex, this.fieldIndex);
   }
 }

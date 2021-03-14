@@ -1,0 +1,12 @@
+<label style="padding-right:25px">{{label}}</label>
+<mat-form-field class="shapeClassInput"
+                style="width:90%"
+                [floatLabel]="'never'">
+
+  <mat-radio-group aria-label="Select an option">
+    <mat-radio-button *ngFor="let term in source; index as i" value="term.ID()">
+      {{term.Content()}}
+    </mat-radio-button>
+  </mat-radio-group>
+
+</mat-form-field>

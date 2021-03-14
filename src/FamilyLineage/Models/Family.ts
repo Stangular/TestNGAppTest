@@ -93,6 +93,6 @@ export class Family extends DataModel {
 
 }
 
-export class Families extends DataCollection{
+export class Families { //extends DataCollection{
 
 }

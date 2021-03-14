@@ -23,12 +23,12 @@ export class TableViewComponent {
 
   constructor(public dialog: MatDialog) { }
 
-  CellData(elm: IElementDefinition<string>, row: number): string {
+  CellData(elm: IElementDefinition, row: number): string {
 
-    const fld = this.source.Fields.find(f => f.FieldId == elm.FieldID());
-    if (fld) {
-      return elm.UIValueConvert(fld.Data[row]);
-    }
+    //const fld = this.source.Fields.find(f => f.ElementID == elm.ElementID);
+    //if (fld) {
+    //  return elm.UIValueConvert(fld.Data[row]);
+    //}
     return '';
   }
 
@@ -41,26 +41,26 @@ export class TableViewComponent {
     this.gotoDetail.emit(1);
   }
 
-  ElementLabel(element: IElementDefinition<string>) {
-    return element.Label();
+  ElementLabel(element: IElementDefinition) {
+    return "later!"; //element.Label();
   }
 
-  Sort(elm: IElementDefinition<string>) {
+  Sort(elm: IElementDefinition) {
     if (elm) {
-      elm.SetNextSortOrder();
+   //   elm.SetNextSortOrder();
       this.sortChange.emit();
     }
   }
 
   toggleFilter(elm: EditElementDefinition<any>) {
 
-    if (!elm.FilterApplied) {
-      this.showFilter(elm);
-    }
-    else {
-      elm.TurnFilterOff();
-      this.applyFilter.emit();
-    }
+    //if (!elm.FilterApplied) {
+    //  this.showFilter(elm);
+    //}
+    //else {
+    //  elm.TurnFilterOff();
+    //  this.applyFilter.emit();
+    //}
   }
 
   removeAllFilters() {
@@ -77,40 +77,41 @@ export class TableViewComponent {
   }
 
   removeFilter(elm: EditElementDefinition<any>) {
-    elm.setFilter(undefined, undefined, false);
+ //   elm.setFilter(undefined, undefined, false);
     this.applyFilter.emit();
   }
 
   get HasFilter() {
     const elements = this.source.GetFormDefinition();
-    let fltrs = elements.filter(e => e.HasFilter);
-    return fltrs.length > 0;
+    //let fltrs = elements.filter(e => e.HasFilter);
+    //return fltrs.length > 0;
+    return false;
   }
 
   ApplyAllFilters(e:any) {
     const elements = this.source.GetFormDefinition();
-    let fltrs = elements.filter(e => e.HasFilter);
-    fltrs.forEach(f => f.ToggleFilter());
+    //let fltrs = elements.filter(e => e.HasFilter);
+    //fltrs.forEach(f => f.ToggleFilter());
     this.applyFilter.emit();
   }
 
   get VisibleElements() {
     const elements = this.source.GetFormDefinition();
-    return elements.filter(e => e.Label() != ':');
+    return null; //elements.filter(e => e.Label() != ':');
   }
 
   showFilter(elm: EditElementDefinition<any>): void {
-    let fltr = elm.getFilter();
-    if (!fltr) {  return; }
-    const dialogRef = this.dialog.open(FormFilteringComponent, {
-      width: '400px',
-      data: { upperValue: fltr.UpperValue, lowerValue: fltr.LowerValue, asContent: elm.getFilter().asContent, elementLowerModel: elm.CloneModel, elementUpperModel: elm.CloneModel }
-    });
+    //let fltr = elm.getFilter();
+    //if (!fltr) {  return; }
+    //const dialogRef = this.dialog.open(FormFilteringComponent, {
+    //  width: '400px',
+    //  data: { upperValue: fltr.UpperValue, lowerValue: fltr.LowerValue, asContent: elm.getFilter().asContent, elementLowerModel: elm.CloneModel, elementUpperModel: elm.CloneModel }
+    //});
 
-    dialogRef.afterClosed().subscribe(result => {
-      elm.setFilter(result.lowerValue, result.upperValue, result.asContent);
+    //dialogRef.afterClosed().subscribe(result => {
+    //  elm.setFilter(result.lowerValue, result.upperValue, result.asContent);
    
-      this.applyFilter.emit();
-    });
+    //  this.applyFilter.emit();
+    //});
   }
 }

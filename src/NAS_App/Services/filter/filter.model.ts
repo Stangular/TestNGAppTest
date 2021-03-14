@@ -19,26 +19,26 @@ export class FilterSystemInventoryModel extends Records<string> {
     private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName, '', fields);
+    super(formName, 0, "sourceId" , fields);
   }
 
   public GetFormDefinition() {
-    if (this._UIElements.length <= 0) {
-      //          let vals: IValidator[] = [];
-      //        let nvals: IValidator[] = [];
-      //let s= new ElementModel<string>();
-      //s.formID = 'filterSystemInventoryForm';
-      //s.fieldID = 'xdate';
-      //s.type = 'date';
-      //s.filter = new ElementFilter<string>('', FilterType.none);
-      //this.addElement(new EditElementDefinition<string>(s, ''));
-      //let m = new ElementModel<number>();
-      //m.fieldID = 'xclose';
-      //m.type = 'float';
-      //m.filter = new ElementFilter<number>(0, FilterType.none);
-      //this.addElement(new EditElementDefinition<number>(m, 1));
-    }
-    return this._UIElements;
+    //if (this._UIElements.length <= 0) {
+    //  //          let vals: IValidator[] = [];
+    //  //        let nvals: IValidator[] = [];
+    //  //let s= new ElementModel<string>();
+    //  //s.formID = 'filterSystemInventoryForm';
+    //  //s.fieldID = 'xdate';
+    //  //s.type = 'date';
+    //  //s.filter = new ElementFilter<string>('', FilterType.none);
+    //  //this.addElement(new EditElementDefinition<string>(s, ''));
+    //  //let m = new ElementModel<number>();
+    //  //m.fieldID = 'xclose';
+    //  //m.type = 'float';
+    //  //m.filter = new ElementFilter<number>(0, FilterType.none);
+    //  //this.addElement(new EditElementDefinition<number>(m, 1));
+    //}
+    return [];//this._UIElements;
   }
 
   UpdateDependentUI(): void {
@@ -104,22 +104,22 @@ export class FilterCityTemperatureModel extends Records<string> {
     private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName, '', fields);
+    super(formName, 0, "sourceId", fields);
   }
 
   public GetFormDefinition() {
-    if (this._UIElements.length <= 0) {
-      //          let vals: IValidator[] = [];
-      //        let nvals: IValidator[] = [];
-     // let m = new ElementModel();
-     // m.formID = 'filterSystemInventoryForm';
-     // m.fieldID = 'date';
-     //this.addElement(new EditElementDefinition( m, ''));
-      //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'new_york', true, 1, 1, 1, '', 'float'));
-      //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'san_francisco', true, 1, 1, 1, '', 'float'));
-      //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'austin', true, 1, 1, 1, '', 'float'));
-    }
-    return this._UIElements;
+    //if (this._UIElements.length <= 0) {
+    //  //          let vals: IValidator[] = [];
+    //  //        let nvals: IValidator[] = [];
+    // // let m = new ElementModel();
+    // // m.formID = 'filterSystemInventoryForm';
+    // // m.fieldID = 'date';
+    // //this.addElement(new EditElementDefinition( m, ''));
+    //  //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'new_york', true, 1, 1, 1, '', 'float'));
+    //  //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'san_francisco', true, 1, 1, 1, '', 'float'));
+    //  //this.addElement(new EditElementDefinition('filterSystemInventoryForm', 'austin', true, 1, 1, 1, '', 'float'));
+    //}
+    return []; //this._UIElements;
   }
 
   ChartData(chartID: string): { xparam: number, yparam: number }[] {
@@ -184,43 +184,43 @@ export class FilterBarCharModel extends Records<string> {
     private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName,'', fields);
+    super(formName, 0, "sourceId", fields);
   }
 
   public GetFormDefinition() {
-    if (this._UIElements.length <= 0) {
-      //          let vals: IValidator[] = [];
-      //        let nvals: IValidator[] = [];'
-      let s = new ElementModel<string>();
-      s.formID = 'filterSystemInventoryForm';
-      s.fieldID = 'state';
-      s.defaultValue = '';
-      this.addElement(new EditElementDefinition<string>(s));
-      let m = new ElementModel<number>();
-      m = new ElementModel<number>(m);
-      m.fieldID = 'under_5';
-      m.type = 'number';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_13';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_17';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_24';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_44';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_64';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'over_64';
-      this.addElement(new EditElementDefinition<number>(m));
-    }
-    return this._UIElements;
+    //if (this._UIElements.length <= 0) {
+    //  //          let vals: IValidator[] = [];
+    //  //        let nvals: IValidator[] = [];'
+    //  let s = new ElementModel<string>();
+    //  s.formID = 'filterSystemInventoryForm';
+    //  s.fieldID = 'state';
+    //  s.defaultValue = '';
+    //  this.addElement(new EditElementDefinition<string>(s));
+    //  let m = new ElementModel<number>();
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'under_5';
+    //  m.type = 'number';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_13';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_17';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_24';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_44';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_64';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'over_64';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //}
+    return []; //this._UIElements;
   }
 
   UpdateDependentUI(): void {
@@ -274,7 +274,7 @@ export class FilterBarCharModel extends Records<string> {
   get testData() {
 
     let data: string[] = [];
-    let f = new BaseField({ fieldID: 'state', values: [] });
+   // let f = new BaseField({ ElementName: 'state', values: [] });
     data.push("AL, 310504, 552339, 259034, 450818, 1231572, 1215966, 641667");
     data.push("AK, 52083, 85640, 42153, 74257, 198724, 183159, 50277");
     data.push("AZ, 515910, 828669, 362642, 601943, 1804762, 1523681, 862573");
@@ -350,14 +350,14 @@ export class FilterBarCharModel extends Records<string> {
       over_64.push(parts[7].trim());
     });
 
-    fields.push(new BaseField({ fieldID: 'state', values: state }));
-    fields.push(new BaseField({ fieldID: 'under_5', values: under_5 }));
-    fields.push(new BaseField({ fieldID: 'to_13', values: to_13 }));
-    fields.push(new BaseField({ fieldID: 'to_17', values: to_17 }));
-    fields.push(new BaseField({ fieldID: 'to_24', values: to_24 }));
-    fields.push(new BaseField({ fieldID: 'to_44', values: to_44 }));
-    fields.push(new BaseField({ fieldID: 'to_64', values: to_64 }));
-    fields.push(new BaseField({ fieldID: 'over_64', values: over_64 }));
+    //fields.push(new BaseField({ ElementName: 'state', values: state }));
+    //fields.push(new BaseField({ ElementName: 'under_5', values: under_5 }));
+    //fields.push(new BaseField({ ElementName: 'to_13', values: to_13 }));
+    //fields.push(new BaseField({ ElementName: 'to_17', values: to_17 }));
+    //fields.push(new BaseField({ ElementName: 'to_24', values: to_24 }));
+    //fields.push(new BaseField({ ElementName: 'to_44', values: to_44 }));
+    //fields.push(new BaseField({ ElementName: 'to_64', values: to_64 }));
+    //fields.push(new BaseField({ ElementName: 'over_64', values: over_64 }));
 
     return fields;
     //  return data;
@@ -372,43 +372,43 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
     private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName,'', fields);
+    super(formName,0,"", fields);
   }
 
-  public GetFormDefinition() {
-    if (this._UIElements.length <= 0) {
-      //          let vals: IValidator[] = [];
-      //        let nvals: IValidator[] = [];'
-      let s = new ElementModel<string>();
-      s.formID = 'filterSystemInventoryForm';
-      s.fieldID = 'state';
-      s.defaultValue = '';
-      this.addElement(new EditElementDefinition<string>(s));
-      let m = new ElementModel<number>();
-      m = new ElementModel<number>(m);
-      m.fieldID = 'under_5';
-      m.type = 'number';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_13';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_17';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_24';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_44';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'to_64';
-      this.addElement(new EditElementDefinition<number>(m));
-      m = new ElementModel<number>(m);
-      m.fieldID = 'over_64';
-      this.addElement(new EditElementDefinition<number>(m));
-    }
-    return this._UIElements;
+  public GetFormDefinition(): IElementDefinition[] {
+    //if (this._UIElements.length <= 0) {
+    //  //          let vals: IValidator[] = [];
+    //  //        let nvals: IValidator[] = [];'
+    //  let s = new ElementModel<string>();
+    //  s.formID = 'filterSystemInventoryForm';
+    //  s.fieldID = 'state';
+    //  s.defaultValue = '';
+    //  this.addElement(new EditElementDefinition<string>(s));
+    //  let m = new ElementModel<number>();
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'under_5';
+    //  m.type = 'number';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_13';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_17';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_24';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_44';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'to_64';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //  m = new ElementModel<number>(m);
+    //  m.fieldID = 'over_64';
+    //  this.addElement(new EditElementDefinition<number>(m));
+    //}
+  return this._fields;
   }
 
   UpdateDependentUI(): void {
@@ -457,7 +457,7 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
   get testData() {
 
     let data: string[] = [];
-    let f = new BaseField({ fieldID: 'state', values: [] });
+  //  let f = new BaseField({ fieldID: 'state', values: [] });
     data.push("AL, 310504, 552339, 259034, 450818, 1231572, 1215966, 641667");
     data.push("AK, 52083, 85640, 42153, 74257, 198724, 183159, 50277");
     data.push("AZ, 515910, 828669, 362642, 601943, 1804762, 1523681, 862573");
@@ -533,14 +533,14 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
       over_64.push(parts[7].trim());
     });
 
-    fields.push(new BaseField({ fieldID: 'state', values: state }));
-    fields.push(new BaseField({ fieldID: 'under_5', values: under_5 }));
-    fields.push(new BaseField({ fieldID: 'to_13', values: to_13 }));
-    fields.push(new BaseField({ fieldID: 'to_17', values: to_17 }));
-    fields.push(new BaseField({ fieldID: 'to_24', values: to_24 }));
-    fields.push(new BaseField({ fieldID: 'to_44', values: to_44 }));
-    fields.push(new BaseField({ fieldID: 'to_64', values: to_64 }));
-    fields.push(new BaseField({ fieldID: 'over_64', values: over_64 }));
+    //fields.push(new BaseField({ fieldID: 'state', values: state }));
+    //fields.push(new BaseField({ fieldID: 'under_5', values: under_5 }));
+    //fields.push(new BaseField({ fieldID: 'to_13', values: to_13 }));
+    //fields.push(new BaseField({ fieldID: 'to_17', values: to_17 }));
+    //fields.push(new BaseField({ fieldID: 'to_24', values: to_24 }));
+    //fields.push(new BaseField({ fieldID: 'to_44', values: to_44 }));
+    //fields.push(new BaseField({ fieldID: 'to_64', values: to_64 }));
+    //fields.push(new BaseField({ fieldID: 'over_64', values: over_64 }));
 
     return fields;
     //  return data;
@@ -570,46 +570,46 @@ export class FilterBasicBarChartModel extends Records<string> {
 
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName, 'charttestTableA', fields);
+    super(formName, 0,"", fields);
   }
 
-  public GetFormDefinition() {
-    if (this._UIElements.length <= 0) {
-      //          let vals: IValidator[] = [];
-      //        let nvals: IValidator[] = [];'
+ public GetFormDefinition() {
+  //  if (this._UIElements.length <= 0) {
+  //    //          let vals: IValidator[] = [];
+  //    //        let nvals: IValidator[] = [];'
 
-      let s = new ElementModel<string>();
-      s.formID = 'filterBasicBarForm';
-      s.fieldID = 'id';
-      s.label = ':';
-      s.defaultValue = "";
-      s.autoDirtyOnDefault = true;
-      this.addElement(new EditElementDefinition<string>(s));
+  //    let s = new ElementModel<string>();
+  //    s.formID = 'filterBasicBarForm';
+  //    s.fieldID = 'id';
+  //    s.label = ':';
+  //    s.defaultValue = "";
+  //    s.autoDirtyOnDefault = true;
+  //    this.addElement(new EditElementDefinition<string>(s));
 
-      s = new ElementModel<string>();
-      s.formID = 'filterBasicBarForm';
-      s.fieldID = 'date';
-      s.label = 'Date';
-      s.defaultValue = '';
-      s.type = 'date';
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const day = 1;
+  //    s = new ElementModel<string>();
+  //    s.formID = 'filterBasicBarForm';
+  //    s.fieldID = 'date';
+  //    s.label = 'Date';
+  //    s.defaultValue = '';
+  //    s.type = 'date';
+  //    const date = new Date();
+  //    const year = date.getFullYear();
+  //    const month = date.getMonth() + 1;
+  //    const day = 1;
 
-      s.defaultValue = year + '-' + month + '-0' + day;
+  //    s.defaultValue = year + '-' + month + '-0' + day;
 
-      this.addElement(new EditElementDefinition<string>(s));
-      let m = new ElementModel<number>();
-      m = new ElementModel<number>(m);
-      m.formID = 'filterBasicBarForm';
-      m.fieldID = 'income';
-      m.label = 'Income';
-      m.type = 'number';
-      m.defaultValue = 0;
-      this.addElement(new EditElementDefinition<number>(m));
-    }
-    return this._UIElements;
+  //    this.addElement(new EditElementDefinition<string>(s));
+  //    let m = new ElementModel<number>();
+  //    m = new ElementModel<number>(m);
+  //    m.formID = 'filterBasicBarForm';
+  //    m.fieldID = 'income';
+  //    m.label = 'Income';
+  //    m.type = 'number';
+  //    m.defaultValue = 0;
+  //    this.addElement(new EditElementDefinition<number>(m));
+   //  }
+   return this._fields;
   }
 
   UpdateDependentUI(): void {
@@ -648,74 +648,74 @@ export class FilterBasicBarChartModel extends Records<string> {
   }
 
   ValueToDateGraphic(width: number, height: number, chartName: string = '') {
-    let f = this.Fields.find(f => f.FieldId == 'Id');//
-    let fid = f.Data;
+    //let f = this.Fields.find(f => f.FieldId == 'Id');//
+    //let fid = f.Data;
 
-    let fx = this.Fields.find(f => f.FieldId == 'date').Data;
-    // Chart has its own order...
-    let fxx = fx.map(d => d)
-    fxx.sort(function (a, b) {
-      let mb = moment(b);
-      let ma = moment(a);
-      return (mb > ma ? -1 : 1);
-    });
-    let fy = this.Fields.find(f => f.FieldId == 'income');
+    //let fx = this.Fields.find(f => f.FieldId == 'date').Data;
+    //// Chart has its own order...
+    //let fxx = fx.map(d => d)
+    //fxx.sort(function (a, b) {
+    //  let mb = moment(b);
+    //  let ma = moment(a);
+    //  return (mb > ma ? -1 : 1);
+    //});
+    //let fy = this.Fields.find(f => f.FieldId == 'income');
 
-    if (!fx || !fy) {
-      return null;
-    }
-    let d: string = '';
-    let r: string[] = [];
-    let years: { label: string, id: string }[] = [];
-    let months: { label: string, id: string }[] = [];
+    //if (!fx || !fy) {
+    //  return null;
+    //}
+    //let d: string = '';
+    //let r: string[] = [];
+    //let years: { label: string, id: string }[] = [];
+    //let months: { label: string, id: string }[] = [];
 
-    for (let i = 0; i < fx.length; i++) {
-      d = fx[i];
-      // calculate percentage of total height -  x/H = (d/500)* H 
-    }
+    //for (let i = 0; i < fx.length; i++) {
+    //  d = fx[i];
+    //  // calculate percentage of total height -  x/H = (d/500)* H 
+    //}
 
-    for (let i = 0; i < fxx.length; i++) {
-      d = fxx[i];
-      r = d.split('-')
-      let ndx = fx.findIndex(f => f == d);
-      years.push({ label: years.findIndex(y => y.label == r[0]) >= 0 ? '' : r[0], id: fid[ndx] });
-      months.push({ label: r[1], id: fid[ndx] });
-    }
-    let dateScale: any[] = [];
-    dateScale.push({ scale: new Scale(months), width: 20, height: 16, angle: 0 });
-    dateScale.push({ scale: new Scale(years), width: 20, height: 16, angle: 0 });
-    let xTick = new Tick(dateScale, 5, 0, 50);
+    //for (let i = 0; i < fxx.length; i++) {
+    //  d = fxx[i];
+    //  r = d.split('-')
+    //  let ndx = fx.findIndex(f => f == d);
+    //  years.push({ label: years.findIndex(y => y.label == r[0]) >= 0 ? '' : r[0], id: fid[ndx] });
+    //  months.push({ label: r[1], id: fid[ndx] });
+    //}
+    //let dateScale: any[] = [];
+    //dateScale.push({ scale: new Scale(months), width: 20, height: 16, angle: 0 });
+    //dateScale.push({ scale: new Scale(years), width: 20, height: 16, angle: 0 });
+    //let xTick = new Tick(dateScale, 5, 0, 50);
 
-    let xScale = new NumericScale(0, 2000, 50, 100);
+    //let xScale = new NumericScale(0, 2000, 50, 100);
 
-    let scale1 = { scale: xScale, width: 20, height: 16, angle: 0 };
+    //let scale1 = { scale: xScale, width: 20, height: 16, angle: 0 };
 
-    let yTick = new Tick([scale1], 5, 0, 50);
-    let chartstate: StateIndex;
+    //let yTick = new Tick([scale1], 5, 0, 50);
+    //let chartstate: StateIndex;
 
-    chartstate = new StateIndex('barchart');
-    chartstate.setState(UIStates.background, 5);
-    chartstate.setState(UIStates.foreground, 3);
-    chartstate.setState(UIStates.color, 3);
-    chartstate.setState(UIStates.weight, 0);
-    chartstate.setState(UIStates.fontFace, 0);
-    let margins = new Margin(10, 50, 10, 60);
-    let chart: ChartLayer;
+    //chartstate = new StateIndex('barchart');
+    //chartstate.setState(UIStates.background, 5);
+    //chartstate.setState(UIStates.foreground, 3);
+    //chartstate.setState(UIStates.color, 3);
+    //chartstate.setState(UIStates.weight, 0);
+    //chartstate.setState(UIStates.fontFace, 0);
+    //let margins = new Margin(10, 50, 10, 60);
+    //let chart: ChartLayer;
 
-    let bar = new BarLayer(0, 2000, fid, fy.Data, margins, new Size(width, height));
-    chart = new ChartLayer(
-      width, height,
-      margins, xTick, yTick, 'barchart', 'bc1',
-      chartstate, bar);
-    return chart;
+    //let bar = new BarLayer(0, 2000, fid, fy.Data, margins, new Size(width, height));
+    //chart = new ChartLayer(
+    //  width, height,
+    //  margins, xTick, yTick, 'barchart', 'bc1',
+    //  chartstate, bar);
+    //return chart;
   }
 
   ChartGraphic(chartID: string, width: number, height: number, chartName: string = ''): ChartLayer {
     let chart: ChartLayer;
-    switch (chartID) {
-      case 'chart2': chart = this.ValueToDateGraphic(width, height, chartName); break;
-      default: chart = null; break;
-    }
+    //switch (chartID) {
+    //  case 'chart2': chart = this.ValueToDateGraphic(width, height, chartName); break;
+    //  default: chart = null; break;
+    //}
     return chart;
   }
 

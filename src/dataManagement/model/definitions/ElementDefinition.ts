@@ -1,5 +1,7 @@
-import { IValidator } from './Validation';
+import { IValidator, Validator } from './Validation';
 import * as moment from 'moment';
+import { ISequenceNavigator } from '../sequencing/sequenceNavigator';
+import { Field } from '../field';
 
 export interface IUpdateType {
   Update(type: IUpdateType): void;
@@ -13,7 +15,7 @@ export enum FilterType {
   equal = 3,
   greaterThanORequal = 4,
   greaterThan = 5,
- contains = 6,
+  contains = 6,
   doesNotContain = 7
 }
 
@@ -28,8 +30,8 @@ export class ElementFilter<T> {
   constructor() { }
   FieldId: string = '';
   Sort: SortOrder = SortOrder.unsorted;
-  LowerValue: any;
-  UpperValue: any;
+  LowerValue: T;
+  UpperValue: T;
   asContent: boolean = false;
   not: boolean = false;
   applied: boolean = false;
@@ -56,13 +58,33 @@ export class ElementFilter<T> {
   }
 }
 
-export class ElementModel<T>{
+export interface IElementModel {
+  Name: string;
+  HasFilter: boolean;
+  Filter: ElementFilter<any>;
+  setFilter(lowervalue: any, uppervalue: any, asContent: boolean);
+  SetNextSortOrder(): void;
+  SortOrder(): SortOrder;
+  ToggleFilter();
+  TurnFilterOff();
+  FilterApplied: boolean;
+  Type(): string;
+  Observable(): boolean;
+  Label: string;
+  Mask(): number;
+  DefaultValue: any;
+  Validator: number;
+  UIConvert(elmdef: IElementDefinition): any;
+  UIValueConvert(value: any): any;
 
-  // userPermission: ePermission;  edit/view
-  formID: string = '';
-  fieldID: string = '';
+}
+
+export class ElementModel<T> implements IElementModel{
+
+  modelName: string = '';
+  modelID: number = -1;
   observe: boolean = true;
-  label = '';
+  label: string = '';
   type: string = 'text';
   defaultValue: T;
   mask: number = 0; // RegExp[] = []; //or {ID:'',mask:RegExp[] = []}
@@ -72,239 +94,81 @@ export class ElementModel<T>{
 
   constructor(model: ElementModel<T> = null) {
     if (model != null) {
-      this.formID = model.formID;
-      this.fieldID = model.fieldID;
       this.observe = model.observe;
-      this.label = model.label;
       this.type = model.type;
       this.mask = model.mask;
       this.validator = model.validator;
-      this.filter.FieldId = model.fieldID;
       this.filter.UpperValue = model.filter.UpperValue;
       this.filter.LowerValue = model.filter.LowerValue;
       this.filter.asContent = model.filter.asContent;
       this.filter.Sort = model.filter.Sort;
+      this.label = model.Label;
     }
   }
-}
 
-export interface IElementDefinition<T> {
+  get Name() { return this.modelName; }
+  get Validator() { return this.validator }
 
-  FormID(): string;
-  FieldID(): string;
-  Observable(): boolean;
-  Label(): string;
-  Type(): string;
-  //  InvalidValue(): T;
-  DefaultValue(): T;
-  InitialValue(): T;
-  CurrentValue(): T;
-  Mask(): number;
+  get Label() { return this.label; }
 
-  init(): void;
-  isNew(): boolean;
-  isDirty(): boolean;
-  Clean(): void;
-  ResetToDefault(): void;
-  validateValue(v: T): boolean;
-  SetInitialValue(v: T): boolean;
-  UpdateCurrentValue(v: T): boolean;
-  UpdateFromUI(): T;
-  setFilter(lowervalue: T, uppervalue: T, asContent: boolean);
-  getFilter();
-  SortOrder(): SortOrder;
-  SetNextSortOrder(): void;
-  UIConvert(): T;
-  UIValueConvert(value: T): T;
-  TurnFilterOff();
-  FilterApplied: boolean;
-  HasFilter: boolean;
-  ToggleFilter();
-};
-
-export class EditElementDefinition<T> implements IElementDefinition<T> {
-
-
-  constructor(
-    private _model: ElementModel<T>,
-    protected _initialValue: T = _model.defaultValue,
-    protected _currentValue: T = _initialValue
-  ) {
-    this.ResetToDefault();
-  }
-  
-  getFilter() {
-    this._model.filter.FieldId = this._model.fieldID;
-    return this._model.filter;
+  get HasFilter(): boolean{
+    return this.filter.LowerValue != null || this.filter.UpperValue != null;
   }
 
-  setFilter(lowervalue: T,uppervalue: T, asContent: boolean = false) {
-    this._model.filter.LowerValue = lowervalue;
-    this._model.filter.UpperValue = uppervalue;
-    this._model.filter.asContent = asContent;
-    this._model.filter.applied = lowervalue != undefined || uppervalue != undefined;
+  get Filter() : ElementFilter<T> {
+    //this.filter.FieldId = this.fieldID;
+    return this.filter;
   }
 
-  get HasFilter() {
-    return this._model.filter.LowerValue != null || this._model.filter.UpperValue != null;
+  setFilter(lowervalue: T, uppervalue: T, asContent: boolean = false) {
+    this.filter.LowerValue = lowervalue;
+    this.filter.UpperValue = uppervalue;
+    this.filter.asContent = asContent;
+    this.filter.applied = lowervalue != undefined || uppervalue != undefined;
   }
-  //FilterValue(): T {
-  //  return this._model.;
-  //}
-
-  //FilterType(): FilterType {
-  //  return this._model.filterType;
-  //}
 
   SetNextSortOrder(): void {
-    switch (this._model.filter.Sort) {
-      case SortOrder.unsorted: this._model.filter.Sort = SortOrder.ascending; break;
-      case SortOrder.ascending: this._model.filter.Sort = SortOrder.descending; break;
-      case SortOrder.descending: this._model.filter.Sort = SortOrder.unsorted; break;
+    switch (this.filter.Sort) {
+      case SortOrder.unsorted: this.filter.Sort = SortOrder.ascending; break;
+      case SortOrder.ascending: this.filter.Sort = SortOrder.descending; break;
+      case SortOrder.descending: this.filter.Sort = SortOrder.unsorted; break;
     }
-  }
-
-  get CloneModel() {
-    return new ElementModel(this._model);
-  }
-
-  get Duplicate() {
-    return new EditElementDefinition(this._model, this._currentValue);
   }
 
   SortOrder(): SortOrder {
-    return this._model.filter.Sort;
-  }
-
-  init(): void {
-
+    return this.filter.Sort;
   }
 
   ToggleFilter() {
-    return this._model.filter.Toggle();
+    return this.filter.Toggle();
   }
 
   TurnFilterOff() {
-    this._model.filter.TurnOff();
+    this.filter.TurnOff();
   }
 
-  get FilterApplied() {
-    return this._model.filter.Applied;
-  }
-  
-  Label(): string {
-    return this._model.label;
+  get FilterApplied(): boolean {
+    return this.filter.Applied;
   }
 
   Type(): string {
-    return this._model.type;
-  }
-
-  FormID(): string {
-    return this._model.formID;
-  }
-
-  FieldID(): string {
-    return this._model.fieldID;
+    return this.type;
   }
 
   Observable(): boolean {
-    return this._model.observe;
+    return this.observe;
   }
 
   Mask(): number {
-    return this._model.mask;
+    return this.mask;
   }
 
-  DefaultValue(): T {
-    return this._model.defaultValue;
+  get DefaultValue(): T {
+    return this.defaultValue;
   }
 
-  InitialValue(): T {
-    return this._initialValue || this.DefaultValue();
-  }
-
-  CurrentValue(): T {
-    return this._currentValue || this.InitialValue();
-  }
-
-  isNew(): boolean {
-    return (this._model.autoDirtyOnDefault
-      && this.CurrentValue() == this.DefaultValue());
-  }
-
-  isDirty(): boolean {
-    let isDirty = false;
-    switch (this.Type()) {
-      case 'date':
-        let c = moment(this._currentValue).format("YYYY-MM-DD");
-        let i = moment(this._initialValue).format("YYYY-MM-DD");
-        isDirty = c != i;
-        break;
-      default: isDirty = this._initialValue !== this._currentValue;
-    }
-    return isDirty || this.isNew();
-  }
-
-  ResetToDefault(): void {
-    this._initialValue = this.DefaultValue();
-    this._currentValue = this._initialValue;
-  }
-
-  //  ResetToInvalid(): void {
-  //       this._initialValue = this._defaultValue;
-  //       this._currentValue = this._invalidValue;
-  //    }
-
-  Clean(): void {
-    this._initialValue = this._currentValue;
-  }
-
-  UpdateFromUI(): T {
-    const elm: any = document.getElementById(this.FieldID()); // <- Non-angular, but seems to work pretty well anyway....
-    if (elm) {
-      const v = this.Type() == 'number' ? parseInt(elm.value) : elm.value;
-      this.UpdateCurrentValue(v);
-    }
-    return this._currentValue;
-  }
-  validateValue(v: T): boolean {
-    let res = true;
-
-    //for (let validator of this._model.validators) {
-    //  if (!validator.validate(v.toString())) {
-    //    res = false;
-    //  }
-    //}
-    return res;
-  }
-
-  SetInitialValue(v: T): boolean {
-    let res = this.validateValue(v);
-    if (res) {
-      this._initialValue = v;
-      this._currentValue = this._initialValue;
-    }
-    return res;
-  }
-
-  UpdateCurrentValue(v: T): boolean {
-    let res = this.validateValue(v);
-    if (res) {
-      this._currentValue = v;
-    }
-    return res;
-  }
-  /// Converts the currentValue if necessary for UI display.
-  UIConvert(): T {
-    let c: any;
-    switch (this.Type()) {
-      case 'date':
-        c = moment(this._currentValue).format("YYYY-MM-DD");
-        break;
-      default: c = this._currentValue;
-    }
-    return c;
+  UIConvert(elmdef: IElementDefinition): any {
+    return this.UIValueConvert(elmdef.CurrentValue());
   }
 
   UIValueConvert(value: T): T {
@@ -315,8 +179,133 @@ export class EditElementDefinition<T> implements IElementDefinition<T> {
         break;
       default: c = value;
     }
-    return c;
+    return value;
   }
+}
+
+
+export interface IElementDefinition {
+
+  ElementID: number;
+  ElementName: string;
+  EditMode: boolean;
+  InitialValue(): any;
+  CurrentValue(): any;
+
+  init(): void;
+  IsDirty: boolean;
+  Clean(): void;
+  ResetToDefault(defaultValue: any): void;
+//  validateValue(v: any): boolean;
+  SetInitialValue(v: any, validator: IValidator): boolean;
+  UpdateCurrentValue(v: any, validator: IValidator): boolean;
+  UpdateFromUI(validator: IValidator): any;
+};
+
+export class EditElementDefinition<T> implements IElementDefinition {
+
+  constructor(
+    private elemName: string,
+    private elemId: number,
+    private modelId: number,
+    protected _initialValue: T,
+    protected _currentValue: T = _initialValue,
+    private editMode: boolean = true) {}
+
+  get ElementName(): string {
+    return this.elemName;
+  }
+
+  get EditMode() : boolean { return this.editMode; }
+  get ElementID(): number {
+    return this.elemId;
+  }
+
+  get ModelID(): number {
+    return this.modelId;
+  }
+
+  get IsDirty(): boolean {
+    return this._currentValue != this._initialValue;
+  }
+
+  init(): void {}
+  
+
+  InitialValue(): T {
+    return this._initialValue;
+  }
+
+  CurrentValue(): T {
+    return this._currentValue || this.InitialValue();
+  }
+
+  ResetToDefault(defaultValue : T): void {
+    this._initialValue = defaultValue;
+    this._currentValue = this._initialValue;
+  }
+
+  Clean(): void {
+    this._initialValue = this._currentValue;
+  }
+
+  UpdateFromUI(validator: IValidator): T {
+    const elm: any = document.getElementById(this.ElementName); // <- Non-angular, but seems to work pretty well anyway....
+    if (elm) {
+      this.UpdateCurrentValue(elm.value,validator);
+    }
+    return this._currentValue;
+  }
+
+  //validateValue(v: T): boolean {
+  //  let res = true;
+
+  //  //for (let validator of this._model.validators) {
+  //  //  if (!validator.validate(v.toString())) {
+  //  //    res = false;
+  //  //  }
+  //  //}
+  //  return res;
+  //}
+
+  SetInitialValue(v: T, validator: IValidator): boolean {
+    let res = validator.validateValue(v);
+    if (res) {
+      this._initialValue = v;
+      this._currentValue = this._initialValue;
+    }
+    return res;
+  }
+
+  UpdateCurrentValue(v: T, validator: IValidator): boolean {
+    let res = validator.validateValue(v);
+    if (res) {
+      this._currentValue = v;
+    }
+    return res;
+  }
+  /// Converts the currentValue if necessary for UI display.
+  //UIConvert(): T {
+  //  //let c: any;
+  //  //switch (this.Type()) {
+  //  //  case 'date':
+  //  //    c = moment(this._currentValue).format("YYYY-MM-DD");
+  //  //    break;
+  //  //  default: c = this._currentValue;
+  //  //}
+  //  return this._currentValue;
+  //}
+
+  //UIValueConvert(value: T): T {
+  //  //let c: any;
+  //  //switch (this.Type()) {
+  //  //  case 'date':
+  //  //    c = moment(value).format("YYYY-MM-DD");
+  //  //    break;
+  //  //  default: c = value;
+  //  //}
+  //  return value;
+  //}
 };
 
 //export class UpdateElementDefinition extends EditElementDefinition<IUpdateType> {

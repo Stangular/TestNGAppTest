@@ -1,18 +1,19 @@
-<div style="display:inline-block; width:60px; margin-right:10px" *ngIf="element.Label().length > 1">
+<!--<div style="display:inline-block; width:60px; margin-right:10px" *ngIf="element.Label().length > 1">
   <label>{{element.Label()}}</label>
-</div>
+</div>-->
 <div style="display:inline-block">
   <mat-form-field class="example-full-width" style="width:100%; text-align:left" [floatLabel]="'never'" *ngIf="editMode">
     <input matInput
-           (mouseout)="onblur()"
-           [id]="element.FieldID()"
-           [placeholder]="element.Label()"
-           [type]="element.Type()"
-           [value]="element.UIConvert()" />
+           (blur)="onUpdate()"
+           [id]="eRef.ElementId()"
+           [placeholder]="mRef.Label"
+           matTooltip="mRef.Label"
+           [type]="mRef.Type"
+           [value]="mRef.UIConvert(eRef)" />
   </mat-form-field>
 </div>
 <div *ngIf="!editMode">
-  <label matInput>{{element.CurrentValue()}}</label>
+  <label matInput>{{Element.CurrentValue()}}</label>
 </div>
 
 

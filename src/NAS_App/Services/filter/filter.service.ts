@@ -150,7 +150,7 @@ export class FilterService implements IRecordService {
       case 'TestNormalizedStackedBarChart': source = this._filterC; break;
       case 'VBarChart': source = this._filterD; break;
     }
-    this.dataHTTPService.postContent(source.NewContent);
+ //   this.dataHTTPService.postContent(source.NewContent);
   }
 
   public Init(formname: string) {

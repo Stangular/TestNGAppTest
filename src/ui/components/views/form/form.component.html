@@ -92,14 +92,13 @@
 
     <!--<ng4-loading-spinner> </ng4-loading-spinner>-->
     <form class="example-form">
-      <div [formGroup]="form" class="form-group">
+      <div [formGroup]="Form" class="form-group">
         <detail-view *ngIf="view == viewType.detail"
                      [elements]="elements"
                      [form]="form"
                      [servicing]="saveing"
                      [formDirty]="source.IsDirty"
                      [formNew]="source.IsNew"
-                     (action)="action($event)"
                      (blur)="UpdateElement($event)"></detail-view>
         <table-view *ngIf="view == viewType.table"
                     [source]="source"
