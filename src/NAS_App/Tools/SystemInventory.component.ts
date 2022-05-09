@@ -4,6 +4,8 @@ import { FilterService } from '../Services/filter/filter.service';
 import { IElementDefinition } from '../../dataManagement/model/definitions/ElementDefinition';
 import { TheCanvasState } from '../../canvas/models/DisplayValues';
 import { ChartLayer } from 'src/canvas/models/custom/layers/charts/chart.layer';
+import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
+import { TabDefinitionModel } from 'src/models/tabs/tabdef';
 
 @Component({
   templateUrl: './SystemInventory.component.html',
@@ -15,7 +17,12 @@ export class SystemInventoryComponent implements OnInit {
   form: FormGroup;
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
   _theCanvas: TheCanvasState = new TheCanvasState();
-  constructor(private filterService: FilterService) {}
+ // tabs: TabDefinitionModel[] = [];
+
+  constructor(private edfs: ElementDefinitionFactoryService) {
+  //  this.tabs.push(new TabDefinitionModel("Details", "view_compact", "/systeminventory/detail", this.Source));
+   // this.tabs.push(new TabDefinitionModel("Table", "grid_on", "/systeminventory/table", this.Source));
+  }
 
   ngOnInit() {
 
@@ -23,11 +30,13 @@ export class SystemInventoryComponent implements OnInit {
     // register D3 view...
   }
 
-
   get Source() {
-    return this.filterService.filterSource('VBarChart');
+    return 'VBarChart';
   }
- 
+
+  //get Tabs(): TabDefinitionModel[] {
+  //  return this.tabs;
+  //}
   //getElement(elementID: string) {
   //  return this.elements.find(e => e.FieldID() === elementID) || {};
   //}
@@ -38,7 +47,8 @@ export class SystemInventoryComponent implements OnInit {
  //   this.filterService.Init('TestMultSeriesLineChart');
     //  this.filterService.Init('testtable1');
     
-    this.filterService.Init('VBarChart');
+    // this.filterService.Init('VBarChart');
+   // this.edfs.LoadData('VBarChart');
     return this.form;
   }
 

@@ -11,12 +11,14 @@ export abstract class ContentShape extends Shape {
     width: number,
     height: number,
     state: string,
-    protected content: Content) {
-    super(id, top, left, width, height, state);
+    protected content: Content,
+    zIndex: number = 0) {
+    super(id, top, left, width, height, state, zIndex);
   }
 
   get Content() {
     return this.content;
   }
+
 
 }

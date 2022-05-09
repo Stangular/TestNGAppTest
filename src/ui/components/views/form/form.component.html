@@ -1,129 +1,27 @@
 <!--<fa-icon aria-label="Filter content" icon="filter"></fa-icon>-->
 <!--<form-filter [elements]="elements" [form]="form"></form-filter>-->
-
+<nav-menu></nav-menu>
 <mat-card class="form-card">
-  <mat-card-header>
-    <mat-card-title>
-      {{source.FormName}}
-    </mat-card-title>
-    <mat-card-subtitle>{{metaInfo}}</mat-card-subtitle>
-    <mat-tab-group [selectedIndex]="activeView" style="width:90%"
-                   (selectedIndexChange)="TabChange($event)">
-      <!--<mat-tab>
-    <ng-template mat-tab-label>
-      <i class="fa fa-filter" style="padding-right:5px"></i>
-      Filter
-    </ng-template>
-    <form-filter [elements]="elements" [form]="form"></form-filter>
-  </mat-tab>-->
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">view_compact</mat-icon>
-          Detail
-        </ng-template>
-        <form-pager (pageaction)="page($event)"
-                    [recordCount]="source.Total"
-                    [formDirty]="source.IsDirty"
-                    [pageSize]="source.PageSize"
-                    (pagesizeOut)="SetFormContent($event)"
-                    [recordNumber]="source.CurrentRecordNumber">
-        </form-pager>
-      </mat-tab>
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">grid_on</mat-icon>
-          Table
-        </ng-template>
-        <form-pager (pageaction)="page($event)"
-                    [mode]="pagingMode.byPage"
-                    [recordCount]="source.Total"
-                    [pageCount]="source.page.PageCount"
-                    [formDirty]="source.IsDirty"
-                    [pageSize]="source.PageSize"
-                    (pagesizeOut)="SetFormContent($event)"
-                    [pageNumber]="source.page.PageNumber">
-        </form-pager>
-      </mat-tab>
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">equalizer</mat-icon>
-          Dashboard
-        </ng-template>
-        <form-pager (pageaction)="page($event)"
-                    [mode]="pagingMode.byPage"
-                    [recordCount]="source.Total"
-                    [pageCount]="source.page.PageCount"
-                    [formDirty]="source.IsDirty"
-                    [pageSize]="source.PageSize"
-                    (pagesizeOut)="SetFormContent($event)"
-                    [pageNumber]="source.page.PageNumber">
-        </form-pager>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">create</mat-icon>
-          Designer
-        </ng-template>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">map</mat-icon>
-          Map
-        </ng-template>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">build_circle</mat-icon>
-          Workshop
-        </ng-template>
-      </mat-tab>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon class="form-tab-icon">people</mat-icon>
-          Family
-        </ng-template>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-header>
+  
   <mat-card-content>
-
-    <!--<ng4-loading-spinner> </ng4-loading-spinner>-->
-    <form class="example-form">
+    <form-pager (pageaction)="page($event)"
+                [mode]="pagingMode.byRecord"
+                [recordCount]="Source.Total"
+                [pageCount]="Source.page.PageCount"
+                [formDirty]="Source.IsDirty"
+                [pageSize]="Source.PageSize"
+                (pagesizeOut)="SetFormContent($event)"
+                [recordNumber]="Source.CurrentRecordNumber"
+                [sourceId]="sourceName"
+                [pageNumber]="Source.page.PageNumber">
+    </form-pager>
+    <!--<form class="example-form">
       <div [formGroup]="Form" class="form-group">
-        <detail-view *ngIf="view == viewType.detail"
-                     [elements]="elements"
-                     [form]="form"
-                     [servicing]="saveing"
-                     [formDirty]="source.IsDirty"
-                     [formNew]="source.IsNew"
-                     (blur)="UpdateElement($event)"></detail-view>
-        <table-view *ngIf="view == viewType.table"
-                    [source]="source"
-                    (gotoDetail)="SetTab(0)"
-                    (sortChange)="tableSort()"
-                    (applyFilter)="applyFilter()"></table-view>
-        <app-dashboard-page *ngIf="view == viewType.graphic"
-                            [layoutName]="'dashboardA'"
-                            [source]="source"
-                            (select)="onSelect($event)"></app-dashboard-page>
-        <app-designer-page *ngIf="view == viewType.design"
-                           (deleteItem)="OnDeleteItem()"
-                           (stateChange)="OnStateChange()">
-        </app-designer-page>
-        <app-sandbox *ngIf="view == viewType.sandbox">
-
-        </app-sandbox>
-        <family_manager *ngIf="view == viewType.familyLineage"></family_manager>
-        <ol-map *ngIf="view == viewType.map">
-
-        </ol-map>
       </div>
 
-    </form>
+    </form>-->
 
+    <router-outlet></router-outlet>
 
   </mat-card-content>
 </mat-card>

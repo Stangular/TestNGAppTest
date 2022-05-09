@@ -1,6 +1,6 @@
 import { Records } from '../../../dataManagement/model/records';
 import { Field, BaseField } from '../../../dataManagement/model/field';
-import { ElementModel, ElementFilter, FilterType, EditElementDefinition, IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
+import { ElementModel, ElementFilter, EditElementDefinition, IElementDefinition, ElementModelFactory } from '../../../dataManagement/model/definitions/ElementDefinition';
 import { D3AxisModel } from '../../../d3/axis/d3.axis.model';
 //import { D3Service } from '../../../d3/services/d3.service';
 import { Tick, IScale, Scale, NumericScale } from '../../../canvas/models/custom/layers/charts/axis/axis.layer';
@@ -10,6 +10,7 @@ import { BarLayer } from '../../../canvas/models/custom/layers/charts/content/ba
 import { Margin } from '../../../canvas/models/shapes/primitives/margin';
 import { Size } from '../../../canvas/models/shapes/primitives/size';
 import * as moment from 'moment';
+import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 
 export class FilterSystemInventoryModel extends Records<string> {
 
@@ -19,9 +20,10 @@ export class FilterSystemInventoryModel extends Records<string> {
     private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName, 0, "sourceId" , fields);
+    super(formName, 0, "sourceId", fields);
   }
 
+  public AddFieldFromModel(models: ElementModelFactory) { }
   public GetFormDefinition() {
     //if (this._UIElements.length <= 0) {
     //  //          let vals: IValidator[] = [];
@@ -55,7 +57,7 @@ export class FilterSystemInventoryModel extends Records<string> {
 
   SetDataView() {
 
-   // this.axisModel = new D3AxisModel(this._fields);
+    // this.axisModel = new D3AxisModel(this._fields);
   }
 
   OutputAll(): any {
@@ -98,7 +100,7 @@ export class FilterSystemInventoryModel extends Records<string> {
 
 export class FilterCityTemperatureModel extends Records<string> {
 
- // axisModel: D3AxisModel;// = new D3AxisModel();
+  // axisModel: D3AxisModel;// = new D3AxisModel();
 
   constructor(
     private D3: any,
@@ -106,7 +108,7 @@ export class FilterCityTemperatureModel extends Records<string> {
     , fields: Field<any>[] = []) {
     super(formName, 0, "sourceId", fields);
   }
-
+  public AddFieldFromModel(models: ElementModelFactory) { }
   public GetFormDefinition() {
     //if (this._UIElements.length <= 0) {
     //  //          let vals: IValidator[] = [];
@@ -160,7 +162,7 @@ export class FilterCityTemperatureModel extends Records<string> {
 
   SetDataView() {
 
-   //this.axisModel = new D3AxisModel(this._fields);
+    //this.axisModel = new D3AxisModel(this._fields);
   }
   OutputAll(): any {
     return {
@@ -186,7 +188,7 @@ export class FilterBarCharModel extends Records<string> {
     , fields: Field<any>[] = []) {
     super(formName, 0, "sourceId", fields);
   }
-
+  public AddFieldFromModel(models: ElementModelFactory) { }
   public GetFormDefinition() {
     //if (this._UIElements.length <= 0) {
     //  //          let vals: IValidator[] = [];
@@ -238,7 +240,7 @@ export class FilterBarCharModel extends Records<string> {
 
   SetDataView() {
 
-//    this.axisModel = new D3AxisModel(this._fields);
+    //    this.axisModel = new D3AxisModel(this._fields);
   }
 
   ChartData(chartID: string): { xparam: number, yparam: number }[] {
@@ -274,7 +276,7 @@ export class FilterBarCharModel extends Records<string> {
   get testData() {
 
     let data: string[] = [];
-   // let f = new BaseField({ ElementName: 'state', values: [] });
+    // let f = new BaseField({ ElementName: 'state', values: [] });
     data.push("AL, 310504, 552339, 259034, 450818, 1231572, 1215966, 641667");
     data.push("AK, 52083, 85640, 42153, 74257, 198724, 183159, 50277");
     data.push("AZ, 515910, 828669, 362642, 601943, 1804762, 1523681, 862573");
@@ -372,9 +374,9 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
     private D3: any,
     formName: string
     , fields: Field<any>[] = []) {
-    super(formName,0,"", fields);
+    super(formName, 0, "", fields);
   }
-
+  public AddFieldFromModel(models: ElementModelFactory) { }
   public GetFormDefinition(): IElementDefinition[] {
     //if (this._UIElements.length <= 0) {
     //  //          let vals: IValidator[] = [];
@@ -408,7 +410,7 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
     //  m.fieldID = 'over_64';
     //  this.addElement(new EditElementDefinition<number>(m));
     //}
-  return this._fields;
+    return null; //this._fields;
   }
 
   UpdateDependentUI(): void {
@@ -445,7 +447,7 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
 
   SetDataView() {
 
-   // this.axisModel = new D3AxisModel(this._fields);
+    // this.axisModel = new D3AxisModel(this._fields);
   }
   OutputAll(): any {
     return {
@@ -457,7 +459,7 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
   get testData() {
 
     let data: string[] = [];
-  //  let f = new BaseField({ fieldID: 'state', values: [] });
+    //  let f = new BaseField({ fieldID: 'state', values: [] });
     data.push("AL, 310504, 552339, 259034, 450818, 1231572, 1215966, 641667");
     data.push("AK, 52083, 85640, 42153, 74257, 198724, 183159, 50277");
     data.push("AZ, 515910, 828669, 362642, 601943, 1804762, 1523681, 862573");
@@ -547,7 +549,7 @@ export class FilterNormalizedStackedBarChartModel extends Records<string> {
   }
 }
 
-export class BarChartModel{
+export class BarChartModel {
 
   private staticValue: Number = 0;
   private variableValue: Number = 0;
@@ -557,7 +559,7 @@ export class BarChartModel{
     private date: Date) { }
 
 
-  CalculateVariablePosition( pos: Number, variableExtent:number, maxValue: number ) {
+  CalculateVariablePosition(pos: Number, variableExtent: number, maxValue: number) {
     return ((this.income / maxValue) * variableExtent);
   }
 }
@@ -565,51 +567,78 @@ export class BarChartModel{
 export class FilterBasicBarChartModel extends Records<string> {
 
   axisModel: D3AxisModel;// = new D3AxisModel();
-  
+
   constructor(
 
     formName: string
+    ,formId
     , fields: Field<any>[] = []) {
-    super(formName, 0,"", fields);
+    super(formName, formId, "charttestTableA", fields);
+
   }
 
- public GetFormDefinition() {
-  //  if (this._UIElements.length <= 0) {
-  //    //          let vals: IValidator[] = [];
-  //    //        let nvals: IValidator[] = [];'
+  public AddFieldFromModel(models: ElementModelFactory) {
+    this.Fields.push(new BaseField(models.DateModel.GetElementDefinition('sss', 1001, 2, 'sss', true), 'date'));
+    this.Fields.push(new BaseField(models.IntegerModel.GetElementDefinition('income', 1002, 1, 'Income', true), 'income'));
+    this.Fields.push(new BaseField(new EditElementDefinition('Id', 1000, 0, '', null, null, false, false), 'Id'));
+  }
 
-  //    let s = new ElementModel<string>();
-  //    s.formID = 'filterBasicBarForm';
-  //    s.fieldID = 'id';
-  //    s.label = ':';
-  //    s.defaultValue = "";
-  //    s.autoDirtyOnDefault = true;
-  //    this.addElement(new EditElementDefinition<string>(s));
 
-  //    s = new ElementModel<string>();
-  //    s.formID = 'filterBasicBarForm';
-  //    s.fieldID = 'date';
-  //    s.label = 'Date';
-  //    s.defaultValue = '';
-  //    s.type = 'date';
-  //    const date = new Date();
-  //    const year = date.getFullYear();
-  //    const month = date.getMonth() + 1;
-  //    const day = 1;
+  public GetFormDefinition() {
+    // if (this._UIElements.length <= 0) {
+    //          let vals: IValidator[] = [];
+    //        let nvals: IValidator[] = [];'
+  
+    let s = new ElementModel();
+    //s.formID = 'filterBasicBarForm';
+    //s.fieldID = 'id';
+    //s.label = ':';
+    //s.defaultValue = "";
+    //s.autoDirtyOnDefault = true;
+    //this.addElement(new EditElementDefinition<string>(s));
 
-  //    s.defaultValue = year + '-' + month + '-0' + day;
+    //s = new ElementModel<string>();
+    //s.formID = 'filterBasicBarForm';
+    //s.fieldID = 'date';
+    //s.label = 'Date';
+    //s.defaultValue = '';
+    //s.type = 'date';
+    //const date = new Date();
+    //const year = date.getFullYear();
+    //const month = date.getMonth() + 1;
+    //const day = 1;
 
-  //    this.addElement(new EditElementDefinition<string>(s));
-  //    let m = new ElementModel<number>();
-  //    m = new ElementModel<number>(m);
-  //    m.formID = 'filterBasicBarForm';
-  //    m.fieldID = 'income';
-  //    m.label = 'Income';
-  //    m.type = 'number';
-  //    m.defaultValue = 0;
-  //    this.addElement(new EditElementDefinition<number>(m));
-   //  }
-   return this._fields;
+    //s.defaultValue = year + '-' + month + '-0' + day;
+    //if (this.Fields.length <= 0) {
+    //  this.Fields.push(new BaseField(
+    //    new EditElementDefinition(
+    //      'income',
+    //      1001,
+    //      0,
+    //      s.DefaultValue),
+    //    'income'));
+
+    //  this.Fields.push(new BaseField(
+    //    new EditElementDefinition(
+    //      'date',
+    //      1002,
+    //      1,
+    //      s.DefaultValue),
+    //    'date'));
+   // }
+    
+
+    //   this.addElement(new EditElementDefinition<string>(s));
+    //let m = new ElementModel<number>();
+    //m = new ElementModel<number>(m);
+    //m.formID = 'filterBasicBarForm';
+    //m.fieldID = 'income';
+    //m.label = 'Income';
+    //m.type = 'number';
+    //m.defaultValue = 0;
+    //this.addElement(new EditElementDefinition<number>(m));
+    //}
+    return this._fields;
   }
 
   UpdateDependentUI(): void {
@@ -644,7 +673,7 @@ export class FilterBasicBarChartModel extends Records<string> {
   }
 
   ChartIDFrom(chartNumber: number) {
-     
+
   }
 
   ValueToDateGraphic(width: number, height: number, chartName: string = '') {
@@ -721,7 +750,7 @@ export class FilterBasicBarChartModel extends Records<string> {
 
   SetDataView() {
 
-  //  this.axisModel = new D3AxisModel(this._fields);
+    //  this.axisModel = new D3AxisModel(this._fields);
   }
 
   get NewContent() {
@@ -734,7 +763,7 @@ export class FilterBasicBarChartModel extends Records<string> {
     return this._fields;
   }
 
-  OutputAll(): any{
+  OutputAll(): any {
     return {
       FormName: this.SourceID,
       RecordCount: 14,
@@ -742,11 +771,19 @@ export class FilterBasicBarChartModel extends Records<string> {
     };
   }
 
+  //public LoadContent(dataHTTPService: DataHTTPService) {
+  //  this.LoadData();
+  //  let p = 'http://localhost:44336/api/data/' + this.FormName;
+  //    dataHTTPService.getContent(p).subscribe(
+  //      data => { this.LoadData(data) },
+  //      err => { this.LoadFail(err) });
+  //}
+
   get testData() {
 
-   
-  //  let f = new BaseField({ fieldID: 'state', values: [] });
-  //  data.push("AL, 310504, 552339, 259034, 450818, 1231572, 1215966, 641667");
+
+    //  let f = new BaseField({ fieldID: 'state', values: [] });
+    //  data.push("AL, 310504, 552339, 259034, 450818, 1231572, 1215966, 641667");
     let id: string[] = [];
     id.push("1DB3E8BE-79DE-47F6-B78D-23482BBBF685");
     id.push("2DB3E8BE-79DE-47F6-B78D-23482BBBF685");
@@ -799,13 +836,13 @@ export class FilterBasicBarChartModel extends Records<string> {
 
     let fields: any[] = [];
 
-  
+
 
     fields.push({ fieldID: 'id', values: id });
     fields.push({ fieldID: 'date', values: data });
     fields.push({ fieldID: 'income', values: ydata });
 
-   
+
 
     return fields;
     //  return data;

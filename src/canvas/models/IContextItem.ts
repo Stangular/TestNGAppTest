@@ -4,7 +4,7 @@ import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult, eContentType } from "./shapes/shapeSelected";
 import { Shape } from "./shapes/shape";
 import { forEach } from "@angular/router/src/utils/collection";
-import { Line, PortPath, lineTypes } from './lines/line';
+import { Line, PortPath, lineTypes, VerticalToVerticalLine, VerticaToHorizontallLine, HorizontalToVerticalLine, HorizontallToHorizontalLine, GradientLine, BezierLine } from './lines/line';
 import { Port, ePortType } from './shapes/port';
 import { Rectangle } from './shapes/rectangle';
 import { StateIndex, UIStates, DisplayValues } from './DisplayValues';
@@ -18,8 +18,12 @@ import { Content, TextContent, ImageContent } from '../models/shapes/content/Con
 import { ImageShape } from './shapes/content/image/image';
 import { ContextModel } from '../component/context.model';
 import { emptyGuid } from '../../const/constvalues.js';
+import { IActionItem, ActionItemsss, IMouseState } from '../component/layers/Interfaces/IActionLayer';
+import { YearContent } from 'src/components/timeline/service/timeLine.model';
+import { ContentShape } from './shapes/content/ContentShape';
 
 class SizerHandle extends Rectangle {
+  private _active: boolean = false;
   constructor(id: string,
     private rangeOfMotion: number,
     private side: number,
@@ -44,7 +48,7 @@ class SizerHandle extends Rectangle {
         }
         break;
       case 2:
-        if (handle == 1 || handle == 3 || handle == 4) {
+        if (handle == 0 || handle == 1 || handle == 3 || handle == 4) {
           this.MoveBy(x, y);
         }
         break;
@@ -76,31 +80,41 @@ class SizerHandle extends Rectangle {
     }
   }
 
-  DrawHandle(context: ContextModel, fos: FreedomOfMotion, areaType: AreaType) {
-    switch (areaType) {
-      case AreaType.constantArea:
-      case AreaType.lockedRatio:
-        if (this.side == 1 || this.side == 3 || this.side == 5 || this.side == 7) {
-          this.Draw(context);
-        }
-        break;
-      default: {
-        switch (fos) {
-          case FreedomOfMotion.vertical:
-            if (this.side == 1 || this.side == 5) {
-              this.Draw(context);
-            }
-            break;
-          case FreedomOfMotion.horizontal:
-            if (this.side == 3 || this.side == 7) {
-              this.Draw(context);
-            }
-            break;
-          default: this.Draw(context); break;
-        }
-      }
-    }
+  get IsActive() { return this._active; }
+  Activate(fos: FreedomOfMotion, areaType: AreaType) {
+    this._active = (fos == FreedomOfMotion.vertical && (this.side == 1 || this.side == 2))
+      || (fos == FreedomOfMotion.horizontal && (this.side == 3 || this.side == 7))
+      || ((areaType == AreaType.constantArea || areaType == AreaType.lockedRatio) && this.side % 2 != 0)
+      || fos == FreedomOfMotion.full;
   }
+
+  DeActivate() { this._active = false; }
+
+  //DrawHandle(context: CanvasRenderingContext2D, fos: FreedomOfMotion, areaType: AreaType) {
+  //  switch (areaType) {
+  //    case AreaType.constantArea:
+  //    case AreaType.lockedRatio:
+  //      if (this.side == 1 || this.side == 3 || this.side == 5 || this.side == 7) {
+  //        this.Draw(context);
+  //      }
+  //      break;
+  //    default: {
+  //      switch (fos) {
+  //        case FreedomOfMotion.vertical:
+  //          if (this.side == 1 || this.side == 5) {
+  //            this.Draw(context);
+  //          }
+  //          break;
+  //        case FreedomOfMotion.horizontal:
+  //          if (this.side == 3 || this.side == 7) {
+  //            this.Draw(context);
+  //          }
+  //          break;
+  //        default: this.Draw(context); break;
+  //      }
+  //    }
+  //  }
+  // }
 
   MoveBy(x: number, y: number) {
     switch (this.rangeOfMotion) {
@@ -116,7 +130,8 @@ class SizerHandle extends Rectangle {
 export interface IContextItem {
 
   Id: string;
-  Draw(contextModel: any): void;
+  zIndex: number;
+  Draw(ctx: CanvasRenderingContext2D): void;
   CopyItem(newId: string): IContextItem;
   Save(): any;
 }
@@ -127,9 +142,11 @@ export interface IContextSystem {
   RemoveContent(): IContextItem;
   RemoveContentById(id: string): IContextItem;
   RemoveAllContent();
-  Draw(context: any): void;
+  Draw(context: CanvasRenderingContext2D): void;
   CopyItem(itemId: string, newId: string): string;
+  Init(): void;
 }
+
 export class UnitCell {
   _removedItems: string[] = [];
   constructor(
@@ -147,24 +164,31 @@ export class UnitCell {
 }
 
 export class ContextLayer implements IContextSystem {
+
   private layers: ContextLayer[] = [];
   private unitCell: UnitCell = null;
 
   constructor(
+    private parentArea: Rectangle,
     private id: string,
     name: string,
     updatedBy: string,
     updatedOn: Date = new Date(),
     private displayState: string = '',
     protected content: IContextItem[] = [],
-    protected lines: Line[] = [],
+    protected lines: ILine[] = [],
     protected paths: PortPath[] = []) {
     this.AddCell(id, name, updatedBy, updatedOn);
+  }
+
+  get ParentArea() {
+    return this.parentArea;
   }
 
   AddCell(id: string, name: string, updatedBy: string, updatedOn: Date) {
     this.unitCell = new UnitCell(id, name, updatedBy, updatedOn);
   }
+
 
   NewCell(id: string, name: string, updatedBy: string, updatedOn: Date) {
     this.unitCell = new UnitCell(emptyGuid, name, updatedBy, updatedOn);
@@ -174,45 +198,71 @@ export class ContextLayer implements IContextSystem {
   get Id() { return this.id; }
   get CanvasId() { return this.id; }
 
-  Draw(context: ContextModel = null) {
-    let self = this;
-    context.ClearLayer(this.id);
-    this.content.forEach(s => self.DrawShape(context, s as Shape));
-    this.content.forEach(s => (<Shape>s).DrawContent(context));
-    //   this.lines.forEach(l => self.DrawPaths(context, l));
+  ClearPaths() {
+    this.paths = [];
   }
 
-  DrawPaths(context: ContextModel, line: Line) {
+  Draw(context: CanvasRenderingContext2D) {
+    let self = this;
+    //    context.SelectLayer(this.id);
+    //    context.ClearLayer(this.id);
+    this.content.forEach(s => self.DrawShape(context, s as Shape));
+  }
+
+  DrawPaths(context: CanvasRenderingContext2D, line: ILine) {
     let paths = this.paths.filter(p => p.LineId == line.Id);
     // paths.forEach(p => line.DrawPortPath(context, p));
   }
 
-  DrawShape(context: ContextModel, shape: Shape) {
+  DrawShape(context: CanvasRenderingContext2D, shape: Shape) {
     shape.Draw(context);
     shape.Ports.forEach(p => this.DrawPortPath(context, p as Port));
+    shape.DrawContent(context);
   }
 
-  DrawPortPath(context: ContextModel, port: Port) {
+  DrawPortPath(context: CanvasRenderingContext2D, port: Port) {
     let self = this;
     let paths = this.paths.filter(p => p.Id == port.PathId);
 
     paths.forEach(function (p, i) {
       let lines = self.lines.filter(l => l.Id == p.LineId);
-      lines.forEach(l => l.Draw(context, p.Ports));
+      lines.forEach(l => l.DrawLine(context, p.Ports));
     });
   }
 
-  AddLine(result: any) {
-    let L = this.lines.find(l => l.Id == result.name);
+  Init(): void { };
+  //AddLine(result: any) {
+  //  let L = this.lines.find(l => l.Id == result.name);
+  //  if (!L) {
+  //    L = new Line(result.name, result.state, result.type);
+  //    this.lines.push(L);
+  //  }
+  //  else {
+  //    L.Update(result.state, result.type);
+  //  }
+  //  this.paths = result.paths.concat(this.paths);
+  //  this.paths.forEach(function (p, i) { p.SetInterimPorts(result.type); });
+  //}
+
+  AddLine(id: string, state: string, type: lineTypes, paths: PortPath[] = []) {
+    let L = this.lines.find(l => l.Id == id);
     if (!L) {
-      L = new Line(result.name, result.state, result.type);
+      switch (type) {
+        case lineTypes.bezier: L = new BezierLine(id, state); break;
+        case lineTypes.gradient: L = new GradientLine(id, state); break;
+        case lineTypes.HtoH: L = new HorizontallToHorizontalLine(id, state); break;
+        case lineTypes.HtoV: L = new HorizontalToVerticalLine(id, state); break;
+        case lineTypes.VtoH: L = new VerticaToHorizontallLine(id, state); break;
+        case lineTypes.VtoV: L = new VerticalToVerticalLine(id, state); break;
+        default: L = new Line(id, state); break;
+      }
       this.lines.push(L);
     }
     else {
-      L.Update(result.state, result.type);
+      L.Update(state);
     }
-    this.paths = result.paths.concat(this.paths);
-    this.paths.forEach(function (p, i) { p.SetInterimPorts(result.type); });
+    this.paths = paths.concat(this.paths);
+    //  this.paths.forEach(function (p, i) { p.SetInterimPorts(type); });
   }
 
   AddPortPath(shape: Shape) {
@@ -225,6 +275,11 @@ export class ContextLayer implements IContextSystem {
       //     self.paths.push();
     });
   }
+
+  AddPath(id: string, lineId: string, ports: Point[]) {
+    this.paths.push(new PortPath(id, lineId, ports));
+  }
+
   //AssignPathPoint(pathName: string, position: Point) {
   //  let path = this.paths.find(p => p.Id == pathName);
   //  if (!path) {
@@ -247,7 +302,6 @@ export class ContextLayer implements IContextSystem {
   get Paths() {
     return this.paths;
   }
-  AddPath() { }
 
   ResetPaths() {
     this.content.forEach((s, i) => this.ResetPath(s as Shape));
@@ -275,12 +329,22 @@ export class ContextLayer implements IContextSystem {
     });
   }
 
-  DrawContent(context: ContextModel, content: IContextItem) {
-    content.Draw(context);
-  }
+  //DrawContent(context: CanvasRenderingContext2D, content: IContextItem) {
+  //  content.Draw(context);
+  //}
 
   get Content(): IContextItem[] { return this.content; }
-  get Lines(): Line[] { return this.lines; }
+
+  ClearContent(start: number = 0) {
+    let c = this.content[this.content.length - 1];
+    this.content = [];
+    if (c) {
+      this.content.push(c);
+    }
+    // this.content = this.content.splice(start);
+  }
+
+  get Lines(): ILine[] { return this.lines; }
 
   //UpdateContextState() {
   //  this.content.forEach(function (c, i) {
@@ -305,38 +369,43 @@ export class ContextLayer implements IContextSystem {
     this.SelectContent(this.content.findIndex(c => c.Id === contentId));
   }
 
+  SortContentByZIndex() {
+    this.content = this.content.sort(function (a, b) { return a.zIndex < b.zIndex ? -1 : 1 });
+  }
+
   AddContent(content: IContextItem) {
     if (content) {
       this.content.unshift(content);
       this.AddPortPath(content as Shape);
+      this.SortContentByZIndex();
     }
   }
 
   AddText(text: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0) {
     let activeShape = this.Content[0] as Shape;
     if (activeShape) {
-      let id = '_text_content_' + activeShape.TextContent.length;
+      let id = '_text_content_' + activeShape.Contents.length;
       let shp = new TextShape(
         activeShape.Id + id,
         activeShape.Top + 3,
         activeShape.Left + 3, 0, 10,
         containerStateName,
         new TextContent(emptyGuid, contentStateName, text, fromSource, angle));
-      activeShape.AddTextShape(shp);
+      activeShape.AddContent(shp);
     }
   }
 
   AddImage(imageName: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0, imageIndex = 0) {
     let activeShape = this.Content[0] as Shape;
     if (activeShape) {
-      let id = '_image_content_' + activeShape.ImageContent.length;
+      let id = '_image_content_' + activeShape.Contents.length;
       let shp = new ImageShape(
         activeShape.Id + id,
         activeShape.Top + 3,
         activeShape.Left + 3, 10, 10,
         containerStateName,
         new ImageContent(emptyGuid, contentStateName, imageName, fromSource, angle, imageIndex));
-      activeShape.AddImageShape(shp);
+      activeShape.AddContent(shp);
     }
   }
 
@@ -348,7 +417,7 @@ export class ContextLayer implements IContextSystem {
   AddShape(shape: IShape) {
     let activeShape = this.Content[0] as Shape;
     if (activeShape) {
-      activeShape.AddShape(shape as Shape);
+      activeShape.AddContent(shape as ContentShape);
     }
   }
 
@@ -363,13 +432,20 @@ export class ContextLayer implements IContextSystem {
     return item;
   };
 
+  RemoveContentByIndex(i: number): IContextItem {
+    if (i < 0) { return null; }
+    let result = this.content.splice(i, 1);
+    return (result.length > 0) ? result[0] : null;
+  };
+
+  RemoveContentByPoint(pt: Point): IContextItem {
+    let i = this.content.reverse().findIndex(c => (<Rectangle>c).IsPointInShape(pt));
+    return this.RemoveContentByIndex(i);
+  }
+
   RemoveContentById(id: string): IContextItem {
-    if (this.content.length <= 0) { return null; }
     let ndx = this.content.findIndex(c => c.Id == id);
-    if (ndx < 0) { return null; }
-    let item = this.content[ndx];
-    this.content.splice(ndx, 1);
-    return item;
+    return this.RemoveContentByIndex(ndx);
   };
 
   MoveToTop(id: string) {
@@ -394,25 +470,26 @@ export class ContextLayer implements IContextSystem {
     return newId;
   }
 
-  GetContentItem(ssr: ShapeSelectResult) {
+  GetContentItem(point: Point) {
 
-    let ndx = this.content.findIndex(c => (<Shape>c).Select(ssr));
+    let ndx = this.content.findIndex(c => (<Shape>c).Select(point));
     if (!this.MakeTop(ndx)) { return false; }
-    ssr.layerId = this.id;
+    //  ssr.layerId = this.id;
     return this.content.splice(0, 1);
   }
 
   PutContentItem(item: IContextItem) {
     if (item) {
       this.content.unshift(item);
+      this.SortContentByZIndex();
     }
   }
 
-  Select(ssr: ShapeSelectResult): boolean {
-
-    let ndx = this.content.findIndex(c => (<Shape>c).Select(ssr));
+  Select(point: Point): boolean {
+    // return this.content.some(c => (<IShape>c).Track(point));
+    let ndx = this.content.findIndex(c => (<Shape>c).Select(point));
     if (!this.MakeTop(ndx)) { return false; }
-    ssr.layerId = this.id;
+    //  ssr.layerId = this.id;
     return true;
   }
 
@@ -420,6 +497,179 @@ export class ContextLayer implements IContextSystem {
     let ndx = this.lines.findIndex(l => l.Id == lineName);
     if (ndx >= 0) {
       this.lines.splice(ndx, 1);
+    }
+  }
+}
+
+export interface Isss {
+  Draw(): void;
+}
+
+export class sss implements Isss {
+  _context: CanvasRenderingContext2D;
+  _layer: EventContextLayer;
+
+  Draw(): void {
+    this._layer.Draw(this._context);
+  }
+}
+
+export class sssex extends sss {
+
+  Draw(): void {
+    // this._layer.DrawSelection(this._context);
+  }
+}
+
+export class EventContextLayer extends ContextLayer {
+
+  _selectedTracker: ITracker = null;
+  _tracker: AreaTracker = new AreaTracker();
+  _sizer: AreaSizer = new AreaSizer();
+
+  protected _selectedItem: IContextItem;
+  private _actionItem: ActionItemsss;
+  constructor(
+    parentArea: Rectangle,
+    id: string,
+    name: string,
+    updatedBy: string,
+    updatedOn: Date = new Date(),
+    displayState: string = '',
+    content: IContextItem[] = [],
+    lines: ILine[] = [],
+    paths: PortPath[] = []) {
+    super(parentArea, id, name, updatedBy, updatedOn, displayState, content, lines, paths);
+    this._actionItem = new ActionItemsss();
+    this._selectedTracker = this._tracker;
+    //   EventContextLayer._sizer = new AreaTracker(null);
+  }
+
+  get hasSelection() {
+    return this._selectedItem != null;
+  }
+
+  get mouseState(): IMouseState {
+    return this._actionItem.mouseState;
+  }
+
+  get mousePosition(): Point {
+    return this._actionItem.mousePosition;
+  }
+
+  private Track(point: Point): boolean {
+    let c = this.RemoveContentByPoint(point);
+    if (!c) {
+      return false;
+    }
+    this._sizer.Reset(c as IShape);
+  //  this._sizer.Hide();
+
+    return true;
+  }
+
+  private Size(point: Point): boolean {
+    if (this._sizer.Select(point)) {
+      this.RemoveContentById(this._sizer.TrackedArea.Id || '');
+  //    this._selectedTracker = this._sizer;
+      return true;
+    }
+    return false;
+  }
+
+  mouseCapture(event: any, boundingArea: Rectangle): Point {
+    return this._actionItem.mouseCapture(event, boundingArea);
+  }
+
+  selectItem(event: any, boundingArea: Rectangle, context: CanvasRenderingContext2D): void {
+   // this._selectedTracker = this._tracker;
+    let d = this.mouseCapture(event, this.ParentArea);
+    this.Track(d);
+  //  this.Size(d);
+    context.clearRect(
+      0,
+      0,
+      this.ParentArea.Width,
+      this.ParentArea.Height);
+    this._sizer.Draw(context);
+  }
+
+  releaseSelectedItem(context: CanvasRenderingContext2D) {
+  //  this._selectedTracker = this._sizer;
+
+    //if (this._selectedItem != null) {
+    //  this.content.unshift(this._selectedItem);
+    //  this._selectedItem = null;
+    //}
+
+    //   this.content.forEach(c => (<Shape>c).Resize(this._sizer));
+    //   this._sizer.Release();
+    //this._tracker.Release();
+   // this.content.forEach(c => (<Shape>c).ClearHit());
+    this._actionItem.mouseRelease();
+    context.clearRect(
+      0,
+      0,
+      this.ParentArea.Width,
+      this.ParentArea.Height);
+  //  this.RemoveContentByPoint
+    if (this._sizer.TrackedArea == null) {
+      this.PutContentItem(this._tracker.TrackedArea);
+    }
+    this._sizer.Reset(this._tracker.TrackedArea);
+    this.Draw(context);
+    this._sizer.Draw(context);
+  }
+
+  mouseRelease(): void {
+    this._actionItem.mouseRelease();
+    this._sizer.Reset(this._tracker.TrackedArea);
+  }
+
+  mouseMove(event: any, boundingArea: Rectangle, context: CanvasRenderingContext2D): Point {
+    let d = this._actionItem.mouseMove(event, boundingArea);
+    if (d.X == 0 && d.Y == 0) {
+      return d;
+    }
+    context.clearRect(
+      0,
+      0,
+      boundingArea.Width,
+      boundingArea.Height);
+    this._selectedTracker.MoveItem(d.X, d.Y);
+    this._selectedTracker.Draw(context);
+    return d;
+  }
+
+  //DrawHitContent(context: CanvasRenderingContext2D) {
+  //  this.content.forEach(s => (<Shape>s).DrawHitContent(context));
+  //}
+
+  //DrawNotHitContent(context: CanvasRenderingContext2D) {
+  //  this.content.forEach(
+  //    s => !(<Shape>s).IsTracked 
+  //    &&  (<Shape>s).Draw(context));
+  //}
+
+  //DrawActive(context: CanvasRenderingContext2D) {
+  //  this._tracker.Draw(context);
+  //  //if( )
+  //  // this._sizer.Draw(context);  only draw this when mouse up or sizing.
+  //}
+
+  DrawSizer(context: CanvasRenderingContext2D) {
+    this._sizer.Draw(context);
+  }
+
+  Draw(context: CanvasRenderingContext2D,initial: boolean = false) {
+    context.clearRect(
+      0,
+      0,
+      this.ParentArea.Width,
+      this.ParentArea.Height);
+    this.content.forEach(s => (<Shape>s).DrawContent(context));
+    if (initial) {
+      this._sizer.Draw(context);
     }
   }
 }
@@ -441,18 +691,25 @@ export class ContextLayer implements IContextSystem {
 //  }
 //}
 
-class Sizer implements IContextItem {
-  private _handles: SizerHandle[] = [];
-  private _selectedSide = -1;
-  private fos: FreedomOfMotion = FreedomOfMotion.full;
-  private areaType: AreaType = AreaType.normal;
 
-  constructor(designerpad: StateIndex) {
-    //  let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
-    //designerpad.setState(UIStates.background, bgNdx);
-    //designerpad.setState(UIStates.foreground, 1);
-    //designerpad.setState(UIStates.color, 4);
-    //designerpad.setState(UIStates.weight, 0);
+export interface ITracker extends IActionItem {
+  MoveItem(dx: number, dy: number);
+  Reset(shape: IShape);
+  Draw(context: CanvasRenderingContext2D);
+}
+
+export class AreaSizer implements ITracker {
+
+  protected _trackedArea: IShape;
+  private _handles: SizerHandle[] = [];
+  private _activeHandles: SizerHandle[] = [];
+  // protected _selectedSide = -1;
+  private _fos: FreedomOfMotion;
+  private _areaType: AreaType;
+  private _sideSelected: boolean = false;
+  private _actionItem: ActionItemsss;
+
+  constructor() { // Create the handles...
     this._handles.push(new SizerHandle('sizerTopLeft', 0, 0, 0, 0, 9, 9, 'default.edit.background'));
     this._handles.push(new SizerHandle('sizerTop', 1, 1, 0, 0, 9, 9, 'default.edit.background'));
     this._handles.push(new SizerHandle('sizerTopRight', 0, 2, 0, 0, 9, 9, 'default.edit.background'));
@@ -462,86 +719,198 @@ class Sizer implements IContextItem {
     this._handles.push(new SizerHandle('sizerBottomLeft', 0, 6, 0, 0, 9, 9, 'default.edit.background'));
     this._handles.push(new SizerHandle('sizerLeft', 2, 7, 0, 0, 9, 9, 'default.edit.background'));
   }
-  AssignToClass(clss: string): void { }
-  CopyItem(newId: string): IContextItem { return null; }
-  //  UpdateContextState(): void { }
 
-  get Id(): string { return 'sizer'; }
-  Save(): any { return null; }
+  get mouseState(): IMouseState { return this._actionItem.mouseState; };
+  get mousePosition(): Point { return this._actionItem.mousePosition; };
+
+  //private Track(point: Point): boolean {
+  //  let c = this.RemoveContentByPoint(point);
+  //  if (!c) {
+  //    return false;
+  //  }
+  //  this._sizer.Reset(c as IShape);
+  //  //  this._sizer.Hide();
+
+  //  return true;
+  //}
+
+  mouseCapture(event: any, boundingArea: Rectangle): Point {
+    return this._actionItem.mouseCapture(event, boundingArea);
+  }
+
+  mouseMove(event: any, boundingArea: Rectangle): Point {
+    return this._actionItem.mouseMove(event, boundingArea);
+  }
+
+  mouseRelease(): void {
+    this._actionItem.mouseRelease();
+  }
+
+  AssignToClass(clss: string): void { }
+
   get Class(): string { return ""; }
 
-  Select(ssr: ShapeSelectResult): boolean {
+  ReleaseHandle() {
+    this._activeHandles = [];
+  }
 
-    this._selectedSide = -1;
-    let handle = this._handles.find(s => s.Select(ssr)) as SizerHandle;
+  Select(point: Point): boolean {
+    this._activeHandles = [];
+    let handle = this._handles.filter(h => h.IsActive).find(h => h.IsPointInShape(point));
     if (handle) {
-      this._selectedSide = handle.Side;
-      return true;
-    }
-    return false;
-  }
 
-  ResizeShape(context: ContextModel, shape: Shape) {
-    if (shape) {
-      shape.SizeBy(
-        context,
-        this._handles[1].Center.Y,
-        this._handles[3].Center.X,
-        this._handles[5].Center.Y,
-        this._handles[7].Center.X);
-    }
-    this.Reset(shape);
+      let x = handle.Center.X;
+      let y = handle.Center.Y;
 
-  }
-
-  Reset(shape: Shape) {
-    if (shape) {
-      this.fos = shape.FreedomOfSizing;
-      this.areaType = shape.AreaType;
-      let xhalf = shape.Left + (shape.Width / 2);
-      let yhalf = shape.Top + (shape.Height / 2);
-      this._handles[0].CenterOn(shape.Left, shape.Top);
-      this._handles[1].CenterOn(xhalf, shape.Top);
-      this._handles[2].CenterOn(shape.Right, shape.Top);
-      this._handles[3].CenterOn(shape.Right, yhalf);
-      this._handles[4].CenterOn(shape.Right, shape.Bottom);
-      this._handles[5].CenterOn(xhalf, shape.Bottom);
-      this._handles[6].CenterOn(shape.Left, shape.Bottom);
-      this._handles[7].CenterOn(shape.Left, yhalf);
-    }
-  }
-
-  Draw(context: ContextModel) {
-    this._handles.forEach(h => h.DrawHandle(context, this.fos, this.areaType));
-  }
-
-  MoveItem(ssr: ShapeSelectResult) {
-    if (this._selectedSide >= 0) {
-      let dx = ssr.DX;
-      let dy = ssr.DY;
-      this._handles[this._selectedSide].MoveBy(dx, dy);
-      for (let i = 0; i < 8; i++) {
-        this._handles[i].MoveSide(dx, dy, this._handles[this._selectedSide].Side);
+      switch (handle.Side) {
+        case 0: this._activeHandles = this._handles.filter(s => s.Center.Y == y && s.Center.X == x); break;
+        case 1: this._activeHandles = this._handles.filter(s => s.Center.Y == y ); break;
+        case 2: this._activeHandles = this._handles.filter(s => s.Center.Y == y && s.Center.X == x); break;
+        case 3: this._activeHandles = this._handles.filter(s => s.Center.X == x ); break;
+        case 4: this._activeHandles = this._handles.filter(s => s.Center.Y == y && s.Center.X == x); break;
+        case 5: this._activeHandles = this._handles.filter(s => s.Center.Y == y ); break;
+        case 6: this._activeHandles = this._handles.filter(s => s.Center.Y == y && s.Center.X == x); break;
+        case 7: this._activeHandles = this._handles.filter(s => s.Center.X == x ); break;
       }
-      return true;
     }
-    return false;
+    this._sideSelected = this._activeHandles.length > 0;
+    return this._sideSelected;
+  }
+
+  //get SelectedSide() {
+  //  return this._selectedSide;
+  //}
+  //Release() {
+  //  this._selectedSide = -1;
+  //  this.Reset(this._trackedArea);
+  //  this.ResizeShape(null);
+  //}
+
+  private ResizeShape() {
+    this._trackedArea.SizeBy(
+      null,
+      this._handles[1].Center.Y,
+      this._handles[3].Center.X,
+      this._handles[5].Center.Y,
+      this._handles[7].Center.X);
+  }
+
+  Hide() {
+    this.Reset(null);
+  }
+
+  Reset(shape: IShape) {
+    this.ReleaseHandle();
+    this._handles.forEach(h => h.DeActivate());
+    this._trackedArea = shape;
+    if (!shape) {
+      return;
+    }
+    this._fos = shape.FreedomOfSizing;
+    this._areaType = shape.AreaType;
+    let xhalf = shape.Left + (shape.Width / 2);
+    let yhalf = shape.Top + (shape.Height / 2);
+    this._handles[0].CenterOn(shape.Left, shape.Top);
+    this._handles[1].CenterOn(xhalf, shape.Top);
+    this._handles[2].CenterOn(shape.Right, shape.Top);
+    this._handles[3].CenterOn(shape.Right, yhalf);
+    this._handles[4].CenterOn(shape.Right, shape.Bottom);
+    this._handles[5].CenterOn(xhalf, shape.Bottom);
+    this._handles[6].CenterOn(shape.Left, shape.Bottom);
+    this._handles[7].CenterOn(shape.Left, yhalf);
+    this._handles.forEach(h => h.Activate(this._fos, this._areaType));
+  }
+
+  get TrackedArea() {
+    return this._trackedArea;
+  }
+
+  Draw(context: CanvasRenderingContext2D) {
+    if (this._trackedArea) {
+      this._trackedArea.Draw(context);
+      this._handles.filter(h => h.IsActive).forEach(h => h.Draw(context));
+    }
+  }
+
+  MoveItem(dx: number, dy: number) {
+    if (!this._sideSelected) {
+      this._trackedArea.MoveBy(dx, dy);
+    }
+    else {
+      this.MoveSide(dx, dy);
+    }
+  }
+
+  protected MoveSide(dx: number, dy: number) {
+
+    this._activeHandles.forEach(h => h.MoveBy(dx, dy));
+    this.ResizeShape();
+  }
+}
+
+export class AreaTracker implements ITracker {
+
+  private _trackedArea: IShape;
+  private _actionItem: ActionItemsss;
+
+  constructor() { }
+
+  get mouseState(): IMouseState { return this._actionItem.mouseState; };
+  get mousePosition(): Point { return this._actionItem.mousePosition; };
+
+  //private Track(point: Point): boolean {
+  //  let c = this.RemoveContentByPoint(point);
+  //  if (!c) {
+  //    return false;
+  //  }
+  //  this._sizer.Reset(c as IShape);
+  //  //  this._sizer.Hide();
+
+  //  return true;
+  //}
+
+  mouseCapture(event: any, boundingArea: Rectangle): Point {
+    return this._actionItem.mouseCapture(event, boundingArea);
+  }
+
+  mouseMove(event: any, boundingArea: Rectangle): Point {
+    return this._actionItem.mouseMove(event, boundingArea);
+  }
+
+  mouseRelease(): void {
+    this._actionItem.mouseRelease();
+  }
+
+  get TrackedArea(): IShape {
+    return this._trackedArea;
+  }
+
+  MoveItem(dx: number, dy: number) {
+      return this._trackedArea.MoveBy(dx, dy);
+  }
+
+  Draw(context: CanvasRenderingContext2D) {
+    this._trackedArea.Draw(context);
+  }
+
+  Reset(shape: IShape) {
+    this._trackedArea = shape;
   }
 }
 
 export class ActionLayer extends ContextLayer {// uses separate context
   private _shapeSelected: boolean = false;
-  private designerpad = new StateIndex('designerpad');
-  private _sizer: Sizer;
+  // private designerpad = new StateIndex('designerpad');
+  private _tracker: AreaTracker;
   private _layer: ContextLayer;
-  constructor(layerName: string) {
-    super('edit', layerName, '', new Date());
+  constructor(parentArea: Rectangle, layerName: string) {
+    super(parentArea,'edit', layerName, '', new Date());
     let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
-    this.designerpad.setState(UIStates.background, bgNdx);
-    this.designerpad.setState(UIStates.foreground, bgNdx);
-    this.designerpad.setState(UIStates.color, bgNdx);
-    this.designerpad.setState(UIStates.weight, bgNdx);
-    this._sizer = new Sizer(this.designerpad);
+    //this.designerpad.setState(UIStates.background, bgNdx);
+    //this.designerpad.setState(UIStates.foreground, bgNdx);
+    //this.designerpad.setState(UIStates.color, bgNdx);
+    //this.designerpad.setState(UIStates.weight, bgNdx);
+    this._tracker = new AreaTracker();
   }
 
   get Editing() {
@@ -550,7 +919,7 @@ export class ActionLayer extends ContextLayer {// uses separate context
 
   EndEdit(): boolean {
     if (!this._layer) { return false; }
-    this._sizer.Reset(this._layer.Content[0] as Shape);
+    this._tracker.Reset(this._layer.Content[0] as Shape);
     this._layer = null;
     return true;
   }
@@ -559,7 +928,7 @@ export class ActionLayer extends ContextLayer {// uses separate context
     if (lyr) {
       if (this._layer && lyr.Id == this._layer.Id) { return; }
       this._layer = lyr;
-      this._sizer.Reset(this._layer.Content[0] as Shape);
+      this._tracker.Reset(this._layer.Content[0] as Shape);
       this._shapeSelected = true;
     }
   }
@@ -568,15 +937,17 @@ export class ActionLayer extends ContextLayer {// uses separate context
     return this._shapeSelected;
   }
 
-  Select(ssr: ShapeSelectResult): boolean {
-    this._shapeSelected = false;
-    let result = (this._layer && (this._sizer.Select(ssr) || this._layer.Select(ssr)));
-    if (result) {
-      let c = (<Shape>this._layer.Content[0]).ChildShape;
-      this._sizer.Reset(c || this._layer.Content[0] as Shape);
-      this._shapeSelected = true;
-    }
-    return result;
+  Select(point: Point): boolean {
+    //this._shapeSelected = false;
+    //let result = (this._layer && (this._tracker.Select(point) || this._layer.Select(point)));
+    //if (result) {
+    //  let c = (<Shape>this._layer.Content[0]).ChildShape;
+    //  this._tracker.Reset(c || this._layer.Content[0] as Shape);
+    //  this._shapeSelected = true;
+    //}
+    //return result;
+
+    return false;
   }
 
   //private GetPath(pathName: string) {
@@ -620,7 +991,7 @@ export class ActionLayer extends ContextLayer {// uses separate context
 
   AddContent(content: IContextItem) {
     if (!this._layer) { return; }
-    this._sizer.Reset(this._layer.Content[0] as Shape);
+    this._tracker.Reset(this._layer.Content[0] as Shape);
     this._shapeSelected = true;
   }
 
@@ -653,14 +1024,14 @@ export class ActionLayer extends ContextLayer {// uses separate context
     }
     if (shp) {
       this._layer.AddContent(shp);
-      this._sizer.Reset(this._layer.Content[0] as Shape);
+      this._tracker.Reset(this._layer.Content[0] as Shape);
       this._shapeSelected = true;
       return true;
     }
     return false;
   }
 
-  Reset(context: ContextModel) {
+  Reset(context: CanvasRenderingContext2D) {
     if (this._shapeSelected) {
       this.DrawPartial(context);
     }
@@ -669,39 +1040,39 @@ export class ActionLayer extends ContextLayer {// uses separate context
     }
   }
 
-  DrawPartial(context: ContextModel) {
+  DrawPartial(context: CanvasRenderingContext2D) {
     for (let i = 1; i < this._layer.Content.length; i++) {
       this.DrawLayerShape(context, this._layer.Content[i] as Shape);
       (<Shape>this._layer.Content[i]).DrawContent(context);
     }
   }
 
-  DrawLayerShape(context: ContextModel, shape: Shape) {
+  DrawLayerShape(context: CanvasRenderingContext2D, shape: Shape) {
     shape.Draw(context);
     shape.Ports.forEach(p => this.DrawLayerPortPath(context, p as Port));
   }
 
-  DrawLayerPortPath(context: ContextModel, port: Port) {
+  DrawLayerPortPath(context: CanvasRenderingContext2D, port: Port) {
     let self = this;
     let paths = this._layer.Paths.filter(p => p.Id == port.PathId);
     paths = paths.filter(p => (<Shape>this._layer.Content[0]).Ports.findIndex(pt => (<Port>pt).PathId == p.Id) < 0);
     paths.forEach(function (p, i) {
       let lines = self._layer.Lines.filter(l => l.Id == p.LineId);
-      lines.forEach(l => l.Draw(context, p.Ports));
+      lines.forEach(l => l.DrawLine(context, p.Ports));
     });
   }
 
-  Draw(context: ContextModel) {
+  Draw(context: CanvasRenderingContext2D) {
 
     if (!this._layer) { return; }
-    context.ClearLayer('editor');
+    //  context.ClearLayer('editor');
     this._layer.Content[0].Draw(context);
     let shp = (<Shape>this._layer.Content[0]);
     if (shp) {
       shp.Ports.forEach(p => this._layer.DrawPortPath(context, p as Port));
       shp.DrawContent(context);
     }
-    this._sizer.Draw(context);
+    this._tracker.Draw(context);
     let I = this;
     this._layer.Lines.forEach(l => I.DrawPaths(context, l));
 
@@ -711,21 +1082,21 @@ export class ActionLayer extends ContextLayer {// uses separate context
     //  this._layer.Lines.forEach(l => l.DrawToContent(context, ports));
   }
 
-  MoveItem(context: ContextModel, ssr: ShapeSelectResult) {
+  MoveItem(context: ContextModel, point: Point) {
     if (!this._layer) { return; }
     let c = (<Shape>this._layer.Content[0]).ChildShape
       || this._layer.Content[0] as Shape;
 
-    if (this._sizer.MoveItem(ssr)) {// Moving sizer handle
-      this._sizer.ResizeShape(context, c);
+    if (this._tracker.MoveItem(point.X, point.Y)) {// Moving sizer handle
+      ////  this._tracker.ResizeShape(context);
     }
     else {
       c.MoveBy(
-        ssr.DX,
-        ssr.DY);
-      this._sizer.Reset(c);
+        point.X,
+        point.Y);
+      this._tracker.Reset(c);
     }
-    ssr.UpdatePosition();
+    //    ssr.UpdatePosition();
     this._layer.ResetPath(c);
   }
 }
@@ -739,12 +1110,14 @@ export class ContextSystem implements IContextSystem {
     private layers: ContextLayer[] = []) {
   }
 
-  get Id() { return this.SelectedLayer.Id; }
+  get Id() { return this.SelectedLayer ? this.SelectedLayer.Id : ''; }
 
   get Layers() { return this.layers; }
   SetSelectedLayer(id: string) {
     this._selectedLayer = this.layers.findIndex(l => l.Id == id);
   }
+
+  Init() { }
 
   get SelectedLayer() {
     return this.layers[this._selectedLayer] || this.layers[0];
@@ -753,8 +1126,8 @@ export class ContextSystem implements IContextSystem {
     return this.layers.find(l => l.UnitCell.ID == unitcellID);
   }
 
-  Draw(contextModel: ContextModel) {
-    this.layers.reverse().forEach(l => l.Draw(contextModel));
+  Draw(context: CanvasRenderingContext2D) {
+    this.layers.reverse().forEach(l => l.Draw(context));
   }
 
   get Content(): IContextItem[] { return this.SelectedLayer.Content; }
@@ -783,8 +1156,8 @@ export class ContextSystem implements IContextSystem {
     return this.SelectedLayer.CopyItem(itemId, newId);
   }
 
-  AddLayer(id: string, name: string, updatedBy: string, updatedOn: Date, displayState: string, content: IContextItem[] = []) {
-    this.layers.unshift(new ContextLayer(id, name, updatedBy, updatedOn, displayState, content));
+  AddLayer(parentArea: Rectangle, id: string, name: string, updatedBy: string, updatedOn: Date, displayState: string, content: IContextItem[] = []) {
+    this.layers.unshift(new ContextLayer(parentArea,id, name, updatedBy, updatedOn, displayState, content));
   }
 
   SelectLayer(index: number) {
@@ -810,19 +1183,19 @@ export class ContextSystem implements IContextSystem {
 
   Move(context: ContextModel, ssr: ShapeSelectResult) { }
 
-  Select(ssr: ShapeSelectResult): boolean {
+  Select(point: Point): boolean {
 
-    let ndx = this.layers.findIndex(l => l.Select(ssr));
-    if (ndx < 0) {
-      ssr.id = '';
-      ssr.layerId = '';
-      ssr.itemCaptured = false;
+    let ndx = this.layers.findIndex(l => l.Select(point));
+    //if (ndx < 0) {
+    //  ssr.id = '';
+    //  ssr.layerId = '';
+    //  ssr.itemCaptured = false;
 
-    }
-    else {
-      this.layers[ndx].MoveToTop(ssr.id);
-      //    this.activeLayer.SetLayer(this.layers[ndx]);
-    }
+    //}
+    //  else {
+    //   this.layers[ndx].MoveToTop(ssr.id);
+    //    this.activeLayer.SetLayer(this.layers[ndx]);
+    // }
     return ndx >= 0;
   }
 
@@ -871,8 +1244,8 @@ export class ContextSystem implements IContextSystem {
     this.SelectedLayer.AddShape(shape);
   }
 
-  AddLine(result: any) {
-    this.SelectedLayer.AddLine(result);
+  AddLine(id: string, state: string, type: lineTypes, path: PortPath[] = []) {
+    this.SelectedLayer.AddLine(id, state, type, path);
   }
 
   ClearLayers() {

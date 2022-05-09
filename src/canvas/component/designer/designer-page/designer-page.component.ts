@@ -121,10 +121,10 @@ export class DesignerPageComponent implements OnInit {
 
   UpdatePort(portData: any) {
     this.canvasService.AddPort(portData);
-    this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
+ //   this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
   }
 
   ShapeChanged(sid:string) {
-    this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
+  //  this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
   }
 }

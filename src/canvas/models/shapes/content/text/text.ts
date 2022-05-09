@@ -15,12 +15,12 @@ export class TextShape extends ContentShape {
     super(id, top, left, width, height,state,content);
   }
 
-  DrawShape(context: ContextModel): void {
+  DrawShape(context: CanvasRenderingContext2D): void {
     this.content.Draw(context,this);
   }
 
-  SizeBy(context: ContextModel, top: number, right: number, bottom: number, left: number) {
-    right = left + context.MeasureText(this.content.Content, this.Height, this.StateIndex) + 10;
+  SizeBy(context: CanvasRenderingContext2D, top: number, right: number, bottom: number, left: number) {
+    right = left + 10; // this.Content.MeasureText(ctx,this.Height, this.StateIndex) + 10;
     super.SizeBy( context,top, right, bottom, left);
   }
 
@@ -53,7 +53,7 @@ export class TextShape extends ContentShape {
       Ports: [],
       Shapes: [],
       TextContent: {
-        Id: this.content.ID,
+        Id: this.content.Id,
         Content: this.content.Content,
         Code: 0,
         ParentShapeId: this.Id,

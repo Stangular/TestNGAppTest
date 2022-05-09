@@ -12,7 +12,7 @@ import {
   DoCheck,
   HostListener
 } from '@angular/core';
-import { ContextSystem, ContextLayer } from '../../../models/IContextItem';
+import { ContextSystem, ContextLayer, EventContextLayer } from '../../../models/IContextItem';
 import { Margin } from '../../../models/shapes/primitives/margin';
 import { Size } from '../../../models/shapes/primitives/size';
 import { Point } from '../../../models/shapes/primitives/point';
@@ -23,6 +23,10 @@ import { Subscription } from 'rxjs';
 import { EditModel } from '../../../models/designer/base.model';
 import { CanvasService } from '../../../service/canvas.service';
 import { ContextModel } from '../../context.model';
+import { DisplayValues } from 'src/canvas/models/DisplayValues';
+import { IActionItem } from '../Interfaces/IActionLayer';
+import { TimeLineSpanLayerModel } from 'src/canvas/models/concepts/timelines/timeLineSpan.model';
+import { Rectangle } from 'src/canvas/models/shapes/rectangle';
 
 
 
@@ -43,7 +47,6 @@ export class ActionCanvasContextModel {
 })
 export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoCheck {
 
-  mouseCaptured: boolean = false;
   subscription: Subscription;
   @Input() width: number = 0;
   @Input() height: number = 0;
@@ -51,13 +54,28 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
   @Input() editSystem: EditModel;
   @Input() id: string = '';
   @Input() source: Records<string>;
-  @ViewChild('theCanvas') theCanvas: ElementRef;
+  @Input() layerName: string = '';
+  @Input() UIAction: string = ''; 
+  @ViewChild('topCanvas') topCanvas: ElementRef;
+  @ViewChild('staticCanvas') theCanvas: ElementRef;
+ // @ViewChild('topcanvas') topCanvas: ElementRef;
   @Input() canvasID: string = 'testCanvas';
   @Input() margin: Margin;
-  @Output() select: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
-  @Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
-  @Output() move: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
-  private point: Point = new Point();
+  //@Output() select: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
+  //@Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
+  //@Output() move: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
+ // private point: Point = new Point();
+ // private _contextSystem: ContextSystem = null;
+ // private _contextModel: ContextModel = new ContextModel();
+//  private _timeSpanLayer: TimeLineSpanLayerModel;
+  private _clientArea: Rectangle = null;
+
+ // _actionLayer: EventContextLayer;
+  _contextLayer: EventContextLayer;
+
+  _context: CanvasRenderingContext2D;
+  _activeContext: CanvasRenderingContext2D;
+
   constructor(private messageService: MessageService, public canvasService: CanvasService) {
 
     this.subscription = this.messageService.getMessage().subscribe(
@@ -70,22 +88,57 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
       case 1015:
       case 1001:
         this.onResize(null);
-        this.Draw(); break;
+      //  this.Draw(); break;
       //   default: this.ReDraw(); break;
     }
   }
-  ngOnInit() { }
+
+  ngOnInit() {
+
+   
+  //  this._timeSpanLayer = new TimeLineSpanLayerModel(this.ClientArea);
+
+    //let layers: ContextLayer[] = [];
+    //if (this.initialLayer) {
+    //  layers.push(this.initialLayer);
+    //  layers.push(this._timeSpanLayer);
+    //}
+    //this._contextSystem = new ContextSystem(layers);
+    //this._contextModel.AddLayerContext(this.canvasID, this.TheContext);
+    //this._contextModel.AddLayerContext(this._timeSpanLayer.Id, this.TopContext);
+    //this.canvasService.SetCanvasContent('');
+  }
 
   get TheCanvas() {
     return <HTMLCanvasElement>this.theCanvas.nativeElement;
   }
 
+  get TopCanvas() {
+    return <HTMLCanvasElement>this.topCanvas.nativeElement;
+  }
+
+  get TheContext() {
+    return this.TheCanvas.getContext('2d');
+  }
+
+  get TopContext() {
+    return this.TopCanvas.getContext('2d');
+  }
+
+  //get TopCanvas() {
+  //  return <HTMLCanvasElement>this.topCanvas.nativeElement;
+  //}
+
+  //get TopContext() {
+  //  return this.TopCanvas.getContext('2d');
+  //}
+
   ngDoCheck() {
-    if (this.canvasService.EditOn) {
-      setTimeout(() =>
-        this.setSize()
-        , 10);
-    }
+    //if (this.canvasService.EditOn) {
+    //  setTimeout(() =>
+    //    this.setSize()
+    //    , 10);
+    //}
   }
 
   //ngOnChanges() {
@@ -100,15 +153,28 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
     //  this.SetActiveLayer()
     //  , 10);
 
+    this._context = this.TheContext;
+    this._activeContext = this.TopContext;
+
+    setTimeout(() =>
+      this.setSize()
+      , 10);
+
+
   }
 
-  get StaticContext() {
-    return this.TheCanvas.getContext('2d');
-  }
+  //get StaticContext() {
+  //  return this.TheCanvas.getContext('2d');
+  //}
 
-  get ClientArea() {
-    return this.TheCanvas.getBoundingClientRect();
-  }
+  ////get ClientArea(): Rectangle {
+  ////  if (!this._clientArea) {
+  ////    let area = this.TheCanvas.getBoundingClientRect();
+  ////    this._clientArea = new Rectangle('activeBoundingArea', area.top, area.left, area.width, area.height,'DefaultBG');
+  ////  }
+  ////  return this._clientArea;
+
+  ////}
 
   PositionFromEvent(e: any) {
     let rect = this.TheCanvas.getBoundingClientRect();
@@ -116,29 +182,19 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
   }
 
   private Clear() {
-    this.StaticContext.clearRect(0, 0, this.TheCanvas.width, this.TheCanvas.height);
+    this.TheContext.clearRect(0, 0, this.TheCanvas.width, this.TheCanvas.height);
   }
 
-  OnMousedown(e: any) {
-    this.PositionFromEvent(e);
-    if (this.canvasService.EditOn) {
-      this.canvasService.Select();
-      this.Clear();
-      this.canvasService.DrawSystem(this.canvasID);
-    }
-  } 
+  //CopySelectedContent() {
+  //  let itemId = this.canvasService.shapeSelectResult.id;
+  //  this.system.CopyItem(itemId);
+  //}
 
-  CopySelectedContent() {
-    let itemId = this.canvasService.shapeSelectResult.id;
-    this.system.CopyItem(itemId);
-  }
+  //RemoveSelectedContent() {
+  //  this.system.RemoveContentById(this.canvasService.shapeSelectResult.id);
+  //  this.canvasService.shapeSelectResult.id = "";
 
-  RemoveSelectedContent() {
-    this.system.RemoveContentById(this.canvasService.shapeSelectResult.id);
-    this.canvasService.shapeSelectResult.id = "";
-    this.mouseCaptured = false;
-
-  }
+  //}
 
   //Edit() {
   // // this.editOn = this.canvasService.shapeSelectResult.id.length > 0;
@@ -150,24 +206,60 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
   //    , 10);
   //}
 
-  SetActiveLayer() {
-    this.setSize();
-     this.canvasService.AddLayer();
+  //SetActiveLayer() {
+  //  this.setSize();
+  //  this.canvasService.AddLayer();
+  //}
+
+  OnMousedownTop(e: any) {
+    this._contextLayer.selectItem(e, this._clientArea, this.TopContext);
+    this._contextLayer.Draw(this._context);
+//    this.DrawActive();
   }
 
-  OnRelease(e: any) {
-    this.canvasService.SSR.itemCaptured = false;
+  OnMouseUpTop(e: any) {
+    this.TopContext.clearRect(
+      0,
+      0,
+      this._clientArea.Width,
+      this._clientArea.Height);
+    this._contextLayer.releaseSelectedItem(this._context);
+  //  this.Draw();
+  //  this._contextLayer.DrawSizer(this._context);
+
+ //   this.DrawActive();
   }
 
-  OnMouseMove(e: any) {
-    if (this.canvasService.SSR.itemCaptured) {
-
-      this.PositionFromEvent(e);
-      this.canvasService.MoveSystem();
-      this.canvasService.DrawSystem(this.canvasID);
-      this.move.emit(this.canvasService.shapeSelectResult);
-    }
+  OnMouseOutTop(e: any) {
+   // this._actionLayer.releaseSelectedItem();
+  //  this.Draw();
   }
+
+  OnMouseMoveTop(e: any) {
+    this._contextLayer.mouseMove(e, this._clientArea, this.TopContext);
+  }
+
+  OnMousedown(e: any) {
+ //   this._contextLayer.selectItem(e, this._clientArea);
+//    this.DrawActive();
+//    this._contextLayer.Select(e, this._clientArea);
+  }
+
+  OnMouseUp(e: any) {
+  //  this._contextLayer.mouseRelease();
+   // return this._contextLayer.mouseRelease();
+  }
+
+  OnMouseOut(e: any) {
+  //  this._contextLayer.releaseSelectedItem();
+    return this._contextLayer.mouseRelease();
+  }
+
+  //OnMouseMove(e: any) {
+
+  //  this._contextLayer.mouseMove(e, this._clientArea);
+  //  this.Draw();
+  //}
 
   setSize() {
     let parent: any = (<Element>this.TheCanvas.parentNode);
@@ -176,19 +268,48 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy, 
       parent = parent.parentElement;
     }
 
-    let styles = getComputedStyle(parent);
+ //   let styles = getComputedStyle(parent);
     let w = parent.offsetWidth || parent.clientWidth; // bug in typescript?  They do exist...
     let h = parent.offsetHeight || parent.clientHeight;
 
-    this.TheCanvas.width = w - 2;
+    this.TheCanvas.width = w;
     this.TheCanvas.height = h - 5;
-   
-    this.Draw();
-  }
+    this.TopCanvas.width = this.TheCanvas.width;
+    this.TopCanvas.height = this.TheCanvas.height;
+    DisplayValues.width = this.TheCanvas.width;
+    DisplayValues.height = this.TheCanvas.height;
+    //if (this.initialLayer) {
+    //  this.initialLayer.Init();
+    //}
+    let area = this.TheCanvas.getBoundingClientRect();
+    this._clientArea = new Rectangle('activeBoundingArea', area.top, area.left, area.width, area.height,'DefaultBG');
+  //  this._timeSpanLayer.resetArea(this._clientArea);
+
+    this._contextLayer = this.canvasService.GetContextLayer(this.layerName, this._clientArea);
+ //   this._actionLayer = new EventContextLayer(this.layerName + '_actionLayer', 'sss','sss');
+ //   this.Draw();
+ //   this._contextLayer.DrawSizer(this._context);
+    this._contextLayer.Draw(this._context,true);
+ }
+
+  //DrawActive() {
+  //  this.DrawStatic();
+  //  this._contextLayer.DrawActive(this.TopContext);
+  //}
 
   Draw() {
-    if (!this.canvasService.BaseSystem) { return; }
-    this.canvasService.DrawSystem(this.canvasID);
+    this._contextLayer.Draw(this._context);
+    //let self = this;
+    //if (this._timeSpanLayer.Hit) {
+    //  this._timeSpanLayer.Draw(self._context);
+    //}
+    //else {
+    //  let lyrs = this._contextSystem.Layers;
+    //  lyrs.forEach((l, i) => { l.Draw(self._context); });
+    //}
+
+    //if (!this.canvasService.BaseSystem) { return; }
+    //this.canvasService.DrawSystem(this.canvasID);
   }
 
   ngOnDestroy() {

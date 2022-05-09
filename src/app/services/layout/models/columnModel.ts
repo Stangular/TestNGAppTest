@@ -80,7 +80,7 @@ export class LayoutManager {
   constructor(private patterns: LayoutPattern[] = []) {
 
 
-    let pattern = new LayoutPattern('base', [1, 2, 3], [40, 220, 68]);
+    let pattern = new LayoutPattern('base', [1, 2, 3], [330, 220, 68]);
     pattern.AddTile([1, 1, 1], [1, 2, 3], 'slotA', 80, 'yellow');
     pattern.AddTile([1, 1, 1], [1, 2, 3], 'slotB', 80, 'green');
     pattern.AddTile([1, 1, 1], [1, 2, 3], 'slotC', 80, 'red');
@@ -103,10 +103,10 @@ export class LayoutManager {
     pattern.AddTile([1, 1, 1], [1, 1, 1], '', 80, '#a4a1b8');
     this.patterns.push(pattern);
 
-    pattern = new LayoutPattern('masterA', [1, 2,3], [16, 120, 120]);
-    pattern.AddTile([1, 1, 1], [3, 2, 1], 'slotA', 180, 'transparent');
-    pattern.AddTile([1, 1, 1], [30, 3, 3], 'slotB', 180, 'transparent');
-    pattern.AddTile([1, 2, 1], [1, 1, 1], 'slotC', 180, 'transparent');
+    pattern = new LayoutPattern('masterA', [1, 2, 3], [16, 120, 120]);
+    pattern.AddTile([1, 1, 1], [3, 2, 1], 'slotA', 180, '#f2ccff');
+    pattern.AddTile([1, 1, 1], [30, 3, 3], 'slotB', 180, '#ffffcc');
+    pattern.AddTile([1, 2, 1], [1, 1, 1], 'slotC', 180, '#996666');
     this.patterns.push(pattern);
 
     pattern = new LayoutPattern('dashboardA', [1, 2, 3], [16, 120, 120]);
@@ -114,6 +114,8 @@ export class LayoutManager {
     pattern.AddTile([1, 1, 1], [2, 2, 2], 'chart2', 180, '#ffffcc');
     pattern.AddTile([1, 2, 1], [1, 1, 1], 'chart3', 180, '#996666');
     this.patterns.push(pattern);
+
+
   }
 
   get Size() {

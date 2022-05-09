@@ -34,7 +34,7 @@ export class Path implements IContextItem {
   AddPort(port: string) {
     this.portNames.push(port);
   }
-
+  get zIndex() { return 0;}
   get Ports() {
     return this.portNames;
   }

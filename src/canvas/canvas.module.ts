@@ -44,7 +44,7 @@ library.add(
   ],
   declarations: [
     CanvasComponent
-    , DashboardPageComponent
+  //  , DashboardPageComponent
     , DesignerPageComponent
     , CanvasDesignerPropertyToolbarComponent
     , UpdatePortDialog
@@ -60,7 +60,7 @@ library.add(
     , ActionCanvasComponent],
 
   exports: [CanvasComponent
-    , DashboardPageComponent
+  //  , DashboardPageComponent
     , DesignerPageComponent
     , CanvasDesignerPropertyToolbarComponent
     , UpdatePortDialog

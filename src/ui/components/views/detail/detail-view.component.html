@@ -1,26 +1,22 @@
 <div style="height:75vh">
-  <mat-grid-list cols="32" rowHeight="60px">
-    <mat-grid-tile [colspan]="2"
-                   [rowspan]="5"
-                   [style.background]="'transparent'">
-      <div>
-        <div class="action-button-row">
-          <button mat-mini-fab color="default"
-                  (click)="onAction(actionType.create)"
-                  [disabled]="formDirty">
+  <form>
+    <mat-grid-list cols="20" rowHeight="50px">
+      <mat-grid-tile [colspan]="20"
+                     [rowspan]="1"
+                     [style.background]="'transparent'">
+        <div style="background-color:darkgray; color: white; border-radius:8px">
+          <button mat-icon-button color="default"
+                  (click)="source.NewRecord(sourceIndex)"
+                  [disabled]="source.IsDirty">
             <mat-icon aria-label="New Record">add</mat-icon>
           </button>
-        </div>
-        <div class="action-button-row">
-          <button mat-mini-fab color="default"
-                  (click)="onAction(actionType.remove)">
+          <button mat-icon-button color="default"
+                  (click)="OnRemove()">
             <mat-icon aria-label="Remove Record">remove</mat-icon>
           </button>
-        </div>
-        <div class="action-button-row">
-          <button mat-mini-fab color="default"
-                  (click)="onAction(actionType.save)"
-                  [disabled]="!formDirty">
+          <button mat-icon-button color="default"
+                  (click)="SaveChanges()"
+                  [disabled]="!source.IsDirty">
             <mat-progress-spinner *ngIf="servicing" class="example-margin"
                                   [color]="color"
                                   [diameter]="diameter"
@@ -29,24 +25,28 @@
             </mat-progress-spinner>
             <mat-icon aria-label="Save" *ngIf="!servicing">send</mat-icon>
           </button>
-        </div>
-        <div class="action-button-row">
-          <button mat-mini-fab color="default"
+          <button mat-icon-button color="default"
                   (click)="onAction(actionType.undo)"
-                  [disabled]="!formDirty || formNew">
+                  [disabled]="!source.IsDirty || formNew">
             <mat-icon aria-label="Undo Changes">undo</mat-icon>
           </button>
         </div>
-      </div>
-    </mat-grid-tile>
-
-    <mat-grid-tile *ngFor="let elm of displayElements"
-                   [colspan]="4"
-                   [rowspan]="2"
-                   [style.background]="'transparent'">
-      <input-edit [element]="elm" (blur)="onBlur($event)"
-                  [form]="form"></input-edit>
-    </mat-grid-tile>
-  </mat-grid-list>
-
+      </mat-grid-tile>
+      <mat-grid-tile *ngFor="let elm of Elements; index as i"
+                     [colspan]="2"
+                     [rowspan]="2"
+                     [style.background]="'transparent'">
+        <input-edit *ngIf="elm.ModelID < 4"
+                    [modelIndex]="0"
+                    [formIndex]="sourceIndex"
+                    [fieldIndex]="i">
+        </input-edit>
+        <check-selector *ngIf="elm.ModelID == 4"
+                        [modelIndex]="0"
+                        [formIndex]="sourceIndex"
+                        [fieldIndex]="i">
+        </check-selector>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </form>
 </div>

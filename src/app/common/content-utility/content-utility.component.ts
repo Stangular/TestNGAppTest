@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LayoutService } from '../../services/layout/layout-service.service';
+import { ColumnModel } from 'src/app/services/layout/models/columnModel';
 
 @Component({
   selector: 'content-utility',
@@ -15,5 +16,9 @@ export class ContentUtilityComponent implements OnInit {
 
   ngOnInit() {
     this.layoutIndex = this.layout.getPatternIndex(this.layoutName);
+  }
+
+  Select(cm: ColumnModel): string {
+    return "[content-type=" + cm.Content + "]";
   }
 }

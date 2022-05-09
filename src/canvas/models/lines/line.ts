@@ -42,7 +42,7 @@ export class PortPath implements IPortPath {
     return this.lineId;
   }
 
-  RemovePortPoint(oldpt: Point,newPoint: Point = null) {
+  RemovePortPoint(oldpt: Point, newPoint: Point = null) {
     let i = this.ports.findIndex(p => p.X == oldpt.X && p.Y == oldpt.Y);
     if (i >= 0) {
       if (newPoint) {
@@ -56,10 +56,10 @@ export class PortPath implements IPortPath {
     return false;
   }
 
-  AddPortPoint(pt: Point,position:number = 0): number {
+  AddPortPoint(pt: Point, position: number = 0): number {
     //switch (type) {
     //}
-    this.ports.splice(position,0,pt);
+    this.ports.splice(position, 0, pt);
     return this.ports.length - 1;
   }
 
@@ -108,8 +108,8 @@ export class PortPath implements IPortPath {
           this.ports.push(new Point());
         }
         p = this.ports[0].Y + ((this.ports[1].Y - this.ports[0].Y) / 2);
-        this.ports[2].SetToPosition(this.ports[1].X,p);
-        this.ports[3].SetToPosition(this.ports[0].X,p);
+        this.ports[2].SetToPosition(this.ports[1].X, p);
+        this.ports[3].SetToPosition(this.ports[0].X, p);
         break;
       case lineTypes.VtoH:
         if (this.ports.length < 3) {
@@ -123,8 +123,8 @@ export class PortPath implements IPortPath {
           this.ports.push(new Point());
         }
         p = this.ports[0].X + ((this.ports[1].X - this.ports[0].X) / 2);
-        this.ports[2].SetToPosition(p,this.ports[1].Y);
-        this.ports[3].SetToPosition(p,this.ports[0].Y);
+        this.ports[2].SetToPosition(p, this.ports[1].Y);
+        this.ports[3].SetToPosition(p, this.ports[0].Y);
         break;
       case lineTypes.HtoV:
         if (this.ports.length < 3) {
@@ -138,71 +138,35 @@ export class PortPath implements IPortPath {
 
   get Ports() { return this.ports; }
 
-  //DrawLine(context: ContextModel) {
-  //  if (this.ports.length < 2) { return; }
-  //  context.moveTo(this.ports[0].X, this.ports[0].Y);
-  //  for (let j = this.ports.length - 1; j > 0; j = j - 1) {
-  //    context.lineTo(this.ports[j].X, this.ports[j].Y);
-  //  }
-  //}
-
-  //DrawBezierPath(context: ContextModel) {
-  //  if (this.ports.length < 4) { return; }
-  //  context.moveTo(this.ports[0].X, this.ports[0].Y);
-  //  for (let j = 1; j < this.ports.length; j = j + 3) {
-  //    context.bezierCurveTo(
-  //      this.ports[j + 1].X, this.ports[j + 1].Y,
-  //      this.ports[j + 2].X, this.ports[j + 2].Y,
-  //      this.ports[j].X, this.ports[j].Y);
-  //  }
-  //}
-
-  //DrawGradientPath(context: ContextModel) {
-  //  if (this.ports.length < 3) { return; }
-  //  try {
-  //    context.moveTo(this.ports[0].X, this.ports[0].Y);
-  //    for (let j = 1; j < this.ports.length - 1; j = j + 2) {
-  //      context.quadraticCurveTo(
-  //        this.ports[j + 1].X, this.ports[j + 1].Y,
-  //        this.ports[j].X, this.ports[j].Y);
-  //    }
-  //  }
-  //  catch (ex) {
-  //    let sss = ex;
-  //  }
- 
-  //}
 
   ResetToPort(port: Port) {
-    
+
     this.ports[port.PathPosition] = port.Center;
   }
 }
 
 export class Line implements ILine {
 
-  // _paths: PortPath[] = [];
-  _state: StateIndex;
-  constructor(private id: string,
+  private _state: StateIndex;
+  constructor(
+    private id: string,
     protected state: string,
-    private type: lineTypes = lineTypes.straight) {
-    //   let t = this.type;
-    //   this._paths = paths.concat([]);
+    private zindex: number = 0) {
     this._state = DisplayValues.GetLineIndex(this.StateName, state);
-    // paths.forEach(function (p, i) { p.SetInterimPorts(t); });
   }
 
-  Update(stateName: string, type: lineTypes) {
+  get zIndex() { return this.zindex; }
+
+  Update(stateName: string) {
     this._state = DisplayValues.GetLineIndex(this.Id + "_state", stateName);
     this.state = stateName;
-    this.type = type;
   }
 
   Save(): any {
     let model = {
       LineId: this.id,
       DisplayValueId: this.state,
-      LineType: this.type,
+      LineType: this.Type,
       OffsetX1: 0,
       OffsetY1: 0,
       OffsetX2: 0,
@@ -211,12 +175,7 @@ export class Line implements ILine {
     return model;
   }
 
-
-  get Type() {
-    return this.type;
-  }
-
-  get State() {
+  get State(): StateIndex {
     return this._state;
   }
 
@@ -226,55 +185,32 @@ export class Line implements ILine {
 
   get Id() { return this.id; }
 
+  get Type() {
+    return lineTypes.straight;
+  }
 
   UpdateContextState() { }
 
-  //public DrawPortPath(context: ContextModel, path: PortPath) {
-  //  if (!path) { return; }
-  //  context.beginPath();
-  //  switch (this.type) {
-  //    case lineTypes.gradient: context.DrawGradientPath(path.Ports); break;
-  //    case lineTypes.bezier: context.DrawBezierPath(path.Ports); break;
-  //    default: context.DrawStraightLine(path.Ports); break;
-  //  }
-  //  this.Draw(context);
-  //  context.closePath();
-  //}
+  DrawLine(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    ctx.beginPath();
 
-  Draw(context: ContextModel,path: Point [] = []): void {
-    context.DrawLine(this, path);
+    ctx.moveTo(path[0].X, path[0].Y);
+
+    this.Plot(ctx, path);
+    this.Draw(ctx);
   }
 
-  //public DrawPath(context: any, pathId: string) {
-  //  let p = this._paths.find(p => p.Id == pathId);
-  //  this.DrawPortPath(context, p);
-  //}
+  Draw(ctx: CanvasRenderingContext2D): void {
+    ctx.strokeStyle = DisplayValues.GetColor(this.State.Index[UIStates.color]);
+    ctx.lineWidth = DisplayValues.GetWeight(this.State.Index[UIStates.weight]);
+    ctx.stroke();
+    ctx.closePath();
+  }
+                                                                                                                    
+  Plot(ctx: CanvasRenderingContext2D, path: Point[]) {
+    path.slice(1).forEach(p => ctx.lineTo(p.X, p.Y));
+  }
 
-  //public DrawAllPaths(context: any) {
-  //  let self = this;
-  //  this._paths.forEach(function (p, i) {
-  //    self.DrawPortPath(context, p);
-  //  });
-  //}
-
-  //public DrawToContent(context: any, ports: Port[]) {
-  //  let self = this;
-  //  ports.forEach(function (p, i) {
-  //    self.DrawPath(context, p.PathId);
-  //  });
-  //}
-
-  //ResetPath(ports: Port[]) {
-  //  let self = this;
-  //  ports.forEach(function (p, i) {
-  //    let path = self.Paths.find(pp => pp.Id == p.PathId);
-  //    if (path) {
-  //      path.ResetToPort(p);
-  //      path.SetInterimPorts(this.type);
-  //    }
-  //  });
-
-  //}
 
   CopyItem(newId: string) {
     return null;
@@ -291,5 +227,144 @@ export class Line implements ILine {
     // this.IsPointInShape(point);
   }
 }
+
+export class GradientLine extends Line {
+
+  constructor(
+    id: string,
+    state: string) {
+    super(id, state);
+  }
+
+  get Type() {
+    return lineTypes.gradient;
+  }
+
+  Plot(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    for (let j = 1; j < path.length; j = j + 1) {
+      let k = j - 1;
+      ctx.quadraticCurveTo(
+        path[k].X + path[k].X / 2, path[k].Y - 10,
+        path[j].X, path[j].Y);
+    }
+  }
+}
+
+export class BezierLine extends Line {
+
+  constructor(
+    id: string,
+    state: string) {
+    super(id, state);
+  }
+
+  get Type() {
+    return lineTypes.gradient;
+  }
+
+  Plot(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    for (let j = 1; j < path.length; j = j + 1) {
+      let k = j - 1;
+      let dx = (path[j].Y - path[k].Y) / 2;
+      let dy = (path[j].X - path[k].X) / 4;
+      ctx.bezierCurveTo(
+        path[j].X - dx, path[k].Y + dx,
+        path[j].X + dy, path[k].Y - dy,
+        path[j].X, path[j].Y);
+    }
+
+  }
+}
+
+export class VerticalToVerticalLine extends Line {
+
+  constructor(
+    id: string,
+    state: string) {
+    super(id, state);
+  }
+
+  get Type() {
+    return lineTypes.VtoV;
+  }
+
+  Plot(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    let p: number = 0;
+    for (let j = 1; j < path.length; j = j + 1) {
+      let k = j - 1;
+      p = path[k].X + ((path[j].X - path[k].X) / 2);
+      ctx.lineTo(p, path[k].Y);
+      ctx.lineTo(p, path[j].Y);
+      ctx.lineTo(path[j].X, path[j].Y);
+    }
+
+  }
+}
+
+export class HorizontallToHorizontalLine extends Line {
+
+  constructor(
+    id: string,
+    state: string) {
+    super(id, state);
+  }
+
+  get Type() {
+    return lineTypes.HtoH;
+  }
+
+  Plot(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    let p: number = 0;
+    for (let j = 1; j < path.length; j = j + 1) {
+      let k = j - 1;
+      p = path[k].Y + ((path[j].Y - path[k].Y) / 2);
+      ctx.lineTo(path[k].X, p);
+      ctx.lineTo(path[j].X, p);
+      ctx.lineTo(path[j].X, path[j].Y);
+    }
+  }
+}
+
+export class HorizontalToVerticalLine extends Line {
+
+  constructor(
+    id: string,
+    state: string) {
+    super(id, state);
+  }
+
+  get Type() {
+    return lineTypes.HtoV;
+  }
+
+  Plot(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    for (let j = 1; j < path.length; j = j + 1) {
+      ctx.lineTo(path[j - 1].X, path[j].Y);
+      ctx.lineTo(path[j].X, path[j].Y);
+    }
+  }
+}
+
+export class VerticaToHorizontallLine extends Line {
+
+  constructor(
+    id: string,
+    state: string) {
+    super(id, state);
+  }
+
+  get Type() {
+    return lineTypes.VtoH;
+  }
+
+  Plot(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
+    for (let j = 1; j < path.length; j = j + 1) {
+      ctx.lineTo(path[j].X, path[j - 1].Y);
+      ctx.lineTo(path[j].X, path[j].Y);
+    }
+  }
+}
+
+
 
 

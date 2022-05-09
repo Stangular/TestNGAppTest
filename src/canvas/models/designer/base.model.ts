@@ -93,7 +93,7 @@ export class EditModel extends ContextLayer {
   private designerpad = new StateIndex('designerpad');
 
   constructor() {
-    super('edit','','');
+    super(new Rectangle('x',0,0,0,0),'edit','','');
     let bgNdx = DisplayValues.GetColorIndex('default.edit.background');
     this.designerpad.setState(UIStates.background, bgNdx);
     this.designerpad.setState(UIStates.foreground, 1);
@@ -164,32 +164,32 @@ export class EditModel extends ContextLayer {
     );
   }
 
-  Select(shapeSelectResult: ShapeSelectResult): boolean {
+  //Select(shapeSelectResult: ShapeSelectResult): boolean {
 
-    shapeSelectResult.id = '';
-    shapeSelectResult.type = '';
+  //  shapeSelectResult.id = '';
+  //  shapeSelectResult.type = '';
 
-    if (super.Select(shapeSelectResult)) {
-      let shape = this._sizer.find(s => s.SelectShape(shapeSelectResult)) as Shape;
-      if (!shape) {
-        shape = this.Content.find(c => (c as Shape).IsSelected) as Shape;
-        if (shape) {
-          this.activeShapeId = shape.Id;
-          this.ResetSizer(shape);
-        }
-      }
-      if (shape) {
-        this.selectedId = shape.Id;
-        shapeSelectResult.id = shape.Id;
-        shapeSelectResult.type = 'shape';
-        this.contactPoint.SetToPosition(
-          shapeSelectResult.point.X,
-          shapeSelectResult.point.Y);
-      }
-      return true;
-    }
-    return false;
-  }
+  //  if (super.Select(shapeSelectResult)) {
+  //    let shape = this._sizer.find(s => s.SelectShape(shapeSelectResult)) as Shape;
+  //    if (!shape) {
+  //      shape = this.Content.find(c => (c as Shape).IsHit) as Shape;
+  //      if (shape) {
+  //        this.activeShapeId = shape.Id;
+  //        this.ResetSizer(shape);
+  //      }
+  //    }
+  //    if (shape) {
+  //      this.selectedId = shape.Id;
+  //      shapeSelectResult.id = shape.Id;
+  //      shapeSelectResult.type = 'shape';
+  //      this.contactPoint.SetToPosition(
+  //        shapeSelectResult.point.X,
+  //        shapeSelectResult.point.Y);
+  //    }
+  //    return true;
+  //  }
+  //  return false;
+  //}
 
   SetTool(tool: tooltypes) {
     this.tooltype = tool;
@@ -255,7 +255,7 @@ export class BaseDesignerModel extends ContextLayer {
   private designerpad = new StateIndex('designerpad');
 
   constructor() {
-    super('designer', 'default','');
+    super(null,'designer', 'default','');
 
     let bgNdx = DisplayValues.GetColorIndex('default.rect.background');
     this.designerpad.setState(UIStates.background, bgNdx);
@@ -268,22 +268,22 @@ export class BaseDesignerModel extends ContextLayer {
     this.Content.forEach(function (item, i) { item.Draw(context); });
   }
 
-  Select(shapeSelectResult: ShapeSelectResult): boolean {
+  //Select(shapeSelectResult: ShapeSelectResult): boolean {
 
-    shapeSelectResult.id = '';
-    shapeSelectResult.type = '';
-    this.point = shapeSelectResult.point;
-    if (super.Select(shapeSelectResult)) {
-      let shape = this.Content.find(c => (c as Shape).IsSelected);
-      if (shape) {
-        shapeSelectResult.id = shape.Id;
-        shapeSelectResult.type = 'shape';
-      }
-      return true;
-    }
-    return false; // this.AddNewItem(this.tooltype, shapeSelectResult.point);
+  //  shapeSelectResult.id = '';
+  //  shapeSelectResult.type = '';
+  //  this.point = shapeSelectResult.point;
+  //  if (super.Select(shapeSelectResult)) {
+  //    let shape = this.Content.find(c => (c as Shape).IsHit);
+  //    if (shape) {
+  //      shapeSelectResult.id = shape.Id;
+  //      shapeSelectResult.type = 'shape';
+  //    }
+  //    return true;
+  //  }
+  //  return false; // this.AddNewItem(this.tooltype, shapeSelectResult.point);
 
-  }
+  //}
 
   SetTool(tool: tooltypes) {
     this.tooltype = tool;

@@ -70,7 +70,7 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
     this.subscription = this.messageService.getMessage().subscribe(
       message => { this.AcceptMessage(message) });
 
-    this._actionLayer = new ActionLayer('editor');
+ //   this._actionLayer = new ActionLayer('editor');
     this._staticLayer = this.canvasService.BaseSystem.getLayer(this.canvasID);
   }
 
@@ -89,8 +89,8 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
   }
 
   ngOnInit() {
-    this.canvasService.ContextModel.AddLayerContext('editor', this.ActiveContext);
-    this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.StaticContext);
+  //  this.canvasService.ContextModel.AddLayerContext('editor', this.ActiveContext);
+  //  this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.StaticContext);
     this._actionLayer.SetLayer(this.canvasService.BaseSystem.getLayer(this.canvasID));
  //   this.Draw();
  //  this._actionLayer.Reset(this.canvasService.ContextModel);
@@ -185,18 +185,21 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
   }
 
   OnMousedown(e: any) {
+  // Select Item and remove from static content
+  // Place in AreaTracker
+  
     this.PositionFromEvent(e);
     if (this.canvasService.EditOn) {
       let selected = this._actionLayer.ShapeSelected;
       this.Clear();
-      if (this._actionLayer.Select(this.canvasService.SSR)) {
+      if (this._actionLayer.Select(this.canvasService.SSR.point)) {
         this.Draw();
       }
       else if (!selected) {
         this._actionLayer.AddNewContent(this.canvasService.SSR);
         this.Draw();
       }
-      this._actionLayer.Reset(this.canvasService.ContextModel);
+  //    this._actionLayer.Reset(this.canvasService.ContextModel);
       this.canvasService.SetActiveShape(this._actionLayer.SelectedShape);
       this.Select.emit(this.canvasService.SSR);
     }
@@ -207,10 +210,11 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
   }
 
   OnMouseMove(e: any) {
+
     if (this.canvasService.SSR.itemCaptured) {
 
       this.PositionFromEvent(e);
-      this._actionLayer.MoveItem(this.canvasService.ContextModel, this.canvasService.SSR);
+   //   this._actionLayer.MoveItem(this.canvasService.ContextModel, this.canvasService.SSR);
       this.Draw();
       this.move.emit(this.canvasService.shapeSelectResult);
     }
@@ -238,7 +242,7 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
         this.ActiveCanvas.height = this.StaticCanvas.height;
       }
       this.Draw();
-      this._actionLayer.Reset(this.canvasService.ContextModel);
+  //    this._actionLayer.Reset(this.canvasService.ContextModel);
 
      // this._staticLayer.Draw(this.canvasService.ContextModel);
     }
@@ -247,9 +251,9 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
 
   Draw() {
     //  if (!this.canvasService.BaseSystem) { return; }
-    this.canvasService.ContextModel.SetLayerContext('editor', this.ActiveContext);
-    this._actionLayer.Draw(this.canvasService.ContextModel);
-    this.canvasService.ContextModel.SetLayerContext(this.canvasID, this.StaticContext);
+  //  this.canvasService.ContextModel.SetLayerContext('editor', this.ActiveContext);
+ //   this._actionLayer.Draw(this.canvasService.ContextModel);
+  //  this.canvasService.ContextModel.SetLayerContext(this.canvasID, this.StaticContext);
   }
 
   ngOnDestroy() {

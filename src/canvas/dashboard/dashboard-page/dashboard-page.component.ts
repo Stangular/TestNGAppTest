@@ -11,7 +11,7 @@ export class DashboardPageComponent implements OnInit {
 
   layoutIndex: number = -1;
   @Input() layoutName: string = 'base';
-  @Input() source: Records<string>;
+  //@Input() source: Records<string>;
 
   constructor(public layout: LayoutService) { }
  

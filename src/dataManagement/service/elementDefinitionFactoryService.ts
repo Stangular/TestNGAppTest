@@ -1,26 +1,29 @@
 import { Injectable } from '@angular/core';
-import { IElementDefinition, EditElementDefinition, ElementModel, IElementModel } from '../model/definitions/ElementDefinition';
+import { IElementDefinition, EditElementDefinition, ElementModel, IElementModel, ElementModelFactory } from '../model/definitions/ElementDefinition';
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { A_Sequence, A_Term } from '../model/sequencing/sequence';
-import { Records } from '../model/records';
+import { Records, FormFiltering } from '../model/records';
 import { ActionType } from 'src/ui/components/views/detail/detail-view.component';
 import { MatSnackBar } from '@angular/material';
 import { IValidator } from '../model/definitions/Validation';
+import { FilterBasicBarChartModel } from 'src/NAS_App/Services/filter/filter.model';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import { FilterLostCausePeopleModel, FilterLostCauseStateModel } from 'src/apps/LostCauseAnalysis/filters/filter.model';
 
 @Injectable()
 export class ElementDefinitionFactoryService {
 
-  private validators: IValidator[] = [];
+  private modelFactory: ElementModelFactory = new ElementModelFactory();
   private source: Records<string>[] = [];
-  private _models: IElementModel[] = [];
  // _elms: IElementDefinition[] = [];  // should be _textElms...
   saveing: boolean = false;
 
   constructor(
-    private httpService: DataHTTPService,
-    private snacker: MatSnackBar
+    private httpService: DataHTTPService
+    , private spinnerService: Ng4LoadingSpinnerService
+    , private snacker: MatSnackBar
 ) {
-
+    this.Init();
     //let m = new ElementModel<string>();
     //m.formID = 'projectForm';
     //m.fieldID = 'name';
@@ -32,8 +35,47 @@ export class ElementDefinitionFactoryService {
   //  return this._elms.findIndex(e => e.FieldID() == ID) || this._elms[0];
   //}
 
-  getRecordsIndex(sourceName: string) : number {
-    return this.source.findIndex(s => s.SourceID == sourceName);
+  Init() {
+    let self = this;
+    // this.LoadModels();
+    this.source.push(new FormFiltering('formFilter', this.source.length));
+    this.source.push(new FilterBasicBarChartModel('VBarChart', this.source.length));
+    this.source.push(new FilterLostCausePeopleModel('lc_people', this.source.length));
+    this.source.push(new FilterLostCauseStateModel('lc_states', this.source.length));
+   this.source.forEach(function (s, i) {
+      s.AddFieldFromModel(self.modelFactory);
+    });
+  }
+
+  public SetFormContent(sourceIndex: number) {
+    let src = this.Source(sourceIndex);
+    this.spinnerService.show();
+    this.httpService.postContent(src.Filter()
+      , 'https://localhost:44336/api/data/GetFilteredContent').subscribe(
+      data => {
+        src.Filter()
+        this.spinnerService.hide();
+        src.LoadData(
+          data.content, [],
+          data.recordCount,
+          data.totalAvailableCount); },
+      err => { this.httpFail(err) });
+  }
+
+  contentSuccess(data: any, source: Records<any>) {
+  
+    //   this.barSystem = this.source.ChartGraphic('bar', 0, 0, 'bar');
+    //setTimeout(() =>
+    //  this.messageService.sendMessage(0), 0);
+  }
+
+  httpFail(data: any) {
+    this.spinnerService.hide();
+    this.Snack('Form failed to initialize');
+  }
+
+  getSourceIndex(sourceName: string): number {
+    return this.source.findIndex(s => s.FormName == sourceName);
   }
 
   getRecords(fid: number = 0): Records<string> {
@@ -45,29 +87,49 @@ export class ElementDefinitionFactoryService {
     if (r) { return r.Form; }
   }
 
+  GetFormFieldIndex(formIndex: number, dataId: string) {
+    return this.source[formIndex].GetFieldIndex(dataId);
+  }
+
+  get IsInvalid() {
+    return this.modelFactory.IsInvalid;
+  }
+
+  get IsDirty() {
+    return this.source.some(r => r.IsDirty);
+  }
+
+  GetSourceIndex(sourceName: string) {
+    return this.source.findIndex(r => r.SourceID == sourceName);
+  }
+
   Source(sourceIndex: number = 0) {
     return this.source[sourceIndex];
   }
 
-  IsValidValue<T>(v: T, validatorIndex: number): boolean {
-
-    return this.validators[validatorIndex].validate(v);
-   
+  NewRecord(sourceIndex: number) {
+    let s = this.Source(sourceIndex);
+    s.NewRecord(this);
   }
 
-  UpdateRecord(modelIndex: number, formIndex: number, fieldIndex: number) : boolean {
-    let m = this._models[modelIndex];
+  UpdateRecord(modelIndex: number, formIndex: number, fieldIndex: number): boolean {
+    let m = this.modelFactory.GetElementModel(modelIndex);
     let r = this.source[formIndex];
-    return r.UpdateRecord(fieldIndex,this.validators[m.Validator]);
+    return r.UpdateRecord(fieldIndex, m.Validators());
   }
 
   Model(index: number) {
-    return this._models[index];
+    return this.modelFactory.GetElementModel(index);
   }
 
   Element(formIndex: number, fieldIndex: number): IElementDefinition {
-    return this.source[formIndex].Fields[fieldIndex];
+    return this.source[formIndex].Field( fieldIndex );
   }
+
+  FormIndex(formIndex: number, fieldIndex: number): IElementDefinition {
+    return this.source[formIndex].Field(fieldIndex);
+  }
+
 
   LoadListsFromServer(lists: string[]) {
 
@@ -77,8 +139,13 @@ export class ElementDefinitionFactoryService {
       
   }
 
+  OutputCurrentValues(sourceIndex: number) {
+    let source = this.Source(sourceIndex);
+    return source.OutputCurrentValues(this.modelFactory);
+  }
+
   saveSuccess(data: any) {
-    this.source.LoadData(data.content, [], data.recordCount);
+   // this.source.LoadData(data.content, [], data.recordCount);
     this.saveing = false;
     this.Snack('Save succeeded');
   }
@@ -87,34 +154,7 @@ export class ElementDefinitionFactoryService {
     this.saveing = false;
     this.Snack(data.error || 'Form save Failed for unknown reason');
   }
-
-  //Action(a: ActionType, elmId = '') {
-  //  //switch (a) {
-  //  //  case ActionType.undo: this.source.ResetToInitial(); break;
-  //  //  case ActionType.create: this.source.NewRecord(); break;
-  //  //  case ActionType.update: break;// TODO: put into edit mode.
-  //  //  case ActionType.remove:
-  //  //    if (!this.source.RemoveNewForm()) { this.acknowledgeDelete(); }
-  //  //    break;
-  //  //  case ActionType.save:
-  //  //    this.saveing = true;
-  //  //    let v = this.source.GetFieldValue('id');
-  //  //    if (v.length <= 0) {
-
-  //  //      this.httpService.postContent(this.source.OutputCurrentValues()).subscribe(
-  //  //        data => { this.saveSuccess(data) },
-  //  //        err => { this.saveFail(err) });
-  //  //    }
-  //  //    else {
-  //  //      this.httpService.updateContent(this.source.OutputCurrentValues()).subscribe(
-  //  //        data => { this.saveSuccess(data) },
-  //  //        err => { this.saveFail(err) });
-  //  //    }
-
-
-  //  //    break;
-  //  }
-  //}
+  
 
   acknowledgeDelete(): void {
     //const dialogRef = this.dialog.open(AcknowlegeDeleteDialog, {
@@ -142,7 +182,7 @@ export class ElementDefinitionFactoryService {
     this.snacker.open(message, 'Close', { duration: 2500, horizontalPosition: 'right', verticalPosition: 'bottom' });
   }
 
-  TestList(model: ElementModel<string>) {
+  TestList(model: ElementModel) {
     //let i = this._elms.findIndex(e => e.FieldID() == "test_list");
     //if (i >= 0) {
     //  return this._elms[i];
@@ -155,14 +195,14 @@ export class ElementDefinitionFactoryService {
 
   }
 
-  USStateAbbreviations(model: ElementModel<string>) {
+  USStateAbbreviations(model: ElementModel) {
 
     //let i = this._elms.findIndex(e => e.FieldID() == "state_abbreviations");
     //if( i >= 0 )
     //{
     //  return this._elms[i];
     //}
-    let list: A_Sequence<string, string, number> = new A_Sequence(model, "state_abbreviations", "States");
+   // let list: A_Sequence<string, string, number> = new A_Sequence(model, "state_abbreviations", "States");
 
     //list.AddItem("AL", "AL",1);
     //list.AddItem("AK", "AK",2);
@@ -217,6 +257,6 @@ export class ElementDefinitionFactoryService {
 
     //this._elms.push(list);
 
-    return list;
+    return {}; //list;
   }
 }

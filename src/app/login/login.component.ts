@@ -24,6 +24,8 @@ export interface DialogData {
 export class LoginComponent  {
   rForm: FormGroup;
   matcher = new MyErrorStateMatcher();
+  @Input() containerLayout: string = "masterA";
+  containerIndex: number = -1;
   layoutIndex: number = -1;
   @Output() close: EventEmitter<boolean> = new EventEmitter<boolean>();
   constructor(
@@ -39,6 +41,7 @@ export class LoginComponent  {
 
   ngOnInit() {
     this.layoutIndex = this.layout.getPatternIndex('formA');
+    this.containerIndex = this.layout.getPatternIndex(this.containerLayout);
   }
 
   control(name: string) {

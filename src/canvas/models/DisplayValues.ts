@@ -60,6 +60,8 @@ export class DisplayValues {
   private static color: NamedValue<string>[] = [];
   private static weight: NamedValue<number>[] = [];
   private static fonts: NamedValue<string>[] = [];
+  public static width: number = 0;
+  public static height: number = 0;
 
   constructor(service: CanvasService) {
      service.RetrieveState();
@@ -151,7 +153,9 @@ export class DisplayValues {
     if (index >= this.color.length) {
       return this.GetColor(index - 1);
     }
-    if (!index || index < 0) { index = 0; }
+    if (!index || index < 0) { 
+      index = 0; 
+    }
     return this.color[index].Value;
   }
 
@@ -260,6 +264,10 @@ export class DisplayValues {
       this.fonts.splice(ndx, 1);
     }
   }
+
+  static get Height() { return this.height; }
+  static get Width() { return this.width; }
+
 }
 
 export class TheCanvasState {

@@ -1,10 +1,55 @@
-
-<span routerLink="home"  class="navItem" routerLinkActive="active">
-  <span class="material-icons">home</span> Home
-</span>
-<span routerLink="project"  class="navItem" >
-    Project
-</span>
-<span routerLink="person" class="navItem">
-  <span class="material-icons">face</span> Person
-</span>
+<mat-toolbar color="primary">
+  <button mat-icon-button style="width:30px">
+    <mat-icon aria-label="login"
+              *ngIf="this._navMan.SelectedItem.Name != 'Home'"
+              [matMenuTriggerFor]="pathMenu">
+      menu
+    </mat-icon>
+  </button>
+  <div (click)="RouteBack()"
+       style="cursor:pointer; width:200px; overflow:hidden; text-overflow:ellipsis">
+    {{_navMan.SelectedItem.Name}}
+  </div>
+  <span>
+    <button mat-button *ngFor="let n of _navMan.SelectedItem.SubLinks; index as i"
+            (click)="RouteTo(n)"
+            [ngStyle]="{'backgroundColor': n.Selected() ? n.BGColorSelected : n.BGColorDefault
+                        ,'color': n.Selected() ? n.FGColorSelected : n.FGColorDefault }">
+      <mat-icon *ngIf="n.Icon.length > 0">{{n.Icon}}</mat-icon>
+      {{n.Name}}
+    </button>
+  </span>
+  <span class="toolbar-spacer"></span>
+  <button mat-button color="warn" 
+          type="button"
+          routerLink="/SiteMap"
+          class="btn btn-default btn-md">
+    <i class="fa fa-sitemap" style="font-size:20px"></i>
+  </button>
+  <button mat-icon-button color="error">
+    <mat-icon aria-label="PDF">insert_photo</mat-icon>
+  </button>
+  <button mat-icon-button color="accent">
+    <mat-icon aria-label="Text">publish</mat-icon>
+  </button>
+  <button mat-icon-button color="default">
+    <mat-icon aria-label="Send as Email">email</mat-icon>
+  </button>
+  <button mat-icon-button color="default" routerLink="/login" *ngIf="!userService.isLoggedIn">
+    <mat-icon aria-label="Login">input</mat-icon>
+  </button>
+  <button mat-icon-button color="default" routerLink="/login" *ngIf="userService.isLoggedIn">
+    <mat-icon aria-label="Login">person</mat-icon>
+  </button>
+  <mat-menu #user="matMenu" xPosition='before' yPosition='below' overlapTrigger="false">
+    <!--<app-user-component></app-user-component>-->
+  </mat-menu>
+</mat-toolbar>
+<mat-menu #pathMenu="matMenu" xPosition="after" overlapTrigger="false">
+  <button mat-menu-item *ngFor="let n of _navMan.Path; index as i"
+          (click)="JumpTo(n)">
+    <mat-icon *ngIf="n.Icon.length > 0">{{n.Icon}}</mat-icon>
+    {{n.Name}}
+  </button>
+</mat-menu>
+<!--<router-outlet></router-outlet>-->

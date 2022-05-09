@@ -3,7 +3,7 @@
   <h1 mat-dialog-title>{{DialogTitle}}</h1>
   <div mat-dialog-content>
     <div class="dialog-form">
-      <mat-grid-list cols="3" rowHeight="30px">
+      <mat-grid-list cols="3" rowHeight="35px">
         <mat-grid-tile [colspan]="1" [rowspan]="1">
           <div style="text-align:left" *ngIf="!asContent && !exact">
             Lower Value:
@@ -14,8 +14,10 @@
         </mat-grid-tile>
         <mat-grid-tile [colspan]="2" [rowspan]="1">
           <div style="text-align:left">
-            <input-edit [element]="selectedLowerElement"
-                        [form]="form"></input-edit>
+            <input-edit [modelIndex]="-1"
+                        [formIndex]="0"
+                        [showLabel]="false"
+                        [fieldIndex]="0"></input-edit>
           </div>
         </mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -25,34 +27,51 @@
         </mat-grid-tile>
         <mat-grid-tile [colspan]="2" [rowspan]="1">
           <div style="text-align:left" *ngIf="!asContent && !exact">
-            <input-edit [element]="selectedUpperElement"
-                        [form]="form"></input-edit>
+            <input-edit [modelIndex]="-1"
+                        [formIndex]="0"
+                        [showLabel]="false"
+                        [fieldIndex]="1"></input-edit>
           </div>
         </mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="1">
-          <div style="text-align:left" *ngIf="selectedLowerElement.Type() == 'text'">
-            <mat-slide-toggle class="example-margin"
-                              [(ngModel)]="asContent"
-                              [checked]="asContent">
-              As Content
-            </mat-slide-toggle>
-          </div>
-        </mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <!--<mat-grid-tile [colspan]="1" [rowspan]="1">
+    <div style="text-align:left">
+      <mat-slide-toggle class="example-margin"
+                        (change)="AsContentChanged()"
+                        [(ngModel)]="asContent"
+                        [checked]="asContent">
+        As Content
+      </mat-slide-toggle>
+    </div>
+  </mat-grid-tile>-->
+        <mat-grid-tile [colspan]="1" [rowspan]="3">
           <div style="text-align:left">
             <mat-slide-toggle class="example-margin"
-                              [(ngModel)]="exact">
+                              [(ngModel)]="exact"
+                              [checked]="exact">
               Exact
             </mat-slide-toggle>
           </div>
         </mat-grid-tile>
+        <mat-grid-tile [colspan]="2" [rowspan]="3">
+          <div style="text-align:left">
+            <div mat-dialog-actions >
+              <button mat-raised-button color="warn"
+                      style="margin-bottom:5px"
+                      (click)="onIgnore()">Ignore</button>
+              <button mat-raised-button color="warn"
+                      style="margin-bottom:5px"
+                      (click)="onRemove()">Remove</button>
+            </div>
+            <div mat-dialog-actions>
+              <button mat-raised-button
+                      (click)="onCancel()">{{cancelLabel}}</button>
+              <button mat-raised-button color="primary"
+                      [mat-dialog-close]="FilterData()">{{okLabel}}</button>
+            </div>
+          </div>
+        </mat-grid-tile>
       </mat-grid-list>
     </div>
-
-  </div>
-  <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
-    <button mat-button [mat-dialog-close]="FilterData">{{okMessage}}</button>
   </div>
 </div>
 <!--cdkFocusInitial-->

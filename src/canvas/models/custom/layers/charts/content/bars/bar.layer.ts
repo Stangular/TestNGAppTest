@@ -40,6 +40,7 @@ export class Bar implements IContextItem{
 
   get Id(): string { return this.area.Id; }
   get Class(): string { return ""; }
+  get zIndex() { return 0; }
 
   UpdateContextState(): void {
 
@@ -58,11 +59,11 @@ export class Bar implements IContextItem{
   }
 
   Select(shapeSelectResult: ShapeSelectResult): boolean{
-    if (this.area.Select(shapeSelectResult)) {
-      shapeSelectResult.id = this.sourceID;
-      shapeSelectResult.type = 'bar';
-      return true;
-    }
+    //if (this.area.Select(shapeSelectResult)) {
+    //  shapeSelectResult.id = this.sourceID;
+    //  shapeSelectResult.type = 'bar';
+    //  return true;
+    //}
     return false;
   }
 }

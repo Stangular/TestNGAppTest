@@ -1,0 +1,55 @@
+<!--<div class="dialog-form;">
+  <div mat-dialog-content>
+    <input type="file" />
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">{{cancelMessage}}</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>{{okMessage}}</button>
+  </div>
+</div>-->
+
+<form id="UploadWTNForm" method="POST" enctype="multipart/form-data" style="padding-top:0px">
+ <!--<input type="hidden" name="selectedclinID" id="selectedclinID" >
+  <input type="hidden" name="serviceOrderId" data-ng-value="ctrlSupplementDetails.serviceOrderId">
+  <input type="hidden" name="selectedServiceType" data-ng-value="ctrlSupplementDetails.selectedServiceType">-->
+  <div style="background-color:blue; width:100%; height:20px">
+    <label class="control-label">WTN Upload</label>
+  </div>
+  <div class="col-md-8"
+       style="margin-top:0px; padding:12px;">
+    <div style="padding-bottom:12px">
+      <input class="form-control" id="fileAttachment"
+             style="margin-left:12px; width:250px; display: inline-block;"
+             name="fileAttachment"
+             ngModel="fileAttachment"
+             value=""
+             type="file"
+             (change)="onFileChange($event.target.files)">
+    </div>
+    <div style="text-align:right">
+      <button mat-button color="default" *ngIf="!uploading"
+              type="button"
+              style="margin-right:12px"
+              id="filecancel"
+              (click)="onNoClick()">
+        <span class="glyphicon glyphicon-upload"></span>Cancel
+      </button>
+
+      <button mat-button color="primary" *ngIf="!uploading"
+              type="button"
+              style="margin-right:12px"
+              id="fileUpload"
+              (click)="Upload()">
+        <span class="glyphicon glyphicon-upload"></span>Upload
+      </button>
+
+      <button mat-button color="warn" *ngIf="uploading"
+              style="margin-right:12px"
+              type="button"
+              disabled
+              class="btn btn-default btn-md">
+        <i class="fa fa-spinner fa-spin"></i>Processing
+      </button>
+    </div>
+  </div>
+</form>

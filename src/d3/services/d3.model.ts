@@ -9,7 +9,7 @@ import { Field, BaseField } from '../../dataManagement/model/field';
 import { DataHTTPService } from '../../dataManagement/service/dataHTTP.service';
 import { ChartLayer } from '../../canvas/models/custom/layers/charts/chart.layer';
 
-export class D3ModelContainer extends Records<string> {
+export class D3ModelContainer { //extends Records<string> {
   _data: D3ChartModel[] = [];
   _charts: Id3ChartModel[] = [];
   _size: Size = new Size(0, 0);
@@ -18,8 +18,9 @@ export class D3ModelContainer extends Records<string> {
   private d3PieChartModel: D3PieChartModel = new D3PieChartModel();
 
 
+
   constructor() {
-    super('testtable1'); // this.TestData();
+  //  super('testtable1'); // this.TestData();
 
   }
 
@@ -27,16 +28,16 @@ export class D3ModelContainer extends Records<string> {
 
   ChartData(chartID: string): { xparam: number, yparam: number }[] {
     let data: { xparam: number, yparam: number }[];
-    if (chartID == 'bar') {
-      let fx = this.Fields.find(f => f.FieldId == 'date');
-      let fy = this.Fields.find(f => f.FieldId == 'income');
-      for (let i = 0; i < fx.Data.length; i++) {
-        data.push({
-          xparam: fx[0].Value(i),
-          yparam: parseInt(fy[1].Value(i)),
-        });
-      }
-    }
+    //if (chartID == 'bar') {
+    //  let fx = this.Fields.find(f => f.FieldId == 'date');
+    //  let fy = this.Fields.find(f => f.FieldId == 'income');
+    //  for (let i = 0; i < fx.Data.length; i++) {
+    //    data.push({
+    //      xparam: fx[0].Value(i),
+    //      yparam: parseInt(fy[1].Value(i)),
+    //    });
+    //  }
+    //}
     return data;
   }
 
@@ -78,7 +79,7 @@ export class D3ModelContainer extends Records<string> {
   }
 
   GetUIValue(fieldID: string): any {
-    return this._form.controls[fieldID].value;
+  //  return this._form.controls[fieldID].value;
   }
 
   New(data: any): Field<any> {
@@ -86,15 +87,15 @@ export class D3ModelContainer extends Records<string> {
   }
 
   public GetFormDefinition() {
-    return this._UIElements;
+   // return this._UIElements;
   }
 
   OutputAll(): any {
-    return {
-      FormName: this.SourceID,
-      RecordCount: 14,
-      Content: this.testData
-    };
+    //return {
+    //  FormName: this.SourceID,
+    //  RecordCount: 14,
+    //  Content: this.testData
+    //};
   }
 
   get testData() {

@@ -5,7 +5,9 @@
                  [colspan]="c.ColSpan(layout.Layout.Size)"
                  [rowspan]="c.RowSpan(layout.Layout.Size)"
                  [style.background]="c.Color">
+    <!--<ng-content select="[content-type=c.Content]"></ng-content>-->
     <div *ngIf="c.Content == 'slotA'" class="tile-content">
+      
       <ng-content select="[content-type='slotA']"></ng-content>
     </div>
     <div *ngIf="c.Content == 'slotB'" class="tile-content">

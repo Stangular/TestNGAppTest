@@ -1,3 +1,28 @@
-﻿.navItem {
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+.navItem {
     padding-right: 20px;
 }
+
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.mat-menu-item {
+  color: white !important;
+}
+
+button.mat-menu-item:hover {
+  background-color: white !important;
+  color: #673ab7 !important;
+}
+
+.mat-menu-content {
+  background-color: #673ab7 !important;
+}
+
+.mat-menu{
+  background-color: #673ab7 !important;
+}
+

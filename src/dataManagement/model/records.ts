@@ -1,9 +1,13 @@
 import { FormGroup, FormControl, AbstractControl } from '@angular/forms';
-import { IElementDefinition, EditElementDefinition, SortOrder, FilterType } from './definitions/ElementDefinition';
+import { IElementDefinition, EditElementDefinition, SortOrder, IElementModel, ElementModelFactory } from './definitions/ElementDefinition';
 import { IDataItem, DataItem, DataItems } from './data/dataitem';
 import { ISequenceNavigator } from './sequencing/sequenceNavigator';
-import { Field } from './field';
+import { Field, BaseField } from './field';
 import { IValidator } from './definitions/Validation';
+import { ElementDefinitionFactoryService } from '../service/elementDefinitionFactoryService';
+import { DataHTTPService } from '../service/dataHTTP.service';
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+
 //import { D3AxisModel } from '../../d3/axis/d3.axis.model';
 
 export interface IRecord {
@@ -76,7 +80,7 @@ export interface IRecordService {
 export interface IRecordManager {
 
   Form: FormGroup;
- // GetFormDefinition(): IElementDefinition<any>[];
+  // GetFormDefinition(): IElementDefinition<any>[];
   // AsList(valueName?: string): IListItem[];
   IsValid(): boolean;
 }
@@ -86,10 +90,12 @@ export class Paging {
   constructor(
     private pageTotal: number,
     private pageSize: number = 10,
-    private pageNumber: number = 0) {}
+    private pageNumber: number = 0) { }
 
   UpdateTotal(pageTotal: number, pageSize: number = 10, pageNumber: number = 0) {
+    let totalChange = this.pageTotal - pageTotal;
     this.pageTotal = pageTotal;
+    return totalChange;
   }
 
   UpdateSize(pageSize: number) {
@@ -105,13 +111,17 @@ export class Paging {
   get TotalSize() { return this.pageTotal; }
   get PageOffset() { return this.pageNumber * this.pageSize; }
   get PageSize() { return this.pageSize; }
-  get PageNumber() { return this.pageNumber; }
-  get PageCount() { return this.pageTotal / this.pageSize; }
+  get PageNumber() {
+    return this.pageNumber;
+  }
+  get PageCount() {
+    return Math.ceil(this.pageTotal / this.pageSize);
+  }
 
   gotoFirstPage() {
     let pn = this.pageNumber;
     this.pageNumber = 0;
-    return pn == 0;   // retunr true if  already on the first page...
+    return pn == 0;   // return true if  already on the first page...
 
   }
 
@@ -134,7 +144,7 @@ export class Paging {
 
   gotoFinalPage() {
     let pn = this.pageNumber;
-    this.pageNumber = (this.TotalSize / this.pageSize) - 1;
+    this.pageNumber = Math.ceil(this.TotalSize / this.pageSize) - 1;
     return pn == this.pageNumber; // Return true if already on the final page...
   }
 }
@@ -172,7 +182,7 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   public page: Paging = new Paging(0);
   protected _form: FormGroup;
   private _selectedItem: number = -1;
-
+  
   constructor(
     private formName: string
     , private formID: number
@@ -191,25 +201,57 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   abstract UpdateDependentUI(): void;
   abstract GetUIValue(fieldID: string): any;
   abstract OutputAll(): any;
-
+  //abstract LoadContent(dataHTTPService: DataHTTPService);
   // abstract get testData(): Field<any>[];
   abstract ChartData(chartID: string): { xparam: number, yparam: number }[];
   abstract ChartGraphic(chartID: string, width: number, height: number, chartName: string);
   abstract ChartIDFrom(chartNumber: number);
+  abstract AddFieldFromModel(models: ElementModelFactory);
 
   //get hasFilters() {
   //  let r = this._UIElements.findIndex(e => e.HasFilter());
   //  return r >= 0;
   //}
 
+  //get DataCurrentPage() {
+  //  let row: any[] = [];
+  //  let size = this.page.PageSize;
+  //  while (0 < size--) {
+
+  //  }
+  //  return page;
+  //}
+
+  DataFullPage(edfs: ElementDefinitionFactoryService) {
+    let dataPage: any[] = [];
+    let size = this.page.PageSize;
+    for (let r = 0; r < size; r++) {
+      let row: any[] = [];
+      this._fields.forEach(function (f, i) {
+        if (f.Observable) {
+          let vlu = f.Value(r);
+          if (!vlu) {
+            row.push('');
+          }
+          else {
+            let v = edfs.Model(f.ModelID).UIValueConvert(vlu) || '';
+            row.push(v);
+          }
+        }
+      });
+      dataPage.push(row);
+    }
+    return dataPage;
+  }
+
   get FormID() { return this.formID; }
 
-    private createFormGroup() {
+  private createFormGroup() {
     let group: any = {};
     this.GetFormDefinition();
-    this._fields.forEach(f => {
-      group[e.ElementID] = new FormControl(f.CurrentValue());
-    });
+    //this._fields.forEach(f => {
+    //  group[e.ElementID] = new FormControl(f.CurrentValue());
+    //});
     this._form = new FormGroup(group);
     //this._UIElements.forEach(e => {
     //  let contrl = this._form.controls[e.FieldID()];
@@ -244,7 +286,6 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   //  }
   //}
 
-
   get FormName(): string {
     return this.formName;
   }
@@ -257,19 +298,34 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     return this._form;
   }
 
+  AddDynamicFields(fields: Field<any>[]) {
+    this._fields = [];
+    this._fields = fields.concat([]);
+  }
+
+  CloneField(fieldId: number, elmName: string, elmId: number) {
+    return this._fields[fieldId].Clone(elmName, elmId);
+  }
   //Elements(): IElementDefinition[] {
   // // return this._fields.forEach
   //}
   //get IsNewForm() {
   //  return this._UIElements.some(e => e.isNew());
   //}
-  
+
   RemoveAllFilters() {
     //this._fields.forEach(f => {
     //  f.TurnFilterOff();
     //});
   }
 
+  GetFieldIndex(dataId: string) {
+    return this._fields.findIndex(f => f.DataID == dataId);
+  }
+
+  GetField(elementName): any {
+    return this._fields.find(f => f.ElementName == elementName);
+  }
 
   RemoveNewForm() {
     //if (!this.IsNewForm) {
@@ -277,7 +333,7 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     //}
     this._fields.forEach(f => f.RemoveLast());
     this._recordCount = this.Count;
-   // this._selectedItem = this.Count - 1;
+    // this._selectedItem = this.Count - 1;
     this.UpdateUI();
     return true;
   }
@@ -285,19 +341,6 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   get IsDirty(): boolean {
 
     return this._fields.some(e => e.IsDirty);
-  }
-
-  SetDirty(): void {
-    //if (this._UIElements.some(e => e.isDirty())) {
-    //  this._dirty.push(this.SelectedIndex());
-    //}
-    //else {
-    //  const v = this._dirty.findIndex(r => r == this.SelectedIndex());
-    //  if (v && v >= 0) {
-    //    this._dirty.splice(v, 1);
-    //  }
-    //}
-
   }
 
   IsValid(): boolean {
@@ -318,19 +361,18 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     return rn;
   }
 
-  //NewRecord(): boolean {
-  //  if (this.IsDirty) {// if the current record is dirty you do not want to leave it...
-  //    return false; // isdirty   TODO: Dirty record message?
-  //  }
-  //  this._fields.forEach(f =>
-  //    f.AddNew(this._fields
-  //      .find(e => e.FieldID() == f.FieldId)));
+  RecordNumber(offset: number) {
+    return offset + this.page.PageSize * this.page.PageNumber + 1;
+  }
 
-  //  this._selectedItem = this.Count;
-  //  this._recordCount = this._selectedItem + 1;
-  //  this._new.push(this._selectedItem);
-  //  this.UpdateUI();
-  //}
+  NewRecord(edfs: ElementDefinitionFactoryService) {
+
+    this._fields.forEach(f => f.AddNew(edfs.Model(f.ModelID)));
+    this._selectedItem = 0;
+    this._recordCount = this.Count + 1;
+    this.UpdateUI();
+
+  }
 
   //get NewContent() {
   //  let flds: Field<T>[] = [];
@@ -357,24 +399,59 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     return this.Final();
   }
 
-  public LoadData(content: IRecord[] = [], converters: Converter[] = [], recordCount = 0, totalRecordCount = 0) {
+  public LoadData(content: any[] = [], converters: Converter[] = [], recordCount = 0, totalRecordCount = 0) {
     let self = this;
-
-    this._fields.length = 0;
+    
     this._recordCount = recordCount;
     this.page.UpdateTotal(totalRecordCount);
+ 
     content.forEach(function (c, i) {
       let fldID = c.fieldID.toLowerCase();
       let fldElm = self.Fields.find(e => e.DataID.toLowerCase() == fldID);
       if (fldElm) {
-        self._fields.push(self.New(c));
-        fldElm.ResetToDefault(fldElm.DefaultValue);
+        fldElm.RefreshPage(c.values);
       }
+      // if (fldElm) {
+      //   self._fields.push(self.New(c));
+      ////   fldElm.ResetToDefault(fldElm.DefaultValue);
+      // }
     });
-    if (recordCount > 0 && this._selectedItem >= recordCount) {
+    if (recordCount > 0 && this._selectedItem >= recordCount - 1) {
       this._selectedItem = recordCount - 1;
     }
+    else {
+      this._selectedItem = 0;
+    }
     this.UpdateUI();
+  }
+
+  get HasIgnoreLower() {
+    return this._fields.some(f => f.Filter.ignore_lower);
+  }
+
+  get HasIgnoreUpper() {
+    return this._fields.some(f => f.Filter.ignore_upper);
+  }
+
+  IgnoreAllFilter() {
+    this.IgnoreAllLower();
+    this.IgnoreAllUpper();
+  }
+
+  IgnoreAllLower(value:boolean = false) {
+    this._fields.forEach(f => {
+      f.Filter.ignore_lower = value;
+    });
+  }
+
+  IgnoreAllUpper(value: boolean = false) {
+    this._fields.forEach(f => {
+      f.Filter.ignore_upper = value;
+    });
+  }
+
+  LoadFail(data: any) {
+    console.error(JSON.stringify(data));
   }
 
   get PageSize() {
@@ -412,7 +489,7 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     if (this.Goto(this._selectedItem - 1)) {
       return true;
     }
-    this._selectedItem = this.Count - 1;
+    this._selectedItem = this.PageSize - 1;
     this.page.gotoPreviousPage();
     return false;
   }
@@ -420,6 +497,7 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   public SelectItem<T>(value: T): boolean {
     return this.SelectItemByField('ID', value);
   }
+
 
   public SelectItemByField(fieldId: string, value: any): boolean {
     let fld = this._fields.find(f => f.DataID == fieldId);
@@ -446,8 +524,8 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
 
   private UpdateUI(): void {
     let self = this;
-    this._fields.forEach(f => this.InitUIField(f));
-    this.UpdateDependentUI();
+    this._fields.forEach(f => f.Goto(self._selectedItem));
+    //this.UpdateDependentUI();
   }
 
   //private InitUIField(field: Field<any>): void {
@@ -466,16 +544,16 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   //  }
   //}
 
-  //ResetToInitial() {
-  //  this._UIElements.forEach(e => {
-  //    let contrl = this._form.controls[e.FieldID()];
-  //    if (contrl) {
-  //      if (e.UpdateCurrentValue(e.InitialValue())) {
-  //        contrl.setValue(e.InitialValue());
-  //      }
-  //    }
-  //  });
-  //}
+  ResetToInitial(validators: IValidator[] = []) {
+    this._fields.forEach(e => {
+      let contrl = this._form.controls[e.DataID];
+      if (contrl) {
+        if (e.UpdateCurrentValue(e.InitialValue(), validators)) {
+          contrl.setValue(e.InitialValue());
+        }
+      }
+    });
+  }
 
   //UpdateCurrent() {
   //  this._fields.forEach(f => {
@@ -486,28 +564,50 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   //  });
   //}
 
-  Filter(pagesize: number = 10) {
-    this.page.UpdateSize(pagesize);
-    this._selectedItem = 0;
+  Filter() {
     let f = {
+      SourceName: '',
       formName: this.SourceID,
       paging: { pageLength: this.page.PageSize, pageNumber: this.page.PageNumber },
       filters: []
     }
     this.Fields.forEach(e => {
-      let fltr = e.getFilter();
-      if (fltr && fltr.Applied) {
-        f.filters.push(fltr);
+      if (e.FilterApplied) {
+        f.filters.push({
+          DataId: e.Filter.DataId,
+          UpperValue: e.Filter.ValueUpper,
+          LowerValue: e.Filter.ValueLower,
+          Sort: e.Filter.Sort,
+          AsContent: e.Filter.asContent
+        });
+      }
+      else {
+        f.filters.push({
+          DataId: e.Filter.DataId,
+          UpperValue: null,
+          LowerValue: null,
+          Sort: e.Filter.Sort,
+          AsContent: false
+        });
+      }
+      if (e.Filter.new) {
+        f.paging.pageNumber = 0;
+        e.Filter.new = false;
       }
     });
     return f;
   }
 
+
   private getControl(elmdef: IElementDefinition) {
     return this._form.controls[elmdef.ElementID];
   }
 
-  UpdateRecord(fieldIndex: number, validator: IValidator ): boolean {
+  Field(index: number) {
+    return this._fields[index];
+  }
+
+  UpdateRecord(fieldIndex: number, validator: IValidator[] = []): boolean {
     let elmdef = this._fields[fieldIndex];
     if (elmdef) {
       let v = elmdef.UpdateFromUI(validator);
@@ -524,7 +624,7 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     let c = this.getControl(elmdef);
     if (c) {
       let v = c.value;
-      return elmdef.validateValue(c.value);
+      return false; // elmdef.validateValue(c.value);
     }
     return true; // An element that does not exist is always valid...
   }
@@ -537,20 +637,20 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   //  });
   //  return data;
   //}
-  get Fields() {// TODO: change this so that derived classes emit formatted data as needed..
+  protected get Fields() {// TODO: change this so that derived classes emit formatted data as needed..
     return this._fields;
   }
   // update model from UI...
-  //UpdateModel(): void {
-  //  let self = this;
-  //  let fldElm;
-  //  this._fields.forEach(function (f, i) {
-  //    fldElm = self
-  //      ._UIElements
-  //      .find(e => e.FieldID().toLowerCase() == f.FieldId.toLowerCase());
-  //    fldElm.UpdateCurrentValue(self.GetUIValue(f.FieldId));
-  //  });
-  //}
+  UpdateModel(): void {
+    let self = this;
+    let fldElm;
+    this._fields.forEach(function (f, i) {
+      fldElm = self
+        ._fields
+        .find(e => e.DataID.toLowerCase() == f.DataID.toLowerCase());
+      fldElm.UpdateCurrentValue(self.GetUIValue(f.DataID));
+    });
+  }
 
   //public GetModelValue(fieldID: string, defaultValue: any) {
   //  let fld = this._UIElements.find(f => f.FieldID() == fieldID);
@@ -564,15 +664,15 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
     return this._selectedItem;
   }
 
-  //protected GetOutputContent() {
-  //  let content = this._UIElements.map(f => {
-  //    return {
-  //      fieldID: f.FieldID()
-  //      , values: [f.CurrentValue()]
-  //    };
-  //  });
-  //  return content;
-  //}
+  protected GetOutputContent(modelFactory: ElementModelFactory) {
+    let content = this._fields.map(f => {
+      return {
+        fieldID: f.DataID
+        , values: [f.CurrentValue()]
+      };
+    });
+    return content;
+  }
 
   //public GetAllValues(fieldID: string): any[] {
   //  let out: any[] = [];
@@ -585,23 +685,23 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   //  return out;
   //}
 
-  //public GetFieldValue(fieldID: string): any {
-  //  let field = this._UIElements.find(e => e.FieldID() == fieldID);
-  //  if (!!field) {
-  //    return field.CurrentValue();
-  //  }
-  //  // TODO: Log error...
-  //  return null;
-  //}
+  public GetFieldValue(dataId: string): any {
+    let field = this._fields.find(e => e.DataID == dataId);
+    if (!!field) {
+      return field.CurrentValue();
+    }
+    // TODO: Log error...
+    return null;
+  }
 
-  //OutputCurrentValues(converters: Converter[] = []) {
-  //  this.UpdateModel();
-  //  return {
-  //    FormName: this.sourceID,
-  //    RecordCount: 1,
-  //    Content: this.GetOutputContent()
-  //  };
-  //}
+  OutputCurrentValues(modelFactory: ElementModelFactory) {
+    this.UpdateModel();
+    return {
+      FormName: this.sourceID,
+      RecordCount: 1,
+      Content: this.GetOutputContent(modelFactory)
+    };
+  }
 
 
 
@@ -614,6 +714,37 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
   //}
 
 }
+
+
+export class FormFiltering extends Records<string>{
+  constructor(
+    formName: string
+    , formID: number
+    , sourceID: string = ''
+    , _fields: Field<any>[] = []
+    , _recordCount = 0
+    , totalRecordCount = 0
+  ) {
+    super(formName
+      , formID
+      , sourceID
+      , _fields
+      , _recordCount
+      , totalRecordCount);
+  }
+
+  GetFormDefinition(): IElementDefinition[] { return null; }
+  New(data: any): Field<any> { return null; }
+  UpdateDependentUI(): void { }
+  GetUIValue(fieldID: string): any { return null; }
+  OutputAll(): any { return null; }
+  ChartData(chartID: string): { xparam: number, yparam: number }[] { return []; }
+  ChartGraphic(chartID: string, width: number, height: number, chartName: string) { return null; }
+  ChartIDFrom(chartNumber: number) { }
+  AddFieldFromModel(models: ElementModelFactory) { }
+
+}
+
 
 
 

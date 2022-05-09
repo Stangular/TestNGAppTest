@@ -1,4 +1,4 @@
-import { IElementDefinition, ElementModel, EditElementDefinition } from "../definitions/ElementDefinition";
+import { IElementDefinition, ElementModel, EditElementDefinition, ElementFilter, SortOrder } from "../definitions/ElementDefinition";
 import { IValidator } from "../definitions/Validation";
 import { modelGroupProvider } from "@angular/forms/src/directives/ng_model_group";
 
@@ -88,13 +88,25 @@ export class A_Sequence<T, U, V> extends A_Term<number, string, number> implemen
     elemName: string,
     elemId: number,
     modelId: number,
+    label: string = '',
     id: number,
     name: string,
+    private observable: boolean = true,
     private _items: ITerm<T, U, V>[] = []) {
     super(id, name);
-    this._element = new EditElementDefinition<string>(elemName, elemId, modelId,name);
+    this._element = new EditElementDefinition<string>(elemName, elemId, modelId,label,name);
   }
 
+  get Label() { return this._element.Label; }
+  Clone(elmName: string, elmId: number): IElementDefinition {
+    return this._element.Clone(elmName,elmId);
+  }
+  
+
+  get Observable(): boolean {
+    return this.observable;
+  }
+  
   SortByContent() {
     this._items.sort(function (a, b) { return b.CompareContent(a); })
   }
@@ -119,19 +131,14 @@ export class A_Sequence<T, U, V> extends A_Term<number, string, number> implemen
     return this._items;
   }
 
-  FilterContent(term: ITerm<T, U, V>): ITerm<T, U, V>[] {
-    return this._items.filter(i => i.HasContent(term));
-  }
-
   IndexOfContent(term: ITerm<T, U, V>): number {
     return this._items.findIndex(i => i.Content() == term.Content());
   }
 
-
   get ElementID() { return this._element.ElementID; }
   get ElementName() { return this._element.ElementName; }
   get EditMode(): boolean { return this._element.EditMode; }
-
+  get ModelID(): number { return this._element.ModelID; }
   //  InvalidValue(): T;
   InitialValue() { return this._element.InitialValue(); }
   CurrentValue() { return this._element.CurrentValue(); }
@@ -140,13 +147,15 @@ export class A_Sequence<T, U, V> extends A_Term<number, string, number> implemen
   get IsDirty() { return this._element.IsDirty; }
   Clean() { return this._element.Clean(); }
   ResetToDefault(defaultValue: any) { return this._element.ResetToDefault(defaultValue); }
-  SetInitialValue(v: U, validator: IValidator) { return this._element.SetInitialValue(v, validator); }
-  UpdateCurrentValue(v: U, validator: IValidator) {
-    if (this._element.UpdateCurrentValue(v, validator)) {
+  SetInitialValue(v: U) { this._element.SetInitialValue(v); }
+  UpdateCurrentValue(v: U, validator: IValidator[]) {
+    let r = this._element.UpdateCurrentValue(v, validator);
+    if( r && r.valid )
+    {
       this._items.forEach(i => i.SelectByContent(this._element.CurrentValue()));
-      return true;
     }
-    return false;
+    return r;
   }
-  UpdateFromUI(validator: IValidator) { return this._element.UpdateFromUI(validator); }
+
+  UpdateFromUI(validator: IValidator[] = [] ) { return this._element.UpdateFromUI(validator); }
 }

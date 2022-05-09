@@ -1,0 +1,7 @@
+<div class="lcgrid">
+  <div *ngFor="let n of data.data; index as i">
+    <div [ngStyle]="{'background-color': columnColor[i]}" id="leftItem">
+      {{n.Content}}
+    </div>
+  </div>
+</div>

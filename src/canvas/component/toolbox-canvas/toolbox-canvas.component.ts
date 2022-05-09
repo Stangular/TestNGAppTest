@@ -91,9 +91,9 @@ export class ToolboxCanvasComponent implements OnInit, OnDestroy{
   OnClick(e: any) {
     this.PositionFromEvent(e);
     this.shapeSelectResult.id = "";
-    if (this.system.Select(this.shapeSelectResult)) {
-      this.toolselect.emit(this.shapeSelectResult);
-    }
+    //if (this.system.Select(this.shapeSelectResult)) {
+    //  this.toolselect.emit(this.shapeSelectResult);
+    //}
     setTimeout(() =>
       this.Draw()
       , 10);

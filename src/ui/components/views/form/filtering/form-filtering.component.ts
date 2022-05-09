@@ -1,14 +1,17 @@
 import { Component, Inject, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import { IElementDefinition, ElementFilter, ElementModel, SortOrder, FilterType, EditElementDefinition } from '../../../../../dataManagement/model/definitions/ElementDefinition';
+import { IElementDefinition, ElementFilter, ElementModel, SortOrder, EditElementDefinition } from '../../../../../dataManagement/model/definitions/ElementDefinition';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 
 
 export interface FilterDialogData {
   upperValue: any;
   lowerValue: any;
   asContent: boolean;
-  elementLowerModel: ElementModel<any>;
-  elementUpperModel: ElementModel<any>;
+  fieldId: string;
+  formId: number;
+  element: IElementDefinition;
+  ignore: boolean;
 }
 
 
@@ -24,10 +27,10 @@ export interface FilterValues {
   styleUrls: ['form-filtering.component.css']
 })
 export class FormFilteringComponent {
-  selections: IElementDefinition<any>[] = [];
+  selections: IElementDefinition[] = [];
   // selectedElementFilter: IElementDefinition<any>;
   sortOrder = SortOrder;
-//  selectedFilterType: any;
+  //  selectedFilterType: any;
   pageSize: number = 10;
   filterSelection: FilterValues[] = [
     { type: 0, label: 'none' },
@@ -41,71 +44,94 @@ export class FormFilteringComponent {
   ];
 
   // @Input() elements: IElementDefinition<any>[] = [];
-  selectedLowerElement: IElementDefinition<any>;
-  selectedUpperElement: IElementDefinition<any>;
+  // selectedLowerElement: IElementDefinition;
+  // selectedUpperElement: IElementDefinition;
   label: string = '';
-
-  asContent: boolean = false;
+  fieldIndex: number = 0;
   inclusive: boolean = true;
   exact: boolean = true;
-  @Input() cancelMessage: string = 'No';
-  @Input() okMessage: string = 'Ok';
+  elmName: string;
+  elmId: number;
+
+  @Input() cancelLabel: string = 'Cancel';
+  @Input() okLabel: string = 'Apply';
 
   @Input() form;
   @Output() applyfilter: EventEmitter<number> = new EventEmitter<number>();
   constructor(public dialogRef: MatDialogRef<FormFilteringComponent>,
+    public edfs: ElementDefinitionFactoryService,
     @Inject(MAT_DIALOG_DATA) public data: FilterDialogData) {
-    data.elementLowerModel.fieldID = data.elementLowerModel.fieldID + '_lowerfilter';
-    this.label = data.elementLowerModel.label;
 
-    data.elementLowerModel.label = '';
-    this.selectedLowerElement = new EditElementDefinition(data.elementLowerModel);
-    this.selectedLowerElement.UpdateCurrentValue(data.elementLowerModel.filter.LowerValue || data.elementLowerModel.defaultValue);
+    //data.element.Filter.FieldId = data.element.Filter.FieldId + '_lowerfilter';
+    this.label = data.element.Label;
+    this.fieldIndex = this.edfs.GetFormFieldIndex(data.formId, data.fieldId);
+    //data.element.Label = '';
+    this.elmName = data.element.ElementName;
+    this.elmId = data.element.ElementID;
 
-    data.elementUpperModel.fieldID = data.elementUpperModel.fieldID + '_upperfilter';
-
-    this.label = data.elementUpperModel.label;
-    data.elementUpperModel.label = '';
-
-    this.selectedUpperElement = new EditElementDefinition(data.elementUpperModel);
-    this.selectedUpperElement.UpdateCurrentValue(data.elementUpperModel.filter.UpperValue || data.elementUpperModel.defaultValue);
-    this.exact = this.selectedUpperElement.CurrentValue() == this.selectedLowerElement.CurrentValue();
-  
- }
+    let form = this.edfs.getRecords(0);
+    let targetForm = this.edfs.getRecords(data.formId);
+    let flds: any[] = [];
+    let lower = targetForm.CloneField(this.fieldIndex, this.elmName + '_lower', 1000 + this.elmId);
+    let upper = targetForm.CloneField(this.fieldIndex, this.elmName + '_upper', 2000 + this.elmId);
+    lower.SetInitialValue(data.lowerValue);
+    upper.SetInitialValue(data.upperValue);
+    flds.push(lower);
+    flds.push(upper);
+    this.exact = !data.asContent;
+    if (data.lowerValue && data.upperValue) {
+      this.exact = false;
+    }
+    else {
+      this.exact = (data.lowerValue || data.upperValue) ? true : false;
+    }
+    form.AddDynamicFields(flds);
+  }
 
   get IsSameValue() {
-    this.selectedLowerElement.UpdateFromUI();
-    this.selectedUpperElement.UpdateFromUI();
-   return this.selectedUpperElement.CurrentValue() == this.selectedLowerElement.CurrentValue();
+    return false;
   }
- 
-  get FilterData() {
-    this.selectedLowerElement.UpdateFromUI();
-    this.selectedUpperElement.UpdateFromUI();
-    this.selectedLowerElement.Type();
-    this.data.lowerValue = this.selectedLowerElement.CurrentValue();
-    this.data.upperValue = this.selectedUpperElement.CurrentValue();
-    this.data.asContent = this.asContent;
-    if (this.exact) {
-      this.data.upperValue = this.data.lowerValue;
+
+  FilterData() {
+    this.data.asContent = this.exact;
+    let form = this.edfs.getRecords(0);
+    this.data.lowerValue = form.Field(0).CurrentValue();
+    this.data.upperValue = this.data.lowerValue;
+    if (!this.exact) {
+      this.data.upperValue = form.Field(1).CurrentValue();
     }
+    this.data.fieldId = this.label;
+    form.Field(0).SetInitialValue(this.data.lowerValue);
+    form.Field(1).SetInitialValue(this.data.upperValue);
     return this.data;
   }
-  
+
   get DialogTitle() {
     return 'Define Filter Parameters for ' + this.label;
   }
 
-  RemoveFromField() {
+  RemoveFromField() { }
 
-  }
+  RemoveAll() { }
 
-  RemoveAll() {
-
-  }
-  
-  onNoClick(): void {
+  onCancel(): void {
     this.dialogRef.close();
+  }
+
+  onIgnore(): void {
+    this.data.ignore = true;
+  }
+
+  onRemove() {
+    this.data.asContent = this.exact;
+    let form = this.edfs.getRecords(0);
+    this.data.lowerValue = "";
+    this.data.upperValue = "";
+    this.data.fieldId = this.label;
+    form.Field(0).SetInitialValue(this.data.lowerValue);
+    form.Field(1).SetInitialValue(this.data.upperValue);
+    //this.dialogRef.close();
+    //return this.data;
   }
 
 }

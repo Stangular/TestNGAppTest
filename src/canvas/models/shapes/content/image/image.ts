@@ -13,18 +13,19 @@ export class ImageShape extends ContentShape {
     width: number,
     height: number,
     state: string,
-    content: ImageContent) {
-    super(id, top, left, width, height,state, content);
+    content: ImageContent,
+    zIndex : number = 0 ) {
+    super(id, top, left, width, height,state, content,zIndex);
 
   }
 
-  DrawShape(context: ContextModel): void {
+  DrawShape(context: CanvasRenderingContext2D): void {
 
     this.content.Draw(context, this);
 
   }
 
-  Draw(context: ContextModel): void {
+  Draw(context: CanvasRenderingContext2D): void {
 
     this.DrawShape(context);
   }
@@ -57,7 +58,7 @@ export class ImageShape extends ContentShape {
       Ports: [],
       Shapes: [],
       ImageContent: {
-        Id: this.content.ID,
+        Id: this.content.Id,
         Content: this.content.Content,
         Code: 1,
         ParentShapeId: this.Id,

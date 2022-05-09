@@ -1,16 +1,19 @@
-import { IElementDefinition, IElementModel, ElementModel, ElementFilter, SortOrder } from './definitions/ElementDefinition';
+import { IElementDefinition, IElementModel, ElementModel, ElementFilter, SortOrder, ElementModelFactory } from './definitions/ElementDefinition';
 import { IRecord } from './records';
 import { ISequenceNavigator } from './sequencing/sequenceNavigator';
-import { IValidator } from './definitions/Validation';
+import { IValidator, Validation } from './definitions/Validation';
 
 export abstract class Field<T> implements ISequenceNavigator<T>, IElementDefinition{
 
   private _page = 0;
+  protected _dataPage: T[] = [];
+  private filter: ElementFilter<T>;
 
   constructor(
     protected _element: IElementDefinition,
-    protected _dataPage: T[] = [],
-    protected _dataID = '') { }
+    dataID) {
+      this.filter = new ElementFilter(dataID);
+    }
 
   //public get FieldId(): string {
   //  return this._fieldId;
@@ -20,12 +23,20 @@ export abstract class Field<T> implements ISequenceNavigator<T>, IElementDefinit
   //  return this._dataPage;
   //}
 
+
+
   get PageSize() { return this._dataPage.length; }
-  get DataID() { return this._dataID; }
+  get DataID() { return this.filter.DataId; }
 
   SelectedIndex(): number { return this._page; }
   SelectItem(v: T): boolean {
     return this.Goto(this._dataPage.findIndex(p => p == v));
+  }
+
+  GetOutputContent(modelFactory: ElementModelFactory) {
+    let model = modelFactory.GetElementModel(this.ModelID);
+    let v = this.CurrentValue();
+    model.UIValueConvert(v);
   }
 
   First(): boolean {
@@ -45,21 +56,32 @@ export abstract class Field<T> implements ISequenceNavigator<T>, IElementDefinit
   }
 
   Goto(index: number) {
-    if (index <= 1 || index >= this._dataPage.length) {
+    if (index < 0 || index >= this._dataPage.length) {
       return false;
     }
     this._page = index;
-    return this.Update();
+    this.Update();
+    return true;
   }
 
   private Update() {
     let v = this._dataPage[this._page];
-    return this.UpdateCurrentValue(v,null);
+    let r = this.SetInitialValue(v || null);
   }
+
+
+  //Value(index: number,defaultValue: any) {
+  //  if (index < 0 || index >= this._dataPage.length) {
+  //    return defaultValue;
+  //  }
+  //  return this._dataPage[index];
+  //}
 
   public ValueIndex(value: T) {
     return this._dataPage.findIndex(v => v === value);
   }
+
+  
 
   abstract Value(recordNumber: number): T;
 
@@ -67,10 +89,14 @@ export abstract class Field<T> implements ISequenceNavigator<T>, IElementDefinit
   //  return this.Value(recordNumber);
   //}
 
-  AddNew(fieldDef: IElementModel): void {
-    if (fieldDef) {
-      this._dataPage.push(fieldDef.DefaultValue());
-    }
+  RefreshPage(datapage: any[] = []) {
+    this._dataPage = [];
+    this._dataPage = this._dataPage.concat(datapage);
+    this.Update();
+  }
+
+  AddNew(model: IElementModel): void {
+    this._dataPage.unshift(model.DefaultValue);
   }
 
   RemoveLast(): void {
@@ -82,7 +108,56 @@ export abstract class Field<T> implements ISequenceNavigator<T>, IElementDefinit
     this._dataPage.push(this._dataPage[recordNumber]);
   }
 
- 
+  get Label() { return this._element.Label; }
+
+  Clone(elmName: string, elmId: number) {
+    return new BaseField(this._element.Clone(elmName, elmId), this.DataID);
+  }
+
+
+  get HasFilter(): boolean {
+    return this.filter != null && (this.filter.LowerValue != null || this.filter.UpperValue != null);
+  }
+
+  get Filter(): ElementFilter<T> {
+    return this.filter;
+  }
+
+  ToggleFilter() {
+    if (this.filter) {
+      return this.filter.Toggle();
+    }
+  }
+
+  TurnFilterOff() {
+    if (this.filter) {
+      return this.filter.TurnOff();
+    }
+  }
+
+  get FilterApplied(): boolean {
+    if (this.filter) {
+      return this.filter.Applied;
+    }
+    return false;
+  }
+
+  get Observable(): boolean {
+    return this._element.Observable;
+  }
+
+  setFilter(fieldId: string, lowervalue: T, uppervalue: T, asContent: boolean = false) {
+    this.filter.SetFilter(fieldId, lowervalue, uppervalue, asContent);
+  }
+
+
+  SortOrder(): SortOrder {
+    if (!this.filter) {
+      return SortOrder.unsorted;
+    }
+    return this.filter.Sort;
+  }
+
   //get FormID(): number { return this._element.; }
   get ElementID(): number { return this._element.ElementID; }
   get ElementName(): string { return this._element.ElementName; }
@@ -93,26 +168,40 @@ export abstract class Field<T> implements ISequenceNavigator<T>, IElementDefinit
   init(): void { return this._element.init(); }
   Clean(): void { return this._element.Clean(); }
   ResetToDefault(defaultValue: any): void { return this._element.ResetToDefault(defaultValue); }
-  SetInitialValue(v: any,validator: IValidator): boolean { return this._element.SetInitialValue(v, validator); }
-  UpdateCurrentValue(v: any,validator: IValidator): boolean { return this._element.UpdateCurrentValue(v, validator); }
-  UpdateFromUI(validator: IValidator): any { return this._element.UpdateFromUI(validator); }
+  SetInitialValue(v: any) { this._element.SetInitialValue(v); }
+  UpdateCurrentValue(v: any, validators: IValidator[] = []): Validation {
+    let r = this._element.UpdateCurrentValue(v, validators);
+    if (r && r.valid)
+    {
+      this._dataPage[this._page] = v;
+    }
+    return r;
+  }
+
+  UpdateFromUI(validator: IValidator[] = []): any {
+    let r = this._element.UpdateFromUI(validator);
+    this._dataPage[this._page] = r;
+    return r;
+  }
   //UIConvert(): any { return this._element.UIConvert(); }
   //UIValueConvert(value: any) { return this._element.UIValueConvert(value); }
   get IsDirty(): boolean { return this._element.IsDirty; }
   get EditMode(): boolean { return this._element.EditMode; }
-
+  get ModelID(): number { return this._element.ModelID; }
 }
 
 export class BaseField extends Field<string> {
 
   constructor(
     element: IElementDefinition,
-    dataPage: string[] = [],
     dataID = '') {
-    super(element, dataPage, dataID);
+    super(element, dataID);
   }
 
   public Value(recordNumber: number) {
+    if (recordNumber < 0 || recordNumber >= this._dataPage.length) {
+      return null;
+    }
     return this._dataPage[recordNumber];
   }
 
@@ -127,10 +216,13 @@ export class DateField extends Field<Date> {
     element: IElementDefinition,
     dataPage: Date[] = [],
     dataID = '') {
-    super(element, dataPage, dataID);
+    super(element, dataID);
   }
 
   public Value(recordNumber: number): Date {
+    if (recordNumber < 0 || recordNumber >= this._dataPage.length) {
+      return null;
+    }
     return new Date(this._dataPage[recordNumber]);
   }
 

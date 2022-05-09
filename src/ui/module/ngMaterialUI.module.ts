@@ -25,6 +25,7 @@ import {
   , MatRadioModule
   , MatAutocompleteModule
   , MatCheckboxModule
+  , MatTooltipModule
   , MatButtonToggleModule
 } from '@angular/material';
 
@@ -55,6 +56,7 @@ import {
     , MatRadioModule
     , MatAutocompleteModule
     , MatCheckboxModule
+    , MatTooltipModule
     , MatButtonToggleModule
   ],
 
@@ -83,6 +85,7 @@ import {
     , MatAutocompleteModule
     , MatCheckboxModule
     , MatButtonToggleModule
+    , MatTooltipModule
   ],
 
   providers: []

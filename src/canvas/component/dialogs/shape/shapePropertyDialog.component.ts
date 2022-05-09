@@ -164,7 +164,7 @@ export class ShapePropertyDialogComponent implements OnInit{
 
   private _filterTextContent(value: string): ContentShape[] {
     const v = value.toLowerCase();
-    let list = (<ContentShape>this.canvasService.ActiveShape).TextContent
+    let list = (<ContentShape>this.canvasService.ActiveShape).Contents
       .filter(option => option.Content.Content.toLowerCase().indexOf(v) >= 0);
     if (list.length == 1) {
       this.contentAngle = list[0].Content.Angle;

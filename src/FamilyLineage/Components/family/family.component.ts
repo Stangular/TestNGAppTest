@@ -15,8 +15,8 @@ export class FamilyComponent implements OnInit {
  // surnameControl = new FormControl();
  // personControl = new FormControl();
   constructor(private edfs: ElementDefinitionFactoryService) {
-    this.surnames = new A_Sequence("surname", 0,0,0,"Surname");
-    this.members = new A_Sequence("familyMembers", 1,1,1,"Family");
+    this.surnames = null;// new A_Sequence("surname", 0,0,0,"Surname");
+    this.members = null;//new A_Sequence("familyMembers", 1,1,1,"Family");
   }
 
   ngOnInit() {

@@ -62,7 +62,7 @@ export class FilterService implements IRecordService {
     this._filterA = new FilterSystemInventoryModel(this.d3Service.D3, 'testtable1');
     this._filterB = new FilterCityTemperatureModel(this.d3Service.D3, 'TestMultSeriesLineChart');
     this._filterC = new FilterNormalizedStackedBarChartModel(this.d3Service.D3, 'VBarChart');
-    this._filterD = new FilterBasicBarChartModel('VBarChart');
+    this._filterD = new FilterBasicBarChartModel('VBarChart',1);
 
 
   }

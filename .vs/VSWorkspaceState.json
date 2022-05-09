@@ -2,14 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\app",
-    "\\src\\app\\services",
-    "\\src\\dataManagement",
-    "\\src\\dataManagement\\model",
-    "\\src\\dataManagement\\model\\data",
-    "\\src\\dataManagement\\model\\definitions",
-    "\\src\\dataManagement\\model\\form",
-    "\\src\\dataManagement\\model\\sequencing"
+    "\\src\\canvas",
+    "\\src\\canvas\\component",
+    "\\src\\canvas\\component\\dialogs",
+    "\\src\\canvas\\component\\dialogs\\shape",
+    "\\src\\canvas\\component\\layers",
+    "\\src\\canvas\\component\\layers\\Edit",
+    "\\src\\canvas\\models",
+    "\\src\\canvas\\models\\concepts"
   ],
+  "SelectedNode": "\\src\\canvas\\component\\canvas.component.ts",
   "PreviewInSolutionExplorer": false
 }

@@ -61,90 +61,85 @@ export class ImageModel {
 }
 
 export class ContextModel {
-  _currentLayer: number = -1;
-  _imagePath: string = '../images/';
-  _context: LayerContext[] = [];
-  private _images: ImageModel[] = [];
+ // _imagePath: string = '../images/';
+ 
+//  private _images: ImageModel[] = [];
 
-  constructor() { }
+  constructor( private _context: CanvasRenderingContext2D ) { }
 
-  get CurrentLayerName() {
-    if (this._currentLayer < 0) { return ''; }
-    return this._context[this._currentLayer].Name;
-  }
-
-  //SelectLayer(layerName: string) {
-  //  _currentLayer = this._context.findIndex(c => c.Name == layerName);
+  //get CurrentLayerName() {
+  //  if (this._currentLayer < 0) { return ''; }
+  //  return this._context[this._currentLayer].Name;
   //}
 
-  ClearCurrentLayer() {
+  //SelectLayer(layerName: string) {
+  //  this._currentLayer = this._context.findIndex(c => c.Name == layerName);
+  //}
 
-    let ctx = this._context[this._currentLayer].Context;
-    if (ctx) {
-      let c = ctx.canvas;
-      ctx.clearRect(0, 0, c.width, c.height);
-      return true;
-    }
-    return false;
-  }
+  //ClearCurrentLayer() {
 
-  ClearLayer(layerId: string) {
-    let index = this._context.findIndex(c => c.Name == layerId);
-    if (index < 0) { return false; }
-    let ctx = this._context[index].Context;
-    if (ctx) {
-      let c = ctx.canvas;
-      ctx.clearRect(0, 0, c.width, c.height);
-      return true;
-    }
-    return false;
-  }
+  //  let ctx = this._context[this._currentLayer].Context;
+  //  if (ctx) {
+  //    let c = ctx.canvas;
+  //    ctx.clearRect(0, 0, c.width, c.height);
+  //    return true;
+  //  }
+  //  return false;
+  //}
 
-  RemoveAllContext() {
-    this._context = [];
-  }
+  //ClearLayer(layerId: string) {
+  //  let index = this._context.findIndex(c => c.Name == layerId);
+  //  if (index < 0) { return false; }
+  //  let ctx = this._context[index].Context;
+  //  if (ctx) {
+  //    let c = ctx.canvas;
+  //    ctx.clearRect(0, 0, c.width, c.height);
+  //    return true;
+  //  }
+  //  return false;
+  //}
 
-  AddLayerContext(layername: string, context: CanvasRenderingContext2D) {
-    this.SetLayerContext(layername, context);
-    if (this._currentLayer < 0) {
-      this._currentLayer = this._context.length;
-      this._context.push(new LayerContext(layername, context));
-    }
-  }
+  //RemoveAllContext() {
+  //  this._context = [];
+  //}
 
-  SetLayerContext(layername: string, ctx: CanvasRenderingContext2D) {
-    this._currentLayer = this._context.findIndex(c => c.Name == layername);
-    if (ctx != null && this._currentLayer >= 0) {
-      return this._context[this._currentLayer].setContext(ctx);
-    }
-  }
+  //AddLayerContext(layername: string, context: CanvasRenderingContext2D) {
+  //  this.SetLayerContext(layername, context);
+  //  if (this._currentLayer < 0) {
+  //    this._currentLayer = this._context.length;
+  //    this._context.push(new LayerContext(layername, context));
+  //  }
+  //}
 
-  AddImage(imageName: string, messageService: MessageService): number {
-    let ndx = this._images.findIndex(i => i.ImageName == imageName);
-    if (ndx >= 0) { return ndx; }
-    ndx = this._images.length;
-    let img = new ImageModel(imageName, this._imagePath, messageService);
-    this._images.push(img);
-    return ndx;
-  }
+  //SetLayerContext(layername: string, ctx: CanvasRenderingContext2D) {
+  //  this._currentLayer = this._context.findIndex(c => c.Name == layername);
+  //  if (ctx != null && this._currentLayer >= 0) {
+  //    return this._context[this._currentLayer].setContext(ctx);
+  //  }
+  //}
+
+  //AddImage(imageName: string, messageService: MessageService): number { 
+  //  let ndx = this._images.findIndex(i => i.ImageName == imageName);
+  //  if (ndx >= 0) { return ndx; }
+  //  ndx = this._images.length;
+  //  let img = new ImageModel(imageName, this._imagePath, messageService);
+  //  this._images.push(img);
+  //  return ndx;
+  //}
 
   DrawImage(shape: Shape, imageIndex: number = 0): boolean {
     if (!shape) { return false; }
     if (imageIndex < 0) { return false; }
-    let img = this._images[imageIndex];
-    if (!img) { return false; }
-    let ctx = this._context[this._currentLayer].Context;
+    //let img = this._images[imageIndex];
+   // if (!img) { return false; }
+  //  let ctx = this._context[this._currentLayer].Context;
 
-    return img.DisplayImage(ctx, shape);
+    return false; //img.DisplayImage(this._context, shape);
   }
 
   DrawText(content: TextContent, shape: Shape) {
-    if (!shape
-      || this._currentLayer < 0
-      || this._currentLayer >= this._context.length) {
-      return;
-    }
-    let ctx = this._context[this._currentLayer].Context;
+
+    let ctx = this._context;
 
     if (!ctx) { return; }
     ctx.beginPath();
@@ -158,12 +153,12 @@ export class ContextModel {
     ctx.rect(0, 0, shape.Width, shape.Height);
     ctx.fillStyle = DisplayValues.GetColor(shape.StateIndex.Index[UIStates.background]);
     ctx.fill();
-    ctx.strokeStyle = DisplayValues.GetColor(content.StateIndex.Index[UIStates.foreground]);
+  //  ctx.strokeStyle = DisplayValues.GetColor(content.StateIndex.Index[UIStates.foreground]);
 
     ctx.font = shape.Height + "px " + DisplayValues.GetFont(content.StateIndex.Index[UIStates.fontFace]);
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'left';
-    ctx.fillStyle = DisplayValues.GetColor(content.StateIndex.Index[UIStates.background]);
+    ctx.fillStyle = DisplayValues.GetFGColor(content.StateIndex.Index[UIStates.foreground]);
     ctx.textAlign = 'left';
     ctx.fillText(content.Content, 0, shape.Height);
     ctx.strokeStyle = 'transparent';
@@ -174,7 +169,7 @@ export class ContextModel {
   }
 
   MeasureText(text: string, height: number, state: StateIndex): number {
-    let ctx = this._context[this._currentLayer].Context;
+    let ctx = this._context; // this._context[this._currentLayer].Context;
     ctx.save();
     ctx.font = height + "px " + DisplayValues.GetFont(state.Index[UIStates.fontFace]);
     let width = ctx.measureText(text).width;
@@ -183,10 +178,9 @@ export class ContextModel {
   }
 
   DrawRectangle(shape: IShape) {
-    let ctx = this._context[this._currentLayer].Context;
+    let ctx = this._context;// [this._currentLayer].Context;
     if (!ctx) { return; }
     ctx.beginPath();
-
     ctx.rect(shape.Left, shape.Top, shape.Width, shape.Height);
     ctx.fillStyle = DisplayValues.GetColor(shape.StateIndex.Index[UIStates.background]);
     ctx.fill();
@@ -212,7 +206,7 @@ export class ContextModel {
   }
 
   DrawEllipse(shape: IShape) {
-    let ctx = this._context[this._currentLayer].Context;
+    let ctx = this._context; // [this._currentLayer].Context;
     if (!ctx) { return; }
     ctx.beginPath();
     var width = shape.Width / 2;
@@ -244,7 +238,7 @@ export class ContextModel {
   DrawLine(line: ILine, ports: Point[]) {
     if (ports.length <= 0) { return; }
 
-    let ctx = this._context[this._currentLayer].Context;
+    let ctx = this._context;// [this._currentLayer].Context;
     if (!ctx) { return; }
     ctx.beginPath();
 

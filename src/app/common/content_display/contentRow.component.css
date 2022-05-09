@@ -1,0 +1,52 @@
+.lcgrid {
+  margin: 1em;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(100px,1fr));
+  grid-template-rows: auto;
+  grid-gap: .5em;
+  grid-template-areas: "lchdr"
+    "leftItem"
+    "lcftr"
+
+}
+
+#lchdr {
+  grid-area: lchdr;
+  background-color: blue;
+  color: white;
+  height: 50px;
+  grid-column-start: 1;
+  grid-column-end: -1;
+}
+
+#lcftr {
+  grid-area: lcftr;
+  background-color: blue;
+  color: white;
+  height: 50px;
+  grid-column-start: 1;
+  grid-column-end: -1;
+}
+
+#leftItem {
+  grid-area: leftItem;
+  background-color: transparent;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#middleItem {
+  grid-area: middleItem;
+  background-color: lightblue;
+  width: 200px;
+  font-size: 20px;
+}
+
+#rightItem {
+  grid-area: rightItem;
+  background-color: lemonchiffon;
+  font-size: 20px;
+  grid-column-start: 10;
+  grid-column-end: -1;
+}

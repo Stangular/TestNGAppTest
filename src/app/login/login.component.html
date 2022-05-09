@@ -1,18 +1,24 @@
 <div style="margin-bottom:1px">
-  <content-utility [layoutName]="'masterA'">
-    <div content-type="slotA">
+  <mat-grid-list [cols]="layout.getLayoutColumnCount(containerIndex)"
+                 [gutterSize]="10"
+                 [rowHeight]="layout.getLayoutRowHeight(containerIndex)">
+    <mat-grid-tile [colspan]="layout.ColSpan(containerIndex,0)"
+                   [rowspan]="layout.RowSpan(containerIndex,0)"
+                   [style.background]="red">
       <div class="view-header">
         Log in
       </div>
-      <!--<div class="view-header">
-        <a color="primary" routerLink="/register">Register</a>
-      </div>
-      <div class="view-header">
-        <a color="primary" routerLink="/forgotPassword">Forgot Password</a>
-      </div>-->
-      <!--<app-test-auth></app-test-auth>-->
+    </mat-grid-tile>
+    <!--<div class="view-header">
+      <a color="primary" routerLink="/register">Register</a>
     </div>
-    <div content-type="slotB">
+    <div class="view-header">
+      <a color="primary" routerLink="/forgotPassword">Forgot Password</a>
+    </div>-->
+    <!--<app-test-auth></app-test-auth>-->
+    <mat-grid-tile [colspan]="layout.ColSpan(containerIndex,1)"
+                   [rowspan]="layout.RowSpan(containerIndex,1)"
+                   [style.background]="blue">
       <form [formGroup]="rForm" class="login-form">
         <mat-grid-list [cols]="layout.getLayoutColumnCount(layoutIndex)"
                        [gutterSize]="10"
@@ -75,9 +81,12 @@
           </mat-grid-tile>
         </mat-grid-list>
       </form>
-    </div>
-    <div content-type="slotC"></div>
-
-  </content-utility>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="layout.ColSpan(containerIndex,2)"
+                   [rowspan]="layout.RowSpan(containerIndex,2)"
+                   [style.background]="green">
+      <div></div>
+    </mat-grid-tile>
+  </mat-grid-list>
 </div>
 

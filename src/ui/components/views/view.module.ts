@@ -1,6 +1,7 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { DetailViewComponent } from '../views/detail/detail-view.component';
 import { CardViewComponent } from '../views/card/card-view.component';
 import { TableViewComponent } from '../views/table/table-view.component';
@@ -25,6 +26,24 @@ import { SandboxComponent } from '../../../app/sandbox/sandbox.component';
 import { PlaceComponent } from 'src/components/place/place.component';
 import { PlaceTreeComponent } from 'src/components/placetree/placetree.component';
 import { FamilyLineageModule } from 'src/FamilyLineage/family-lineage.module';
+import { NASRoute } from 'src/NAS_App/NAS_APP.routes';
+import { LoginComponent } from 'src/app/login/login.component';
+import { PopupContentComponent } from 'src/app/popup/popup-content.component';
+import { CheckSelectorComponent } from '../sequencing/check/check-selector/check-selector.component';
+//import { NavMenuComponent } from 'src/app/navigation/navmenu.component';
+import { ContentUtilityComponent } from 'src/app/common/content-utility/content-utility.component';
+import { AppUserComponent } from 'src/app/user/app-user-component/app-user.component';
+import { NAS_AppModule } from 'src/NAS_App/NAS_App.module';
+import { HomeDefaultComponent } from 'src/app/home-default/home-default.component';
+import { FileUploaderComponent } from 'src/app/common/file-uploader/file-uploader.component';
+import { UploadFileDialog } from './form/dialogs/upload/upload-file';
+import { NavMenuComponent } from 'src/app/navigation/navmenu.component';
+import { NAS_APPPrimaryOutletPageComponent } from 'src/NAS_App/NAS_APPPrimaryOutletPage.component';
+import { LostCauseComponent } from 'src/apps/LostCauseAnalysis/LostCause.component';
+import { SiteMapComponent } from 'src/app/common/site-map/site-map.component';
+import { DashboardPageComponent } from 'src/canvas/dashboard/dashboard-page/dashboard-page.component';
+import { ContentGridComponent } from 'src/app/common/content_display/contentGrid.component';
+import { ContentRowComponent } from 'src/app/common/content_display/contentRow.component';
 
 library.add(
   faCoffee
@@ -37,6 +56,7 @@ library.add(
     CommonModule
     , MapModule
     , FormsModule
+    , RouterModule
     , ReactiveFormsModule
     , CanvasModule
     , ngMaterialModule
@@ -52,30 +72,61 @@ library.add(
     , CardViewComponent
     , TableViewComponent
     , FormComponent
+    , FileUploaderComponent
     , FormPagingComponent
     , FormFilteringComponent
     , SaveFormSuccessSnackComponent
     , SelectListComponent
     , AcknowlegeDeleteDialog
+    , UploadFileDialog
     , CanvasShapePropertyDialogComponent
     , PlaceComponent
     , PlaceTreeComponent
     , SandboxComponent
+    , ContentUtilityComponent
+    , LoginComponent
+    , PopupContentComponent
+    , CheckSelectorComponent
+  //  , AppUserComponent
+    //, NavMenuComponent
+    , NavMenuComponent
+    , HomeDefaultComponent
+    , SiteMapComponent
+    , NAS_APPPrimaryOutletPageComponent
+    , LostCauseComponent
+    , DashboardPageComponent
+    , ContentGridComponent
+   , ContentRowComponent
+
   ],
   exports: [
     DetailViewComponent
     , CardViewComponent
     , TableViewComponent
     , FormComponent
+    , FileUploaderComponent
     , FormFilteringComponent
     , SaveFormSuccessSnackComponent
     , AcknowlegeDeleteDialog
+    , UploadFileDialog
     , SandboxComponent
     , PlaceComponent
     , PlaceTreeComponent
-    , CanvasShapePropertyDialogComponent],
+    , LoginComponent
+    , NavMenuComponent
+    //, NavMenuComponent
+    , HomeDefaultComponent
+    , SiteMapComponent
+    , CanvasShapePropertyDialogComponent
+        , NAS_APPPrimaryOutletPageComponent
+    , LostCauseComponent
+    , DashboardPageComponent
+    , CanvasModule
+    , MapModule
+    , ngMaterialModule],
   entryComponents: [
     AcknowlegeDeleteDialog
+    , UploadFileDialog
     , FormFilteringComponent],
   providers: [
     PagingService

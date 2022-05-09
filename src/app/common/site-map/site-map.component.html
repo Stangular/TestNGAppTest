@@ -1,0 +1,10 @@
+<p>
+  Site Map...
+</p>
+<div  *ngFor="let n of _navMan.SiteMap; index as i">
+  <button style="background-color: transparent; font-size:16px; font-family:Tahoma; border: none"
+          [style.padding-left.px]="[( 10 * n.Level ) + 10]"
+          (click)="JumpTo(n)">
+    {{n.Name}}
+  </button>
+</div>

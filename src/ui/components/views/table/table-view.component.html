@@ -1,37 +1,49 @@
 <table class="defaultTable">
   <thead>
     <tr>
-      <th>
+      <th style="width:3%">
         <div class="header-filter_remove">
           <mat-grid-list cols="1" rowHeight="30px">
-            <mat-icon (click)="removeAllFilters()" *ngIf="filtersApplied" aria-label="Remove all filters">not_interested</mat-icon>
-            <i class="fa fa-filter" style="padding-right:5px" *ngIf="HasFilter && !filtersApplied" (click)="ApplyAllFilters(element)"></i>
+            <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+              <mat-icon (click)="removeAllFilters()" *ngIf="filtersApplied" aria-label="Remove all filters">not_interested</mat-icon>
+              <!--<i class="fa fa-filter" style="padding-right:5px" *ngIf="HasFilter && !filtersApplied" (click)="ApplyAllFilters(element)"></i>-->
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+              <mat-icon (click)="ToggleFilterRows()" *ngIf="filtersApplied" aria-label="Remove all filters">filter_list</mat-icon>
+              <!--<i class="fa fa-filter" style="padding-right:5px"></i>-->
+            </mat-grid-tile>
           </mat-grid-list>
         </div>
       </th>
       <th *ngFor="let element of VisibleElements" style="width:10%">
         <mat-grid-list cols="3" rowHeight="30px">
           <mat-grid-tile [colspan]="2" [rowspan]="1" style="text-align:left">
-            <div class="header-label">
-              {{ElementLabel(element)}}
-              <button mat-icon-button color="default" (click)="Sort(element)">
-                <mat-icon aria-label="Ascending"
-                          *ngIf="element.SortOrder() == sortOrder.ascending">arrow_drop_up</mat-icon>
-                <mat-icon aria-label="None"
-                          *ngIf="element.SortOrder() == sortOrder.unsorted">remove</mat-icon>
-                <mat-icon aria-label="Descending"
-                          *ngIf="element.SortOrder() == sortOrder.descending">arrow_drop_down</mat-icon>
-              </button>
+            <div class="header-label" style="white-space: nowrap;overflow:visible">
+              <span (click)="showFilter(element)">{{element.Label}}</span>
+              <span>
+                <button mat-icon-button color="default" (click)="Sort(element)" style="width:16px">
+                  <mat-icon aria-label="Ascending"
+                            *ngIf="element.Filter.Sort == sortOrder.ascending">arrow_drop_up</mat-icon>
+                  <mat-icon aria-label="None"
+                            *ngIf="element.Filter.Sort == sortOrder.unsorted">remove</mat-icon>
+                  <mat-icon aria-label="Descending"
+                            *ngIf="element.Filter.Sort == sortOrder.descending">arrow_drop_down</mat-icon>
+                </button>
+              </span>
             </div>
           </mat-grid-tile>
-          <mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
+          <!--<mat-grid-tile [colspan]="1" [rowspan]="1" style="text-align:left">
             <div class="header-filter" *ngIf="!element.FilterApplied">
-              <i class="fa fa-filter" style="padding-right:5px" (click)="toggleFilter(element)"></i>
+              <i class="fa fa-filter"
+                 style="padding-right:5px"
+                 (click)="toggleFilter(element)"></i>
             </div>
             <div class="header-filter_remove" *ngIf="element.FilterApplied">
-              <i class="fa fa-filter" style="padding-right:5px" (click)="toggleFilter(element)"></i>
+              <i class="fa fa-filter"
+                 style="padding-right:5px"
+                 (click)="toggleFilter(element)"></i>
             </div>
-          </mat-grid-tile>
+          </mat-grid-tile>-->
         </mat-grid-list>
       </th>
       <th style="text-align:right">
@@ -42,18 +54,48 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let d of source.Fields[0].Data; index as i"
+    <tr style="background-color:aliceblue" *ngIf="HasLowerFilter">
+      <td style="width:3%" class="filter_row">
+        <mat-checkbox
+                      [checked]="source.HasIgnoreLower"
+                      (change)="ToggleIgnoreAllLower()">
+          >=
+        </mat-checkbox>
+      </td>
+      <td class="filter_row"
+          *ngFor="let element of VisibleElements; index as i" style="width:10%">
+        <mat-checkbox *ngIf="element.Filter.LowerValue"
+                      (change)="edfs.SetFormContent(sourceIndex)"
+                      [(ngModel)]="element.Filter.ignore_lower">
+          {{ GetLowerFilterValue(element) }}
+        </mat-checkbox>
+      </td>
+    </tr>
+    <tr style="background-color:antiquewhite" class="filter_row" *ngIf="HasUpperFilter">
+      <td style="width:3%" class="filter_row">
+        <mat-checkbox
+                       [checked]="source.HasIgnoreUpper"
+                      (change)="ToggleIgnoreAllUpper()">
+          <=
+        </mat-checkbox>
+      </td>
+      <td class="filter_row"
+          *ngFor="let element of VisibleElements; index as i" style="width:10%">
+        <mat-checkbox *ngIf="element.Filter.UpperValue"
+                      (change)="edfs.SetFormContent(sourceIndex)"
+                      [(ngModel)]="element.Filter.ignore_upper">
+          {{ GetUpperFilterValue(element) }}
+        </mat-checkbox>
+      </td>
+    </tr>
+    <tr *ngFor="let d of Data; index as i"
         (click)="selectRecord(i)"
         [class.selected]="source.SelectedIndex()==i">
-      <td style="width:2%">{{i+1}}</td>
-      <td *ngFor="let element of VisibleElements" style="width:10%">
-        {{CellData(element,i)}}
+      <td style="width:3%" class="data_row" >{{source.RecordNumber(i)}}</td>
+      <td *ngFor="let r of d" style="width:10%" class="data_row" >
+        {{r}}
       </td>
-      <td style="text-align:right">
-        <button mat-icon-button color="warn" (click)="GotoDetail(i)">
-          <mat-icon aria-label="Ascending">view_compact</mat-icon>
-        </button>
-      </td>
+      <td style="text-align:right" class="data_row" ></td>
     </tr>
   </tbody>
   <tfoot>

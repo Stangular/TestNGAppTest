@@ -142,7 +142,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
     if (this.canvasService.EditOn) {
       this.canvasService.Select();
       this.Clear();
-      this.canvasService.DrawSystem(this.canvasID);
+  //    this.canvasService.DrawSystem(this.canvasID);
     }
   }
 
@@ -187,7 +187,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
 
       this.PositionFromEvent(e);
       this.canvasService.MoveSystem();
-      this.canvasService.DrawSystem(this.canvasID);
+   //   this.canvasService.DrawSystem(this.canvasID);
       this.move.emit(this.canvasService.shapeSelectResult);
     }
   }
@@ -214,7 +214,7 @@ export class CanvasComponent implements OnInit, AfterViewInit, OnDestroy, DoChec
 
   Draw() {
     if (!this.canvasService.BaseSystem) { return; }
-    this.canvasService.DrawSystem(this.canvasID);
+ //   this.canvasService.DrawSystem(this.canvasID);
   }
 
   ngOnDestroy() {

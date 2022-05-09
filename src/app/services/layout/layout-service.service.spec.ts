@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { LayoutServiceService } from './layout-service.service';
+import { LayoutService } from './layout-service.service';
 
 describe('LayoutServiceService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LayoutServiceService]
+      providers: [LayoutService]
     });
   });
 
-  it('should be created', inject([LayoutServiceService], (service: LayoutServiceService) => {
+  it('should be created', inject([LayoutService], (service: LayoutService) => {
     expect(service).toBeTruthy();
   }));
 });

@@ -3,7 +3,7 @@ import { IContextItem, ContextSystem } from '../IContextItem';
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { ContextModel } from 'src/canvas/component/context.model';
 
-export class Ellipse extends Shape implements IContextItem {
+export class Ellipse extends Shape {
 
   constructor(id: string,
     top: number,
@@ -50,16 +50,36 @@ export class Ellipse extends Shape implements IContextItem {
       Content: {}
     }
     this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
-    this.TextContent.forEach((s, i) => model.Text.push(s.Save()));
-    this.ImageContent.forEach((s, i) => model.Images.push(s.Save()));
-    this.GeneralContent.forEach((s, i) => model.Shapes.push(s.Save()));
+    this.Contents.forEach((s, i) => model.Text.push(s.Save()));
     return model;
   }
 
-  Draw(context: ContextModel): void {
+  Draw(ctx: CanvasRenderingContext2D): void {
 
-    context.DrawEllipse(this);
-  }
+    ctx.beginPath();
+    var width = this.Width / 2;
+    var height = this.Height / 2;
+    var centerX = this.Left + width;
+    var centerY = this.Top + height;
+
+    var i = 0;
+    let xPos = this.getXPos(i, centerX, width, height);
+    let yPos = this.getYPos(i, centerY, width, height);
+    ctx.moveTo(xPos, yPos);
+
+    for (i = 0.01; i < 2 * Math.PI; i += 0.01) {
+      xPos = this.getXPos(i, centerX, width, height);
+      yPos = this.getYPos(i, centerY, width, height);
+      ctx.lineTo(xPos, yPos);
+    }
+
+    ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
+    ctx.fill();
+    ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    ctx.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
+    ctx.stroke();
+
+    ctx.closePath();  }
 
   CopyShape(newID: string): Shape {
 

@@ -1,4 +1,5 @@
 import { Size } from './size';
+import { Area } from './area';
 
 export class Point {
 
@@ -18,11 +19,22 @@ export class Point {
     this.y = y;
 
   }
-  Offset( offsetX: number, offsetY: number) {
 
+  Offset( offsetX: number, offsetY: number) {
     this.x += offsetX;
     this.y += offsetY;
+  }
+}
 
+export class OffsetPoint extends Point {
+
+  constructor(private offsetX : number, private offsetY: number, protected x: number = 0, protected y: number = 0, area: Area) {
+    super(x, y);
+  }
+
+  SetToArea(area: Area) {
+    this.x = area.Left + ( area.Width * this.offsetX);
+    this.y + area.Top + ( area.Height * this.offsetY);
   }
 }
 

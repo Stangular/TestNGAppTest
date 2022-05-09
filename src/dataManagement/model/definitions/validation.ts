@@ -1,94 +1,105 @@
+export enum FilterType {
+  none = 0,
+  lessThan = 1,
+  lessThanORequal = 2,
+  equal = 3,
+  greaterThanORequal = 4,
+  greaterThan = 5,
+  contains = 6,
+  doesNotContain = 7,
+  notEqual = 8
+}
+
+export class Validation {
+  valid: boolean = true;
+  message: string = '';
+}
+
 export interface IValidator {
 
-    Message: string;
-    validate(v: any): boolean;
-    validateValue(v: any): boolean;
+  IsInvalid: boolean;
+  validate(v: any): Validation;
 }
 
-export abstract class Validation implements IValidator {
+export abstract class Validator<T> implements IValidator {
 
-    abstract validate(v: any): boolean;
-    abstract get Message(): string;
+  protected validation: Validation = new Validation();
 
-    validateValue(
-        v: any): boolean {
-        let m = this.Message;
-        if (!this.validate(v)) {
-            if (m.length > 0) {
-                return true;
-                //  t.error(m, fieldName + ' is invalid');
-            }
-            return false;
-        }
-        return true;
-    }
-}
-// This would simply be a default string validator
-export class Validator extends Validation {
+  constructor(
+    message: string) {
+    this.validation.message = message;
+  }
 
-    constructor(
-        private message = '',
-        private _regex?: RegExp) {
-        super();
-    }
+  get IsInvalid():  boolean {
+    return !this.validation.valid;
+  }
 
-    get Message() {
-        return this.message;
-    }
-
-    validate(v: string) {
-        if (!this._regex) { return true; }
-        if (!this._regex.test(v)) {
-            return false;
-        }
-        return true;
-    }
+  abstract validate(v: T): Validation;
 }
 
-export class ValueValidator extends Validation {
+export class PatternValidator<T> extends Validator<T> {
 
-    constructor(private message: string, private value: number, private compare: number) {
-        super();
-    }
+  constructor(
+    message: string,
+    private validPattern : string,
+    private _regex?: RegExp) {
+    super(message);
+  }
 
-    get Message() {
-        return this.message;
+  validate(v: T): Validation {
+    let v1: string = (v + this.validPattern.slice(v.toString().length)).toString();
+    if( this._regex.test(v1))
+    {
+      if(this.validation.valid == false){
+        console.error("False to true!!!!!!!!")
+      }
+      this.validation.valid = true;
+      console.error(v + ": Set to True   !!!!!!!!")
     }
-
-    validate(val: string) {
-        let r = false;
-        let v = parseInt(val);
-        switch (this.compare) {
-            case 0: r = v === this.value; break;
-            case 1: r = v < this.value; break;
-            case 2: r = v > this.value; break;
-            case 3: r = v <= this.value; break;
-            case 4: r = v >= this.value; break;
-            case 5: r = v != this.value; break;
-        }
-        return r;
+    else{
+      this.validation.valid = false;
+      console.error(v + ": Set to False!!!!!!!!")
     }
+  
+    return this.validation;
+  }
 }
 
-export class NumberValidator extends Validation {
+export class ValueValidator<T> extends Validator<T> {
 
-    constructor(private message: string, private max: number, private min?: number) {
-        super();
+  constructor(
+    message: string,
+    private value: T,
+    private compare: FilterType) {
+    super(message);
+  }
+  
+  validate(v: T): Validation{
+    let r = false;
+    switch (this.compare) {
+      case FilterType.equal: r = v === this.value; break;
+      case FilterType.lessThan: r = v < this.value; break;
+      case FilterType.greaterThan: r = v > this.value; break;
+      case FilterType.lessThanORequal: r = v <= this.value; break;
+      case FilterType.greaterThanORequal: r = v >= this.value; break;
+      case FilterType.notEqual: r = v != this.value; break;
     }
+    this.validation.valid = r;
+    return this.validation;
+  }
+}
 
-    get Message() {
-        return this.message;
-    }
+export class NumberValidator extends Validator<number> {
 
-    validate(v: string) {
-        let y = parseInt(v);
+  constructor(
+    message: string,
+    private max: number,
+    private min?: number) {
+    super(message);
+ }
 
-        if (this.max < y) {
-            return false;
-        }
-        if (this.min && this.min > y) {
-            return false;
-        }
-        return true;
-    }
+  validate(v: number): Validation{
+    this.validation.valid = (this.max > v && (!this.min || this.min < v));
+    return this.validation;
+  }
 }

@@ -40,15 +40,15 @@ export class VBarChart implements ID3SVGView { // Based on: http://bl.ocks.org/d
   }
   
   Data(records: Records<string>) {
-    let f = records.Fields;
-    if (f.length > 0) {
-      for (let i = 0; i < f[0].Data.length; i++) {
-        this._data.push({
-          xparam: f[0].Value(i),
-          yparam: parseInt(f[1].Value(i)),
-        });
-      }
-    }
+   // let f = records.Fields;
+    //if (f.length > 0) {
+    //  for (let i = 0; i < f[0].Data.length; i++) {
+    //    this._data.push({
+    //      xparam: f[0].Value(i),
+    //      yparam: parseInt(f[1].Value(i)),
+    //    });
+    //  }
+    //}
    
   }
 

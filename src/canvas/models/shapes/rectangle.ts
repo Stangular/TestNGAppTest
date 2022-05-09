@@ -7,6 +7,7 @@ import { Port } from './port';
 import { Path } from '../lines/path';
 import { ContextModel } from 'src/canvas/component/context.model';
 
+
 export class Rectangle extends Shape {
 
   protected _roundedCorners: number = 0;
@@ -16,17 +17,30 @@ export class Rectangle extends Shape {
     left: number,
     width: number,
     height: number,
-    stateName: string) {
+    stateName: string = '',
+    zIndex: number = 0) {
     super(id,
       top,
       left,
       width,
       height,
-      stateName);
+      stateName,
+      zIndex);
   }
 
-  Draw(context: ContextModel): void {
-    context.DrawRectangle(this);
+  Draw(ctx: CanvasRenderingContext2D): void {
+
+    ctx.beginPath();
+    ctx.rect(this.Left, this.Top, this.Width, this.Height);
+    ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
+    ctx.fill();
+    ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    ctx.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
+    ctx.stroke();
+
+    ctx.closePath();
+
+
   }
 
   Save(): any {
@@ -45,16 +59,14 @@ export class Rectangle extends Shape {
       Content: {}
     }
     this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
-    this.TextContent.forEach((s, i) => model.Shapes.push(s.Save()));
-    this.ImageContent.forEach((s, i) => model.Shapes.push(s.Save()));
-    this.GeneralContent.forEach((s, i) => model.Shapes.push(s.Save()));
-   return model;
+    this.Contents.forEach((s, i) => model.Shapes.push(s.Save()));
+    return model;
   }
 
   ShapeType(): number {
     return 0;
   }
-  CopyShape(newID: string ) : Shape {
+  CopyShape(newID: string): Shape {
 
     return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName);
   }
@@ -62,10 +74,19 @@ export class Rectangle extends Shape {
   CopyItem(newID: string) {
     return this.CopyShape(newID);
   }
+
+  ResetArea(left: number, top: number, width: number, height: number) {
+    this.left = left;
+    this.top = top;
+    this.width = width;
+    this.height = height;
+  }
   //SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
   //  return (this.SelectShape(shapeSelectResult));
   //}
 }
+
+
 
 //export class RoundedRectangle extends Shape implements IContextItem {
 

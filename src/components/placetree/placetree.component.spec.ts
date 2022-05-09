@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlacetreeComponent } from './placetree.component';
+import { PlaceTreeComponent } from './placetree.component';
 
 describe('PlacetreeComponent', () => {
-  let component: PlacetreeComponent;
-  let fixture: ComponentFixture<PlacetreeComponent>;
+  let component: PlaceTreeComponent;
+  let fixture: ComponentFixture<PlaceTreeComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PlacetreeComponent ]
+      declarations: [PlaceTreeComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PlacetreeComponent);
+    fixture = TestBed.createComponent(PlaceTreeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -7,10 +7,15 @@ import { HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 //import { FormGroup } from '@angular/forms';
 //import 'rxjs/add/operator/map';
 //mport 'rxjs/add/operator/catch';
-import { map, catchError } from 'rxjs/operators';
-import { Observable, Subject, forkJoin } from 'rxjs';
+import { map, catchError, take, concatMap } from 'rxjs/operators';
+import { Observable, Subject, forkJoin, from, of, Observer } from 'rxjs';
 import { IForm } from '../model/form/form';
 import { TokenService } from '../../app/user/token/token.service';
+import { IUploadedFile } from 'src/ui/components/views/form/dialogs/upload/IUpload.model';
+
+const INVALID_FILE = ' Invalid file.';
+const INVALID_IMAGE = ' Invalid image.';
+const INVALID_SIZE = ' Invalid Size.';
 
 @Injectable()
 export class DataHTTPService {
@@ -113,20 +118,112 @@ export class DataHTTPService {
         catchError(this.handleError)));
   }
 
+  StreamData(file: File): Observable<IForm> {
+    const formData = new FormData();
+    formData.append('file', file);
+ //   let content: any = { file: formData, form: { SourceName: 'sss', FormName: 'sss' } };
+    let url = 'https://localhost:44336/api/data/StreamDataFile';
+    return this.http.post(
+      url, formData)
+      .pipe(map(response =>
+        this.processData(response),
+        catchError(this.handleError)));
+    //this.httpOptions(new HttpParams()))
+    //.pipe(map(response =>
+    //  this.processData(response),
+    //  catchError(this.handleError)));
+  }
   updateContent(content: any, restPath: string = 'https://localhost:44336/api/data'): Observable<IForm> {
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      })
+    };
+  //  let cnt = { value: "adfaf" };
     return this.http.put(
-      restPath, content)
+      restPath, content,
+      httpOptions)
       .pipe(map(response =>
         this.processData(response),
         catchError(this.handleError)));
   }
 
-  deleteContent(content: any, restPath: string = 'https://localhost:44336/api/data/DeletePost'): Observable<IForm> {
-
-    return this.http.post(
-      restPath, content)
+  deleteContent(content: any, restPath: string = 'https://localhost:44336/api/data'): Observable<IForm> {
+    restPath += '/' + content.Id + '/' + content.why + '/' + content.FormName;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      })
+    };
+    return this.http.delete(
+      restPath
+      , httpOptions)
       .pipe(map(response =>
         this.processData(response),
         catchError(this.handleError)));
+  }
+  //https://medium.com/@danielimalmeida/creating-a-file-upload-component-with-angular-and-rxjs-c1781c5bdee
+  uploadFiles(event): void {
+   // const files = event?.target?.files;  need typescript !3.7 for this!
+    const files = event && event.target && event.target.files || [];
+    const numberOfFiles = files.length;
+    from(files)
+      .pipe(
+        concatMap((file: File) => this.validateFile(file).pipe(catchError((error: IUploadedFile) => of(error)))),
+        take(numberOfFiles)
+      )
+      .subscribe((validatedFile: IUploadedFile) => {
+     //   this.uploadedFiles.emit(validatedFile);
+      });
+  }
+  
+
+
+  //https://medium.com/@danielimalmeida/creating-a-file-upload-component-with-angular-and-rxjs-c1781c5bdee
+  private validateFile(file: File): Observable<IUploadedFile> {
+    const fileReader = new FileReader();
+    const { type, name } = file;
+    return new Observable((observer: Observer<IUploadedFile>) => {
+      this.validateSize(file, observer);
+      fileReader.readAsDataURL(file);
+      fileReader.onload = event => {
+        if (this.isImage(type)) {
+          const image = new Image();
+          image.onload = () => {
+            observer.next({ file });
+            observer.complete();
+          };
+          image.onerror = () => {
+            observer.error({ error: { name, errorMessage: INVALID_IMAGE } });
+          };
+          image.src = fileReader.result as string;
+        } else {
+          observer.next({ file });
+          observer.complete();
+        }
+      };
+      fileReader.onerror = () => {
+        observer.error({ error: { name, errorMessage: INVALID_FILE } });
+      };
+    });
+  }
+
+  private isImage(mimeType: string): boolean {
+    return mimeType.match(/image\/*/) !== null;
+  }
+
+  private validateSize(file: File, observer: Observer<IUploadedFile>): void {
+    const { name, size } = file;
+    if (!this.isValidSize(size)) {
+      observer.error({ error: { name, errorMessage: INVALID_SIZE } });
+    }
+  }
+
+  private isValidSize(size: number): boolean {
+    const toKByte = size / 1024;
+    return toKByte >= 5 && toKByte <= 5120;
   }
 }

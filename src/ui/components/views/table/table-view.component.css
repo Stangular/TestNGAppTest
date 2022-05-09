@@ -8,9 +8,14 @@ th {
   height: 50px;
 }
 
-table, td, th {
+table, th {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding-left: 8px;
+}
+
+.data_row {
+  border: 1px solid #ddd;
+  padding: 4px;
 }
 
 .number td {
@@ -56,4 +61,19 @@ th {
 .header-label {
   width: 100%;
   text-align: left;
+}
+
+.mat-checkbox .mat-checkbox-frame {
+  transform: scale(.7);
+}
+
+.mat-checkbox-checked .mat-checkbox-background {
+  transform: scale(.7);
+}
+
+.filter_row {
+  color: darkgray;
+  font-size: 12px;
+  height: 20px;
+  padding: 1px;
 }

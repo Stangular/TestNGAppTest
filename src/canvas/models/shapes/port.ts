@@ -1,7 +1,7 @@
-import { IShape } from './IShape';
+import { IShape, ITracker } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
 import { Ellipse } from './ellipse';
-import { IContextItem } from '../IContextItem';
+import { IContextItem, AreaTracker } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { StateIndex, DisplayValues } from '../DisplayValues';
 
@@ -19,9 +19,10 @@ export class Port implements IShape, IContextItem {
     private offsetX: number,
     private offsetY: number,
     parent: IShape,
-    private type: ePortType,
+    private type: ePortType ,
     stateName: string,
     private pathId: string,
+    private zindex: number = 0,
     private pathPosition: number = -1
   ) {
     this.internalShape = new Ellipse(id + "_*", 0, 0, 5, 5, stateName);
@@ -30,9 +31,15 @@ export class Port implements IShape, IContextItem {
     this._stateIndex = DisplayValues.GetShapeIndex(stateName);
   }
 
+  Tracker(): ITracker {
+    return null;
+  }
+
   get StateIndex(): StateIndex {
     return this._stateIndex;
   }
+
+  get zIndex() { return this.zindex; }
 
   SetPortToParent(top: number, right: number, bottom: number, left: number) {
     let w = (right - left) / 2;
@@ -136,6 +143,12 @@ export class Port implements IShape, IContextItem {
 
   MoveBy(x: number, y: number) {
     this.internalShape.MoveBy(x, y);
+  }
+
+  Track(point: Point, tracker: AreaTracker): boolean {
+
+    return false; // this.SelectContentFromPoint(point) && tracker.Reset(this);
+
   }
 
   get ParentShapeId() {

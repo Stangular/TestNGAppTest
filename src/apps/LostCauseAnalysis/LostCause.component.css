@@ -1,0 +1,53 @@
+.lcgrid {
+  margin: 1em;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto auto auto;
+  grid-gap: 1em;
+  grid-template-areas:
+    "lchdr lchdr lchdr"
+    "middleItem ... leftItem"
+    "... rightItem rightItem"
+    "lcftr ... ..."
+}
+
+#lchdr {
+  grid-area: lchdr;
+  background-color: blue;
+  color: white;
+  height: 50px;
+  grid-column-start: 3;
+  grid-column-end: -1;
+}
+
+#lcftr {
+  grid-area: lcftr;
+  background-color: blue;
+  color: white;
+  height: 50px;
+  grid-column-start: 1;
+  grid-column-end: -1;
+}
+
+#leftItem {
+  grid-area: leftItem;
+  background-color: red;
+  font-size: 20px;
+  grid-column-start: 6;
+  grid-column-end: 9;
+}
+
+#middleItem {
+  grid-area: middleItem;
+  background-color: lightblue;
+  width: 200px;
+  font-size: 20px;
+}
+
+#rightItem {
+  grid-area: rightItem;
+  background-color: lemonchiffon;
+  font-size: 20px;
+  grid-column-start: 10;
+  grid-column-end: -1;
+}

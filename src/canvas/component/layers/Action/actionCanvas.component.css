@@ -1,2 +1,23 @@
-﻿body {
+.chart {
+  font-family: Verdana;
+  font-size: 9pt;
+}
+
+.staticCanvas {
+  background-color: rgb(254, 100, 254);
+}
+
+.activeCanvas {
+  border: 1px solid blue;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  border: 0;
+  background-color: rgba(254, 100, 254,.5);
+}
+
+.waitSpinner {
+  position: absolute;
+  top: 1px;
+  left: 1px;
 }

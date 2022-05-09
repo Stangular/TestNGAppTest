@@ -18,7 +18,7 @@ import {
 export class SelectListComponent implements OnInit {
 
   List: ListItem[] = [];
-  @Input() element: IElementDefinition<string>;
+  @Input() element: IElementDefinition;
   @Input() form: FormGroup;
   @Input() actionClass: string = '';
   @Input() currentItem: number = 0;
@@ -27,7 +27,7 @@ export class SelectListComponent implements OnInit {
 
   ngOnInit() {
 
-    this.List = this.appDataService.GetList(this.element.FieldID());
+    this.List = this.appDataService.GetList(this.element.ElementName);
   }
 
   SelectItem(item: MatSelectChange) {

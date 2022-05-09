@@ -1,10 +1,8 @@
-import { Records } from '../../../dataManagement/model/records';
-import { ChartLayer } from '../custom/layers/charts/chart.layer';
-import { Tick, IScale, Scale, NumericScale } from '../custom/layers/charts/axis/axis.layer';
-import { StateIndex, UIStates } from '../DisplayValues';
-import { BarLayer } from '../custom/layers/charts/content/bars/bar.layer';
-import { Margin } from '../shapes/primitives/margin';
-import { Size } from '../shapes/primitives/size';
+import { Records } from '../../../../../dataManagement/model/records';
+import { ChartLayer } from '../../../custom/layers/charts/chart.layer';
+import { Tick, IScale, Scale, NumericScale } from '../../../custom/layers/charts/axis/axis.layer';
+import { StateIndex, UIStates } from '../../../DisplayValues';
+import { Margin } from 'src/canvas/models/shapes/primitives/margin';
 
 export class BasicBarChartModel {
 
@@ -16,8 +14,8 @@ export class BasicBarChartModel {
     chartName: string = '',
     source: Records<string>) {
 
-    let fx = source.Fields.find(f => f.ElementName == this.xField);  //'date'
-    let fy = source.Fields.find(f => f.ElementName == this.yField);   //'income'
+    let fx = source.GetField( this.xField );  //'date'
+    let fy = source.GetField( this.yField );   //'income'
 
     if (!fx || !fy) {
       return null;
@@ -27,10 +25,10 @@ export class BasicBarChartModel {
     let years: string[] = [];
     let months: string[] = [];
 
-    for (let i = 0; i < fx..length; i++) {
-      d = fx.Value(i);
-      // calculate percentage of total height -  x/H = (d/500)* H 
-    }
+    //for (let i = 0; i < fx..length; i++) {
+    //  d = fx.Value(i);
+    //  // calculate percentage of total height -  x/H = (d/500)* H 
+    //}
 
     //for (let i = 0; i < fx.Data.length; i++) {
     //  d = fx.Value(i);

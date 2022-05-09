@@ -1,0 +1,9 @@
+
+
+<div *ngFor="let d of tempdata.data; index as i">
+  <content-row
+               [columnColor]="tempdata.columnColor"
+               [data]="d"
+               [row]="i">
+  </content-row>
+</div>

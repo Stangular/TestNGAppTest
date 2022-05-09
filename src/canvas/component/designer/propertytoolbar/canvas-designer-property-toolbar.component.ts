@@ -280,7 +280,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.canvasService.AddLine(result);
+        this.canvasService.AddLine(result.name, result.state, result.type, result.paths);
       }
     });
   }
@@ -355,7 +355,7 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
 
   RemoveShape() {
     this.canvasService.BaseSystem.RemoveContent();
-    this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
+  //  this.canvasService.DrawSystem(this.canvasService.SelectedUnitCellId);
   }
 
   ManagePorts(): void {

@@ -10,5 +10,8 @@ export interface ILine extends IContextItem {
   State: StateIndex;
   Type: lineTypes;
   StateName: string;
+  Plot(ctx: CanvasRenderingContext2D, path: Point[]);
+  Update(stateName: string);
+  DrawLine(ctx: CanvasRenderingContext2D, path: Point[]): void 
 }
 

@@ -22,7 +22,7 @@ export class TestNormalizedStackedBarChart implements ID3SVGView { // Based on: 
   }[] = [];
 
   constructor(records: Records<string>, private _viewId: string = 'testNormalizedStackedBarChart') {
-    this._fields = records.Fields;// TODO: Change this to do a look up against a cache of records...
+    //this._fields = records.Fields;// TODO: Change this to do a look up against a cache of records...
   }
 
   IsView(viewId: string) {
@@ -78,29 +78,29 @@ export class TestNormalizedStackedBarChart implements ID3SVGView { // Based on: 
    // });
   //  this._data.length = 0;
     let self = this;
-    for (let i = 0; i < this._fields[0].Data.length; i++) {
-      let s = {
-        state: this._fields[0].Value(i),
-        under_5: parseInt(this._fields[1].Value(i)),
-        to_13: parseInt(this._fields[2].Value(i)),
-        to_17: parseInt(this._fields[3].Value(i)),
-        to_24: parseInt(this._fields[4].Value(i)),
-        to_44: parseInt(this._fields[5].Value(i)),
-        to_64: parseInt(this._fields[6].Value(i)),
-        over_64: parseInt(this._fields[7].Value(i)),
-        total: 0
-      };
-      for (let x = 1; x < 8; x = x + 1) {
-        s.total += parseInt(this._fields[x].Value(i));
-      }
-      columns.push(this._fields[0].Value(i));
-      this._data.push(s);
-    }
+    //for (let i = 0; i < this._fields[0].Data.length; i++) {
+    //  let s = {
+    //    state: this._fields[0].Value(i),
+    //    under_5: parseInt(this._fields[1].Value(i)),
+    //    to_13: parseInt(this._fields[2].Value(i)),
+    //    to_17: parseInt(this._fields[3].Value(i)),
+    //    to_24: parseInt(this._fields[4].Value(i)),
+    //    to_44: parseInt(this._fields[5].Value(i)),
+    //    to_64: parseInt(this._fields[6].Value(i)),
+    //    over_64: parseInt(this._fields[7].Value(i)),
+    //    total: 0
+    //  };
+    //  for (let x = 1; x < 8; x = x + 1) {
+    //    s.total += parseInt(this._fields[x].Value(i));
+    //  }
+    //  columns.push(this._fields[0].Value(i));
+    //  this._data.push(s);
+    //}
     
     this._data.sort(function (a, b) { return a.under_5 / a.total > b.under_5 / b.total ? -1 : 1 });
 
     let keys: string[] = [];
-    this._fields.slice(1).forEach(function (f, i) { keys.push(f.FieldId); });
+ //   this._fields.slice(1).forEach(function (f, i) { keys.push(f.FieldId); });
     var series = d3.stack()
       .keys(keys)
       .offset(d3.stackOffsetExpand)(this._data);

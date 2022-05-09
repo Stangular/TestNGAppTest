@@ -1,8 +1,20 @@
-<wait [Width]="TheCanvas.width" [Height]="TheCanvas.height" *ngIf="canvasService.DataLoading"></wait>
-<canvas #staticcanvas *ngFor="let layer of canvasService.System(canvasID)"
-        class="actionCanvas"
-        [id]="canvasService.System(canvasID).ActiveLayerName"
-        (mousedown)="OnMousedown($event)"
-        (mouseup)="OnRelease($event)"
-        (mousemove)="OnMouseMove($event)">
-</canvas>
+<!--<wait [Width]="TheCanvas.width" [Height]="TheCanvas.height" *ngIf="canvasService.DataLoading"></wait>-->
+
+
+<div>
+  <canvas #topCanvas
+          class="activeCanvas"
+          id="timeline"
+          (mousedown)="OnMousedownTop($event)"
+          (mouseup)="OnMouseUpTop($event)"
+          (mousemove)="OnMouseMoveTop($event)"
+          (mouseout)="OnMouseOutTop($event)">
+  </canvas>
+  <canvas #staticCanvas
+          class="staticCanvas"
+          id="topLayer"
+          (mousedown)="OnMousedown($event)"
+          (mouseup)="OnMouseUp($event)"
+          (mouseout)="OnMouseOut($event)">
+  </canvas>
+</div>

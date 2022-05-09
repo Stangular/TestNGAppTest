@@ -12,7 +12,7 @@ import { D3LineChartModel } from '../../../d3/Services/d3.linechart.model';
 export class HRMProductionHistoryComponent implements OnInit, AfterContentInit {
   form: FormGroup;
   toggle = false;
-  private d3LineChartModel: D3LineChartModel = new D3LineChartModel();
+ // private d3LineChartModel: D3LineChartModel = new D3LineChartModel();
 
   constructor(private filterService: FilterService, private d3Service: D3Service, private loc: Location ) { }
 
@@ -39,7 +39,7 @@ export class HRMProductionHistoryComponent implements OnInit, AfterContentInit {
   }
 
   ngAfterContentInit() {
-    this.d3Service.D3.select("p").style("color", "red");
+  //  this.d3Service.D3.select("p").style("color", "red");
   }
   
 }

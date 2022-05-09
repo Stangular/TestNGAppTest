@@ -1,4 +1,4 @@
-import { IListNavigator } from '../list/ListNavigator';
+import { ITerm } from '../sequencing/sequence';
 
 export interface IDataItem<T> {
     ID(): T;
@@ -11,7 +11,7 @@ export abstract class DataItem<T> implements IDataItem<T> {
     public ID(): T { return this._ID; }
 }
 
-export abstract class DataItems<T> extends DataItem<T> implements IListNavigator<T> {
+export abstract class DataItems<T> extends DataItem<T> { // implements ITerm<T> {
     private _selectedItem: number;
 
     constructor(ID: T, protected _items: DataItem<T>[] = []) {

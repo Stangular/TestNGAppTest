@@ -63,10 +63,10 @@ export class AutoCompleteEditComponent implements OnInit {
     this.state = 0;
     this.selection = item;
     this.selectionId = '';
-    let result = this.source.FilterContent(item);
-    if (result.length == 1) {
-      this.selectionId = result[0].ID();
-    }
+    //let result = this.source.FilterContent(item);
+    //if (result.length == 1) {
+    //  this.selectionId = result[0].ID();
+    //}
     //if (item.length <= 0) {
     //  this.state = 0;
     //}
@@ -75,6 +75,6 @@ export class AutoCompleteEditComponent implements OnInit {
     //  this.state = n < 0 ? 1 : 2;
     //}
 
-    return result;
+    return null; //result;
   }
 }

@@ -1,0 +1,22 @@
+<mat-grid-list [cols]="1"
+               [rowHeight]="20">
+  <mat-grid-tile [colspan]="1"
+                 [rowspan]="1"
+                 [style.background]="'#aaaaaa'"
+                 class="script-menu">
+    <button mat-icon-button></button>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="30"
+                 [rowspan]="1"
+                 [style.background]="'transparent'">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="30"
+                 [rowspan]="1"
+                 [style.background]="'blue'">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="1"
+                 [rowspan]="10"
+                 [style.background]="'#aaaaaa'">
+    <input type="text" id="time_value" style="width:100px;margin:15px" />
+  </mat-grid-tile>
+</mat-grid-list>

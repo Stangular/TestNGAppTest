@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs';
 import { EditModel } from '../../../models/designer/base.model';
 import { CanvasService } from '../../../service/canvas.service';
 import { ContextModel } from '../../context.model';
+import { DisplayValues } from 'src/canvas/models/DisplayValues';
 
 export class CanvasContextModel {
   size: Size = new Size();
@@ -47,6 +48,7 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() system: ContextSystem;
   @Input() editSystem: EditModel;
   @Input() id: string = '';
+  @Input() initialLayer: ContextLayer = null;
   @Input() canvasID: string = '';
 
   @Input() source: Records<string>;
@@ -56,8 +58,8 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() edit: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   @Output() move: EventEmitter<ShapeSelectResult> = new EventEmitter<ShapeSelectResult>();
   private point: Point = new Point();
-  constructor(private messageService: MessageService, public canvasService: CanvasService) {
-
+  constructor(private messageService: MessageService,
+            public canvasService: CanvasService) {
     this.subscription = this.messageService.getMessage().subscribe(
       message => { this.AcceptMessage(message) });
   }
@@ -69,15 +71,15 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.Draw();
         break;
       case 1001:
-        this.canvasService.ContextModel.RemoveAllContext();
-        this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.TheContext);
+      //  this.canvasService.ContextModel.RemoveAllContext();
+     //   this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.TheContext);
         this.onResize(null);
         this.Draw(); break;
     }
   }
 
   ngOnInit() {
-    this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.TheContext);
+   // this.canvasService.ContextModel.AddLayerContext(this.canvasID, this.TheContext);
     this.SetActiveLayer();
   }
 
@@ -86,11 +88,12 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   SetActiveLayer() {
+    this.canvasService.AddLayer(this.initialLayer);
     this.setSize();
-    this.canvasService.AddLayer();
   }
 
   ngAfterViewInit(): void {
+
     setTimeout(() =>
       this.setSize()
       , 10);
@@ -125,15 +128,21 @@ export class StaticCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     let h = parent.offsetHeight || parent.clientHeight || 400;
 
     this.TheCanvas.width = w - 2;
-    this.TheCanvas.height = h - 5;
- 
+    this.TheCanvas.height = 100;
+    DisplayValues.width = this.TheCanvas.width;
+    DisplayValues.height = this.TheCanvas.height;
+    if (this.initialLayer) {
+      this.initialLayer.Init();
+
+    }
+
     this.Draw();
   }
 
   Draw() {
-    this.canvasService.ContextModel.SetLayerContext(this.canvasID, this.TheContext);
+    this.canvasService.SetLayerContext(this.canvasID, this.TheContext);
 
-    this.canvasService.DrawSystem(this.canvasID);
+  //  this.canvasService.DrawSystem(this.canvasID);
   }
 
   ngOnDestroy() {

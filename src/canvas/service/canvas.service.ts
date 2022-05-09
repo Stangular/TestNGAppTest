@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult, eContentType } from '../models/shapes/shapeSelected';
 import { BaseDesignerModel, EditModel } from '../models/designer/base.model';
-import { ContextSystem, ContextLayer, ActionLayer, UnitCell, IContextItem } from '../models/IContextItem';
+import { ContextSystem, ContextLayer, ActionLayer, UnitCell, IContextItem, EventContextLayer } from '../models/IContextItem';
 import { PathService } from '../models/shapes/service/path.service';
-import { Line, PortPath, lineTypes } from '../models/lines/line';
+import { Line, PortPath, lineTypes, VerticalToVerticalLine, VerticaToHorizontallLine, HorizontalToVerticalLine, HorizontallToHorizontalLine, GradientLine, BezierLine } from '../models/lines/line';
 import { DisplayValues } from '../models/DisplayValues';
 import { Shape } from '../models/shapes/shape';
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
@@ -23,6 +23,9 @@ import { ContextModel } from '../component/context.model';
 import { emptyGuid } from '../../const/constvalues.js';
 import { IShape } from '../models/shapes/IShape';
 import { ImageShape } from '../models/shapes/content/image/image';
+import { TimeLineBaseLayerModel, TimeLineTypes } from '../models/concepts/timelines/timeLineBase.model';
+import { ILine } from '../models/lines/ILine';
+import { ContentShape } from '../models/shapes/content/ContentShape';
 
 export enum objectTypes {
   rectangle = 0,
@@ -38,6 +41,7 @@ export class CanvasService {
   editOn: boolean = false;
   private contextModel: ContextModel;
   private _activeShape: IShape = null;
+  public _layerName: '';
   // protected lines: Line[] = []
   //  protected paths: PortPath[] = [];
   private selectedUnitCellId: string = emptyGuid;
@@ -47,6 +51,7 @@ export class CanvasService {
   private availableImages: ImageModel[] = [];
   private _loadingData: boolean = false;
   private contextSystems: ContextSystem[] = [];
+  private selectedSystem: number = 0;
   readonly datapath: string = 'https://localhost:44328/api/canvas';
   constructor(
     private pathService: PathService,
@@ -54,19 +59,48 @@ export class CanvasService {
     public dialog: MatDialog,
     private messageService: MessageService) {
 
+
+    DisplayValues.Clear();
+    DisplayValues.SetColor('TimeSpansss', '#add8e699');
+    DisplayValues.SetColor('DefaultBG', '#ee112255');
+    DisplayValues.SetWeight('DefaultBG', 2);
+    DisplayValues.SetFont('DefaultBG', 'verdana');
+    DisplayValues.SetColor('DefaultFG', '#000000');
+    DisplayValues.SetColor('timeLineColor', 'red');
+    DisplayValues.SetColor('OddSlot', '#999999');
+    DisplayValues.SetColor('EvenSlot', '#abc25f');
+    DisplayValues.SetFGColor('OddSlot', '#000000');
+    DisplayValues.SetFGColor('EvenSlot', '#000000');
+    DisplayValues.SetColor('boundingArea', 'yellow');
+    DisplayValues.SetColor('personData', '#ffffff00');
+    DisplayValues.SetFGColor('personData', '#000000');
+    DisplayValues.SetColor('personFG', '#ffffff');
+    DisplayValues.SetColor('timeLineColor', '#44121255');
+
     this.GetImageList();
-    this.contextModel = new ContextModel();
+  //  this.contextModel = new ContextModel();
   }
 
   get SelectedUnitCellId() { return this.selectedUnitCellId; }
 
   AddPort(portData: any) {
     if (!portData) { return; }
-    this.contextSystems[0].AddPort(portData.name,
+    this.contextSystems[this.selectedSystem].AddPort(portData.name,
       portData.offsetX,
       portData.offsetY,
       portData.type,
       portData.path);
+  }
+
+  GetContextLayer(id: string, area: Rectangle): EventContextLayer {
+    let result: EventContextLayer = null;
+    switch (id.toLowerCase()) {
+      case 'timeline-decade': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.decade); break;
+      case 'timeline-century': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.century); break;
+      default: result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.year);
+    }
+
+    return result;
   }
 
   System(canvasId: string) {
@@ -79,14 +113,39 @@ export class CanvasService {
       , 0);
   }
 
-  DrawSystem(canvasId: string) {
+  SetLayerContext(layername: string, ctx: CanvasRenderingContext2D) {
+ //   this.contextModel.SetLayerContext(layername, ctx);
+    this.selectedSystem = this.contextSystems.findIndex(s => s.Id === layername);
+  }
+
+  public SetCanvasContent(canvasId: string) {
     let self = this;
-    let lyrs = this.BaseSystem.Layers.filter(l => l.CanvasId == canvasId);
-    lyrs.forEach((l, i) => { l.Draw(self.contextModel); });
+
+    this.httpService.postContent('', '').subscribe(
+      data => {
+        //    if (self.BaseSystem) {
+        //    let lyrs = self.BaseSystem.Layers;
+        //     lyrs.forEach((l, i) => { l.Draw(self.contextModel); });
+
+        //      }
+
+      },
+      err => {
+        //      if (self.BaseSystem) {
+        //    let lyrs = self.BaseSystem.Layers.filter(l => l.CanvasId == canvasId);
+        //   lyrs.forEach((l, i) => { l.Draw(self.contextModel); });
+        //       }
+      });
+  }
+
+  DrawSystem(canvasId: string) {
+    //let self = this;
+    //let lyrs = this.BaseSystem.Layers.filter(l => l.CanvasId == canvasId);
+    //lyrs.forEach((l, i) => { l.Draw(self.contextModel); });
   }
 
   MoveSystem() {
-    this.BaseSystem.Move(this.contextModel, this.shapeSelectResult);
+  //  this.BaseSystem.Move(this.contextModel, this.shapeSelectResult);
   }
 
   SetActiveShape(shape: IShape) {
@@ -99,9 +158,12 @@ export class CanvasService {
 
   get DataLoading() { return this._loadingData; }
 
-  AddLayer() {
+  AddLayer(layer: ContextLayer = null) {
     let activeLayer: ActionLayer = null;
     let layers: ContextLayer[] = [];
+    if (layer) {
+      layers.push(layer);
+    }
     //  layers.push(new ContextLayer("baseLayer", "displayState"));
     // activeLayer = new ActionLayer();
     this.contextSystems.push(new ContextSystem(layers));
@@ -115,9 +177,9 @@ export class CanvasService {
     return this.editOn;
   }
 
-  get ContextModel() {
-    return this.contextModel;
-  }
+  //get ContextModel() {
+  //  return this.contextModel;
+  //}
 
   AddNewChartContent(id: string,
     minValue: number,
@@ -135,7 +197,7 @@ export class CanvasService {
   }
 
   get BaseSystem(): ContextSystem {
-    return this.contextSystems[0];
+    return this.contextSystems[this.selectedSystem];
   }
 
   get SSR(): ShapeSelectResult {
@@ -148,10 +210,10 @@ export class CanvasService {
 
   Select() {
     if (this.contextSystems.length > 0
-      && !this.contextSystems[0].Select(this.SSR)) {
+      && !this.contextSystems[this.selectedSystem].Select(this.SSR.point)) {
 
       this.SSR.shapeType = this.selectedType;
-      this.contextSystems[0].AddNewContent(this.SSR);
+      this.contextSystems[this.selectedSystem].AddNewContent(this.SSR);
     }
   }
 
@@ -212,7 +274,7 @@ export class CanvasService {
     paths.push(this.datapath + '/Cells');
     this.httpService.getCombined(paths).subscribe(results => {
       this.RetrieveCellsSuccess(results[2]);
-      this.RetrieveStateSuccess(results[0]);
+      this.RetrieveStateSuccess(results[this.selectedSystem]);
       this.RetrieveLineSuccess(results[1]);
       this.FinishedLoading();
     },
@@ -288,21 +350,21 @@ export class CanvasService {
 
   }
 
-  UpdateLine(result: any) {
+  UpdateLine(id: string, state: string, type: lineTypes, path: PortPath[] = []) {
     let model: GraphicsModel = new GraphicsModel();
 
     let value: LineModel = new LineModel();
-    value.DisplayValueId = result.state;
-    value.LineId = result.name;
-    value.LineType = result.type;
+    value.DisplayValueId = state;
+    //  value.LineId = name;
+    value.LineType = type;
     value.OffsetX1 = 0;
     value.OffsetX2 = 0;
     value.OffsetY1 = 0;
     value.OffsetY2 = 0;
     model.lines.push(value);
-    result.paths.forEach(function (p, i) {
+    path.forEach(function (p, i) {
       let path = new PathModel();
-      path.LineId = result.name;
+      //  path.LineId = name;
       path.PathId = p.Id;
       model.paths.push(path);
     });
@@ -316,7 +378,17 @@ export class CanvasService {
     if (!this.BaseSystem) { return; }
     let self = this;
     data.lines.forEach(function (d, i) {
-      self.BaseSystem.Lines.push(new Line(d.lineId, d.displayValueId, d.lineType));
+      let line: ILine;
+      switch (d.lineType) {
+        case lineTypes.bezier: line = new BezierLine(d.lineId, d.displayValueId); break;
+        case lineTypes.gradient: line = new GradientLine(d.lineId, d.displayValueId); break;
+        case lineTypes.HtoH: line = new HorizontallToHorizontalLine(d.lineId, d.displayValueId); break;
+        case lineTypes.HtoV: line = new HorizontalToVerticalLine(d.lineId, d.displayValueId); break;
+        case lineTypes.VtoH: line = new VerticaToHorizontallLine(d.lineId, d.displayValueId); break;
+        case lineTypes.VtoV: line = new VerticalToVerticalLine(d.lineId, d.displayValueId); break;
+        default: line = new Line(d.lineId, d.displayValueId); break;
+      }
+      self.BaseSystem.Lines.push(line);
     });
     data.paths.forEach(function (d, i) {
       self.BaseSystem.Paths.push(new PortPath(d.pathId, d.lineId));
@@ -381,14 +453,14 @@ export class CanvasService {
         }
         else if (shape.imageContent) {
           let c = shape.imageContent;
-          let imageIndex = this.contextModel.AddImage(c.content, this.messageService);
+          //      let imageIndex = this.contextModel.AddImage(c.content, this.messageService);
           let content = new ImageContent(
             c.id,
             c.displayValueId,
             c.content,
             c.fromSource || false,
             c.angle,
-            imageIndex);
+            0);
 
           s = new ImageShape(
             shape.id,
@@ -424,13 +496,13 @@ export class CanvasService {
     shape.shapes.forEach(function (shp, i) {
       let child = self.LoadShape(shp, s);
       if (shp.textContent) {
-        s.AddTextShape(child as TextShape);
+        s.AddContent(child as TextShape);
       }
       else if (shp.imageContent) {
-        s.AddImageShape(child as ImageShape);
+        s.AddContent(child as ImageShape);
       }
       else {
-        s.AddShape(child);
+        s.AddContent(child as ContentShape);
       }
     });
     return s;
@@ -443,7 +515,7 @@ export class CanvasService {
     let self = this;
     this.BaseSystem.ClearLayers();
     data.forEach(function (d, i) {
-      self.BaseSystem.AddLayer(d.unitCellId, d.name, d.updatedBy, d.updatedOn, "displayState");
+      self.BaseSystem.AddLayer(null, d.unitCellId, d.name, d.updatedBy, d.updatedOn, "displayState");
     });
     this.FinishedLoading();
   }
@@ -455,8 +527,8 @@ export class CanvasService {
   }
 
   AddImage(imageName: any, containerState: string, contentState: string, fromSource: boolean, angle = 0) {
-    let imageIndex = this.contextModel.AddImage(imageName, this.messageService);
-    this.BaseSystem.AddImage(imageName, containerState, contentState, fromSource, angle, imageIndex);
+    //   let imageIndex = this.contextModel.AddImage(imageName, this.messageService);
+    //   this.BaseSystem.AddImage(imageName, containerState, contentState, fromSource, angle, imageIndex);
     setTimeout(() => this.messageService.sendMessage(1001), 0);
   }
 
@@ -465,9 +537,9 @@ export class CanvasService {
     setTimeout(() => this.messageService.sendMessage(1001), 0);
   }
 
-  AddLine(result: any) {
-    this.BaseSystem.AddLine(result);
-    this.UpdateLine(result);
+  AddLine(id: string, state: string, type: lineTypes, path: PortPath[] = []) {
+    this.BaseSystem.AddLine(id, state, type, path);
+    this.UpdateLine(id, state, type, path);
   }
 
   get AvailableImages() {

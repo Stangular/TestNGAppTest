@@ -1,0 +1,11 @@
+<div class="header-label">
+  {{element.Label}}
+  <button mat-icon-button color="default" (click)="Sort(element)">
+    <mat-icon aria-label="Ascending"
+              *ngIf="element.Filter.Sort == sortOrder.ascending">arrow_drop_up</mat-icon>
+    <mat-icon aria-label="None"
+              *ngIf="element.Filter.Sort == sortOrder.unsorted">remove</mat-icon>
+    <mat-icon aria-label="Descending"
+              *ngIf="element.Filter.Sort == sortOrder.descending">arrow_drop_down</mat-icon>
+  </button>
+</div>
