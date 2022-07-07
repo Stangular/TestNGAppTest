@@ -30,7 +30,7 @@
     "d3": "^5.5.0",
     "font-awesome": "^4.7.0",
     "fontawesome": "^4.7.2",
-    "moment": "^2.22.2",
+    "moment": "^2.29.4",
     "ng4-loading-spinner": "^1.2.3",
     "ngx-color-picker": "^7.5.0",
     "ol": "^5.1.3",
