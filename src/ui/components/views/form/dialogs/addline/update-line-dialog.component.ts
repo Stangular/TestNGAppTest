@@ -158,7 +158,7 @@ export class UpdateLineDialog implements OnInit {
     let list = this.canvasService.BaseSystem.Lines
       .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
     if (list.length == 1 && list[0].Id == value) {
-      this.data.paths = this.canvasService.BaseSystem.Paths.filter(p => p.LineId == value);
+ //     this.data.paths = this.canvasService.BaseSystem.Paths.filter(p => p.LineId == value);
       this.data.state = list[0].StateName;
       this.data.type = list[0].Type;
       this.savedLineSelected = true;

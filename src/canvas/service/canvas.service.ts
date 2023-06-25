@@ -10,22 +10,24 @@ import { Shape } from '../models/shapes/shape';
 import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { DisplayValueModel, GraphicsModel, LineModel, PathModel, PortModel, ShapeModel, ContentModel } from './graphicsModel';
 import { Point } from '../models/shapes/primitives/point';
-import { Port, ePortType } from '../models/shapes/port';
+import { Port } from '../models/shapes/port';
 import { MatDialog, MatDialogRef, MatDialogConfig, MAT_DIALOG_DATA } from '@angular/material';
 import { Rectangle } from '../models/shapes/rectangle';
 import { MessageService } from 'src/app/messaging/message.service';
 import { Path } from '../models/lines/path';
 import { Ellipse } from '../models/shapes/ellipse';
 import { Content, TextContent, ImageContent } from '../models/shapes/content/Content';
-import { TextShape } from '../models/shapes/content/text/text';
+//import { TextShape } from '../models/shapes/content/text/text';
 import { ImageModel } from '../models/shapes/content/image/image.model';
 import { ContextModel } from '../component/context.model';
 import { emptyGuid } from '../../const/constvalues.js';
 import { IShape } from '../models/shapes/IShape';
-import { ImageShape } from '../models/shapes/content/image/image';
+//import { ImageShape } from '../models/shapes/content/image/image';
 import { TimeLineBaseLayerModel, TimeLineTypes } from '../models/concepts/timelines/timeLineBase.model';
 import { ILine } from '../models/lines/ILine';
-import { ContentShape } from '../models/shapes/content/ContentShape';
+import { FamilyTreeModel, PersonModel, FamilyModel, Sex } from '../models/concepts/Family/familyTree/familyTree.model';
+import { DNAChromosomes } from '../models/concepts/CommonMatchDNA/dnaChromosome';
+//import { ContentShape } from '../models/shapes/content/ContentShape';
 
 export enum objectTypes {
   rectangle = 0,
@@ -61,21 +63,40 @@ export class CanvasService {
 
 
     DisplayValues.Clear();
-    DisplayValues.SetColor('TimeSpansss', '#add8e699');
-    DisplayValues.SetColor('DefaultBG', '#ee112255');
+    DisplayValues.SetColor('TimeSpansss', '#aad8e699');
+    DisplayValues.SetColor('TimeSpanLine', 'orange');
+    DisplayValues.SetWeight('TimeSpanLine', 2);
+    DisplayValues.SetColor('DefaultBG', '#bbbbbb');
     DisplayValues.SetWeight('DefaultBG', 2);
-    DisplayValues.SetFont('DefaultBG', 'verdana');
+    DisplayValues.SetFont('DefaultBG', 'FontAwesome');
     DisplayValues.SetColor('DefaultFG', '#000000');
-    DisplayValues.SetColor('timeLineColor', 'red');
-    DisplayValues.SetColor('OddSlot', '#999999');
-    DisplayValues.SetColor('EvenSlot', '#abc25f');
-    DisplayValues.SetFGColor('OddSlot', '#000000');
-    DisplayValues.SetFGColor('EvenSlot', '#000000');
+    DisplayValues.SetColor('OddSlot', '#bbbbbb');
+    DisplayValues.SetColor('EvenSlot', '#FFE4E1');
+    DisplayValues.SetGradientColor('OddSlot', '#FFE4E1');
+    DisplayValues.SetGradientArea('OddSlot', new Rectangle('sss',10, 0, 50, 0));
+    DisplayValues.SetGradientColor('EvenSlot', '#bbbbbb');
+    DisplayValues.SetGradientArea('EvenSlot', new Rectangle('sss', 10, 0, 50, 0));
+    DisplayValues.SetFGColor('OddSlot', '#2F4F4F');
+    DisplayValues.SetFGColor('EvenSlot', '#2F4F4F');
+    DisplayValues.SetWeight('OddSlot', 0);
+    DisplayValues.SetWeight('EvenSlot', 0);
     DisplayValues.SetColor('boundingArea', 'yellow');
-    DisplayValues.SetColor('personData', '#ffffff00');
+    DisplayValues.SetColor('sizerHandleA', '#d8ade699');
+    DisplayValues.SetFGColor('sizerHandleA', 'yellow');
+    DisplayValues.SetColor('sizerHandleB', 'transparent');
+    DisplayValues.SetFGColor('sizerHandleB', 'yellow');
+    DisplayValues.SetColor('personData', 'transparent');
+    DisplayValues.SetColor('personContainer', '#ffffff');
+    DisplayValues.SetColor('personContainer_hit', '#ff22ff');
+    DisplayValues.SetColor('personPort1', '#555555');
+    DisplayValues.SetColor('personPort2', 'yellow');
     DisplayValues.SetFGColor('personData', '#000000');
-    DisplayValues.SetColor('personFG', '#ffffff');
+    DisplayValues.SetColor('person', '#ffffff');
     DisplayValues.SetColor('timeLineColor', '#44121255');
+    DisplayValues.SetColor('dnaSegmentLineColor', 'yellow');
+
+    DisplayValues.SetColor('dnaSegments', '#d8ade699');
+
 
     this.GetImageList();
   //  this.contextModel = new ContextModel();
@@ -83,21 +104,40 @@ export class CanvasService {
 
   get SelectedUnitCellId() { return this.selectedUnitCellId; }
 
-  AddPort(portData: any) {
-    if (!portData) { return; }
-    this.contextSystems[this.selectedSystem].AddPort(portData.name,
-      portData.offsetX,
-      portData.offsetY,
-      portData.type,
-      portData.path);
-  }
+  //AddPort(portData: any) {
+  //  //if (!portData) { return; }
+  //  //this.contextSystems[this.selectedSystem].AddPort(portData.name,
+  //  //  portData.offsetX,
+  //  //  portData.offsetY,
+  //  //  portData.type,
+  //  //  portData.path);
+  //}
 
-  GetContextLayer(id: string, area: Rectangle): EventContextLayer {
+  GetContextLayer(id: string, area: Rectangle,context: CanvasRenderingContext2D): EventContextLayer {
     let result: EventContextLayer = null;
+    let people: PersonModel[] = [];
+    people.push(new PersonModel('197182_0', Sex.Male, "Stanley"));
+    people.push(new PersonModel('197182_1', Sex.Male, "J.C."));
+    people.push(new PersonModel('197182_2', Sex.Male, "Joshua"));
+    people.push(new PersonModel('197182_3', Sex.Male, "William"));
+    people.push(new PersonModel('197182_4', Sex.Male, "John"));
+    people.push(new PersonModel('197182_5', Sex.Male, "John"));
+    people.push(new PersonModel('197182_6', Sex.Male, "John"));
+    people.push(new PersonModel('197182_7', Sex.Male, "Thomas"));
+    people.push(new PersonModel("R-Y34201", Sex.Male, "R-Y34201"));
+    people.push(new PersonModel("R-Y34202 ", Sex.Male, "R-Y34202"));
+    people.push(new PersonModel("R-E306", Sex.Male, "R-E306"));
+    people.push(new PersonModel("R-Y23202", Sex.Male, "R-Y23202"));
+    people.push(new PersonModel("R-FR123394", Sex.Male, "R-FR123394"));
+    people.push(new PersonModel("R-1211", Sex.Male, "R-1211"));
+    let f = new FamilyModel('197182', 'Shannon', 'R-Y34201', people);
+
     switch (id.toLowerCase()) {
+      case 'dna-segments': result = new DNAChromosomes(area); break;
+      case 'family-tree': result = new FamilyTreeModel(area, f, context); break;
       case 'timeline-decade': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.decade); break;
       case 'timeline-century': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.century); break;
-      default: result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.year);
+      default: result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.year,1844);
     }
 
     return result;
@@ -390,18 +430,18 @@ export class CanvasService {
       }
       self.BaseSystem.Lines.push(line);
     });
-    data.paths.forEach(function (d, i) {
-      self.BaseSystem.Paths.push(new PortPath(d.pathId, d.lineId));
-    });
+    //data.paths.forEach(function (d, i) {
+    //  self.BaseSystem.Paths.push(new PortPath(d.pathId, d.lineId));
+    //});
     setTimeout(() => this.messageService.sendMessage(1002), 0);
   }
 
   RetrievePathSuccess(data: any[]) {
     if (!this.BaseSystem) { return; }
     let self = this;
-    data.forEach(function (d, i) {
-      self.BaseSystem.Paths.push(new PortPath(d.PathId, d.LineId));
-    });
+    //data.forEach(function (d, i) {
+    //  self.BaseSystem.Paths.push(new PortPath(d.PathId, d.LineId));
+    //});
   }
 
   RetrieveShapeSuccess(data: any[], unitCellId: string) {
@@ -442,14 +482,14 @@ export class CanvasService {
             c.content,
             c.fromSource || false,
             c.angle);
-          s = new TextShape(
-            shape.id,
-            shape.top,
-            shape.left,
-            shape.width,
-            shape.height,
-            shape.displayValueId,
-            content);
+          //s = new TextShape(
+          //  shape.id,
+          //  shape.top,
+          //  shape.left,
+          //  shape.width,
+          //  shape.height,
+          //  shape.displayValueId,
+          //  content);
         }
         else if (shape.imageContent) {
           let c = shape.imageContent;
@@ -462,14 +502,14 @@ export class CanvasService {
             c.angle,
             0);
 
-          s = new ImageShape(
-            shape.id,
-            shape.top,
-            shape.left,
-            shape.width,
-            shape.height,
-            shape.displayValueId,
-            content);
+          //s = new ImageShape(
+          //  shape.id,
+          //  shape.top,
+          //  shape.left,
+          //  shape.width,
+          //  shape.height,
+          //  shape.displayValueId,
+          //  content);
         }
         else {
           s = new Rectangle(
@@ -482,29 +522,29 @@ export class CanvasService {
         }
         break;
     }
-    shape.ports.forEach(function (p, i) {
-      let port = new Port(
-        p.portId,
-        p.offsetX,
-        p.offsetY, s,
-        ePortType.source,
-        '',
-        p.pathId,
-        p.pathOrder);
-      s.AddPort(port);
-    });
-    shape.shapes.forEach(function (shp, i) {
-      let child = self.LoadShape(shp, s);
-      if (shp.textContent) {
-        s.AddContent(child as TextShape);
-      }
-      else if (shp.imageContent) {
-        s.AddContent(child as ImageShape);
-      }
-      else {
-        s.AddContent(child as ContentShape);
-      }
-    });
+    //shape.ports.forEach(function (p, i) {
+    //  let port = new Port(
+    //    p.portId,
+    //    p.offsetX,
+    //    p.offsetY, s,
+    //    ePortType.source,
+    //    '',
+    //    p.pathId,
+    //    p.pathOrder);
+    //  s.AddPort(port);
+    //});
+    //shape.shapes.forEach(function (shp, i) {
+    //  let child = self.LoadShape(shp, s);
+    //  if (shp.textContent) {
+    //    s.AddContent(child as TextShape);
+    //  }
+    //  else if (shp.imageContent) {
+    //    s.AddContent(child as ImageShape);
+    //  }
+    //  else {
+    //    s.AddContent(child as ContentShape);
+    //  }
+    //});
     return s;
   }
 
@@ -532,10 +572,10 @@ export class CanvasService {
     setTimeout(() => this.messageService.sendMessage(1001), 0);
   }
 
-  AddGeneral(id: any, containerState: string) {
-    this.BaseSystem.AddGeneralShape(id, containerState);
-    setTimeout(() => this.messageService.sendMessage(1001), 0);
-  }
+  //AddGeneral(id: any, containerState: string) {
+  //  this.BaseSystem.AddGeneralShape(id, containerState);
+  //  setTimeout(() => this.messageService.sendMessage(1001), 0);
+  //}
 
   AddLine(id: string, state: string, type: lineTypes, path: PortPath[] = []) {
     this.BaseSystem.AddLine(id, state, type, path);

@@ -7,6 +7,7 @@ import { ILine } from './Iline'
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { ShapeSelectResult } from '../shapes/shapeSelected';
 import { ContextModel } from 'src/canvas/component/context.model';
+import { IShape } from '../shapes/IShape';
 
 export enum lineTypes {
   straight = 0,
@@ -18,6 +19,8 @@ export enum lineTypes {
   HtoV = 13
 }
 
+
+
 export interface IPortPath {
   Id: string
 }
@@ -25,8 +28,7 @@ export class PortPath implements IPortPath {
 
   constructor(
     protected id: string,
-    protected lineId: string,
-    protected ports: Point[] = [],
+    protected ports: any[] = [],
     offsetX: number = 0,
     offsetY: number = 0) { }
 
@@ -38,110 +40,121 @@ export class PortPath implements IPortPath {
     return this.ports.length;
   }
 
-  get LineId() {
-    return this.lineId;
+  AddPorts(ports: Port[] ) {
+    this.ports.push(ports);
+  //  this.ports = this.ports.sort((a, b) => a.Position - b.Position);
   }
 
-  RemovePortPoint(oldpt: Point, newPoint: Point = null) {
-    let i = this.ports.findIndex(p => p.X == oldpt.X && p.Y == oldpt.Y);
+  DrawAreaPorts(context: any): void {
+    this.ports.forEach(function (pp, i) {
+      pp.forEach(p => p.Draw(context));
+    });
+  }
+
+  DrawPath(context: any, line: ILine) {
+    this.ports.forEach(function (p, i) {
+      let linePorts = (<Port[]>p).filter(pp => pp.LineId == line.Id);
+      line.DrawLine(context,linePorts.map(p => p.Center));
+    });
+  }
+  
+  RemovePortPoint(oldpt: Point) {
+    let i = this.ports.findIndex(p => p.Center.X == oldpt.X && p.Center.Y == oldpt.Y);
     if (i >= 0) {
-      if (newPoint) {
-        this.ports.splice(i, 1, newPoint);
-      }
-      else {
-        this.ports.splice(i, 1);
-      }
+      this.ports.splice(i, 1);
       return true;
     }
     return false;
   }
 
-  AddPortPoint(pt: Point, position: number = 0): number {
-    //switch (type) {
-    //}
-    this.ports.splice(position, 0, pt);
-    return this.ports.length - 1;
-  }
+  //AddPortPoint(pt: Point, position: number = 0): number {
+  //  //switch (type) {
+  //  //}
+  //  this.ports.splice(position, 0, pt);
+  //  return this.ports.length - 1;
+  //}
 
   Clear() {
     this.ports = [];
   }
 
   Update(lineId: string, type: lineTypes) {
-    this.lineId = lineId;
+   // this.lineId = lineId;
 
   }
 
-  SetInterimPorts(type: lineTypes) {
+  //SetInterimPorts(type: lineTypes) {
 
-    if (this.ports.length < 2) { return; }
-    let dx = this.ports[1].X - this.ports[0].X;
-    let dy = this.ports[1].Y - this.ports[0].Y;
-    let p = 0;
-    switch (type) {
+  //  if (this.ports.length < 2) { return; }
+  //  let dx = this.ports[1].Center.X - this.ports[0].Center.X;
+  //  let dy = this.ports[1].Center.Y - this.ports[0].Center.Y;
+  //  let p = 0;
+  //  //switch (type) {
 
-      case lineTypes.bezier:
-        //p = dx / 4;
-        //if (this.ports.length < 4) {
-        //  this.ports.push(new Point());
-        //  this.ports.push(new Point());
-        //}
-        //if (dx > 0) {
-        //  this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
-        //  this.ports[3].SetToPosition(this.ports[0].X + (p * 3), this.ports[3].Y + 10);
-        //}
-        //else {
-        //  this.ports[2].SetToPosition(this.ports[3].X + p, this.ports[3].Y - 10);
-        //  this.ports[3].SetToPosition(this.ports[3].X + (p * 3), this.ports[0].Y + 10);
-        //}
-        break;
-      case lineTypes.gradient:
-        //p = dx / 2;
-        //if (this.ports.length < 3) {
-        //  this.ports.push(new Point());
-        //}
-        //this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
-        break;
-      case lineTypes.VtoV:
-        if (this.ports.length < 4) {
-          this.ports.push(new Point());
-          this.ports.push(new Point());
-        }
-        p = this.ports[0].Y + ((this.ports[1].Y - this.ports[0].Y) / 2);
-        this.ports[2].SetToPosition(this.ports[1].X, p);
-        this.ports[3].SetToPosition(this.ports[0].X, p);
-        break;
-      case lineTypes.VtoH:
-        if (this.ports.length < 3) {
-          this.ports.push(new Point());
-        }
-        this.ports[2].SetToPosition(this.ports[1].X, this.ports[0].Y);
-        break;
-      case lineTypes.HtoH:
-        if (this.ports.length < 4) {
-          this.ports.push(new Point());
-          this.ports.push(new Point());
-        }
-        p = this.ports[0].X + ((this.ports[1].X - this.ports[0].X) / 2);
-        this.ports[2].SetToPosition(p, this.ports[1].Y);
-        this.ports[3].SetToPosition(p, this.ports[0].Y);
-        break;
-      case lineTypes.HtoV:
-        if (this.ports.length < 3) {
-          this.ports.push(new Point());
-        }
-        this.ports[2].SetToPosition(this.ports[0].X, this.ports[1].Y);
-        break;
+  //  //  case lineTypes.bezier:
+  //  //    //p = dx / 4;
+  //  //    //if (this.ports.length < 4) {
+  //  //    //  this.ports.push(new Point());
+  //  //    //  this.ports.push(new Point());
+  //  //    //}
+  //  //    //if (dx > 0) {
+  //  //    //  this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
+  //  //    //  this.ports[3].SetToPosition(this.ports[0].X + (p * 3), this.ports[3].Y + 10);
+  //  //    //}
+  //  //    //else {
+  //  //    //  this.ports[2].SetToPosition(this.ports[3].X + p, this.ports[3].Y - 10);
+  //  //    //  this.ports[3].SetToPosition(this.ports[3].X + (p * 3), this.ports[0].Y + 10);
+  //  //    //}
+  //  //    break;
+  //  //  case lineTypes.gradient:
+  //  //    //p = dx / 2;
+  //  //    //if (this.ports.length < 3) {
+  //  //    //  this.ports.push(new Point());
+  //  //    //}
+  //  //    //this.ports[2].SetToPosition(this.ports[0].X + p, this.ports[0].Y - 10);
+  //  //    break;
+  //  //  case lineTypes.VtoV:
+  //  //    if (this.ports.length < 4) {
+  //  //      this.ports.push(new Point());
+  //  //      this.ports.push(new Point());
+  //  //    }
+  //  //    p = this.ports[0].Y + ((this.ports[1].Center.Y - this.ports[0].Center.Y) / 2);
+  //  //    this.ports[2].SetToPosition(this.ports[1].Center.X, p);
+  //  //    this.ports[3].SetToPosition(this.ports[0].Center.X, p);
+  //  //    break;
+  //  //  case lineTypes.VtoH:
+  //  //    if (this.ports.length < 3) {
+  //  //      this.ports.push(new Point());
+  //  //    }
+  //  //    this.ports[2].SetToPosition(this.ports[1].Center.X, this.ports[0].Center.Y);
+  //  //    break;
+  //  //  case lineTypes.HtoH:
+  //  //    if (this.ports.length < 4) {
+  //  //      this.ports.push(new Point());
+  //  //      this.ports.push(new Point());
+  //  //    }
+  //  //    p = this.ports[0].X + ((this.ports[1].X - this.ports[0].X) / 2);
+  //  //    this.ports[2].SetToPosition(p, this.ports[1].Y);
+  //  //    this.ports[3].SetToPosition(p, this.ports[0].Y);
+  //  //    break;
+  //  //  case lineTypes.HtoV:
+  //  //    if (this.ports.length < 3) {
+  //  //      this.ports.push(new Point());
+  //  //    }
+  //  //    this.ports[2].SetToPosition(this.ports[0].X, this.ports[1].Y);
+  //  //    break;
 
-    }
-  }
+  //  //}
+  //}
 
   get Ports() { return this.ports; }
 
 
-  ResetToPort(port: Port) {
-
-    this.ports[port.PathPosition] = port.Center;
+  ResetToPort(position: number) {
+    let port = this.ports.find(p => p.Position == position);
+    if (port) {
+      port.CenterOn(port.Center.X, port.Center.Y);
+    }
   }
 }
 

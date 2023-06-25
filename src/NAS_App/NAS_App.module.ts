@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { d3Module } from '../d3/d3.module';
 import { D3Service } from '../d3/services/d3.service';
 import { FilterService } from './Services/filter/filter.service';
-import { NAS_APPPrimaryOutletPageComponent } from './NAS_APPPrimaryOutletPage.component'
 import { SystemInventoryComponent } from './Tools/SystemInventory.component';
 import { HRMProductionHistoryComponent } from './Hot_Mill/Production_Reports/HRMProductionHistory.component';
 import { NASRoute } from './NAS_APP.routes'

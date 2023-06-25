@@ -1,23 +1,39 @@
 import { Point } from "src/canvas/models/shapes/primitives/point";
 import { Rectangle } from "src/canvas/models/shapes/rectangle";
+import { EventContextLayer, IContextItem } from "src/canvas/models/IContextItem";
+import { IShape } from "src/canvas/models/shapes/IShape";
 
 export interface IMouseState {
-  State: number;
+  //State: number;
   GetDelta(previousPosition: Point, mousePosition: Point, delta: Point): Point;
+  EvaluatePoint(shape: IShape, point: Point);
+ // GetDeltaX(previousPosition: Point, mousePosition: Point, delta: Point): Point;
 }
 
 export class MouseStateUp implements IMouseState {
 
+  _selectedItem : IContextItem ;
   GetDelta(previousPosition: Point, mousePosition: Point, delta: Point): Point {
     delta.SetToPosition(0, 0);
     return delta;
   }
 
-  get State() { return 0; }
+  EvaluatePoint(shape: IShape, point : Point){
+    shape.Touch(point);
+  }
+  //GetDeltaX(previousPosition: Point, mousePosition: Point, delta: Point): Point {
+  //  let dx = mousePosition.X - previousPosition.X;
+  //  let dy = mousePosition.Y - previousPosition.Y;
+  //  delta.SetToPosition(dx, dy);
+  //  return delta;
+  //}
+
+  //get State() { return 0; }
 }
 
 export class MouseStateDown implements IMouseState {
 
+  _selectedItem: IContextItem;
   GetDelta(previousPosition: Point, mousePosition: Point, delta: Point): Point {
     let dx = mousePosition.X - previousPosition.X;
     let dy = mousePosition.Y - previousPosition.Y;
@@ -25,7 +41,15 @@ export class MouseStateDown implements IMouseState {
     return delta;
   }
 
-  get State() { return 1; }
+  EvaluatePoint(shape: IShape, point: Point) {
+  //  shape.Move(delta);
+  }
+  //GetDeltaX(previousPosition: Point, mousePosition: Point, delta: Point): Point {
+  //  delta.SetToPosition(0, 0);
+  //  return delta;
+  //}
+
+  //get State() { return 1; }
 
 }
 
@@ -38,8 +62,11 @@ export interface IActionItem {
   mouseRelease(): void;
 }
 
+
 export class ActionItemsss implements IActionItem {
 
+  _selectedItem: IContextItem;
+  //Tracker
   protected _mousePosition: Point = new Point();
   private _previousPosition: Point = new Point();
   private _delta: Point = new Point();
@@ -55,9 +82,12 @@ export class ActionItemsss implements IActionItem {
     this._mouseState = this._mouseStateUp;
   }
 
-
   get mouseState(): IMouseState { return this._mouseState; }
   get mousePosition() { return this._mousePosition; }
+
+  Track(layer: EventContextLayer, context: CanvasRenderingContext2D, event: any, boundingArea: Rectangle) {
+
+  }
 
   mouseCapture(event: any, boundingArea: Rectangle): Point {
     this._mouseState = this._mouseStateDown;
@@ -73,10 +103,11 @@ export class ActionItemsss implements IActionItem {
   }
 
   mouseMove(event: any, boundingArea: Rectangle): Point {
-    this._delta.SetToPosition(0, 0);
-    this.positionFromEvent(event, boundingArea);
-    this.Delta();
-    this._previousPosition.SetToPosition(this.mousePosition.X, this.mousePosition.Y);
+   // this._delta.SetToPosition(0, 0);
+   // this.positionFromEvent(event, boundingArea);
+   // this.Delta();
+   //// this._mouseState.EvaluatePoint(this._selectedItem,this.mousePosition);
+   // this._previousPosition.SetToPosition(this.mousePosition.X, this.mousePosition.Y);
     return this._delta;
   }
 
@@ -100,3 +131,28 @@ export class ActionItemsss implements IActionItem {
   get dY() { return this._delta.Y; }
 
 }
+
+export class ActionItemMouseUpState extends ActionItemsss {
+
+  Track(layer: EventContextLayer, context: CanvasRenderingContext2D, event: any, boundingArea: Rectangle) {
+    this.mouseMove(event, boundingArea);
+    //if (this._tracker.TouchNewItem(layer,context,this.mousePosition.X, this.mousePosition.Y)) {
+      
+    //  layer.ClearContext(context);
+    //  this._tracker.Draw(context, true);
+    //}
+ 
+  }
+}
+
+export class ActionItemMouseDownState extends ActionItemsss  {
+
+  Track(layer: EventContextLayer, context: CanvasRenderingContext2D, event: any, boundingArea: Rectangle) {
+    this.mouseMove(event, boundingArea);
+    layer.ClearContext(context);
+  //  this._tracker.MoveItem(this.dX, this.dY);
+  //  this._tracker.Draw(context, true);
+  }
+
+}
+

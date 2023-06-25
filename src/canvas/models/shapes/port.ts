@@ -5,60 +5,55 @@ import { IContextItem, AreaTracker } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { StateIndex, DisplayValues } from '../DisplayValues';
 
-export enum ePortType {
-  source = 0,
-  target = 1
-}
+//export enum ePortType {
+//  source = 0,
+//  target = 1
+//}
 export class Port implements IShape, IContextItem {
-
-  internalShape: IShape;
-  private _parentShapeId: string = '';
+  
   private _stateIndex: StateIndex;
+  private _hit: boolean = false;
 
   constructor(private id: string,
     private offsetX: number,
     private offsetY: number,
-    parent: IShape,
-    private type: ePortType ,
+    private parentShapeId: string,
+    private lineId:string,
     stateName: string,
-    private pathId: string,
-    private zindex: number = 0,
-    private pathPosition: number = -1
+    private internalShape: IShape,
+    private position: number
   ) {
-    this.internalShape = new Ellipse(id + "_*", 0, 0, 5, 5, stateName);
-    this._parentShapeId = parent.Id;
-    this.SetPortToParent(parent.Top, parent.Right, parent.Bottom, parent.Left);
     this._stateIndex = DisplayValues.GetShapeIndex(stateName);
   }
 
-  Tracker(): ITracker {
-    return null;
+  get LineId() {
+    return this.lineId;
   }
+
+  //InitializeContext(context: CanvasRenderingContext2D) { };
 
   get StateIndex(): StateIndex {
     return this._stateIndex;
   }
 
-  get zIndex() { return this.zindex; }
-
-  SetPortToParent(top: number, right: number, bottom: number, left: number) {
-    let w = (right - left) / 2;
-    let h = (bottom - top) / 2;
-    let cx = left + w;
-    let cy = top + h;
-    let x = Math.round(cx + (w * (this.offsetX / 100)));
-    let y = Math.round(cy + (h * (this.offsetY / 100)));
-    this.internalShape.CenterOn(x, y);
-  }
-
+  get zIndex() { return this.internalShape.zIndex; }
+  
   get IsHit(): boolean{
     return false;
+  }
+////  public DrawContent(context: any) { this.internalShape.DrawContent(context); }
+
+  public HitTest(point: Point): boolean {
+    const x = point.X;
+    const y = point.Y;
+    this._hit = (x >= this.Left && x <= this.Right
+      && y >= this.Top && y <= this.Bottom);
+    return this._hit;
   }
 
   Save(): any {
     let model = {
-      ShapeId: this._parentShapeId,
-      PathId: this.pathId,
+      ShapeId: this.parentShapeId,
       PortId: this.id,
       OffsetX: this.offsetX,
       OffsetY: this.offsetY
@@ -66,9 +61,13 @@ export class Port implements IShape, IContextItem {
     return model;
   }
 
+  IsPointInShape(point: Point) { return this.internalShape.IsPointInShape(point); }
+
   get StateName(): string {
     return this.internalShape.StateName;
   }
+
+  Touch(point: Point) { }
 
   public get AreaType() {
     return this.internalShape.AreaType;
@@ -91,11 +90,11 @@ export class Port implements IShape, IContextItem {
   }
 
   get ParentShapeID() {
-    return this._parentShapeId;
+    return this.parentShapeId;
   }
 
-  get PortType(): ePortType {
-    return this.type;
+  get Position(): number {
+    return this.position;
   }
 
   //get Class(): string {
@@ -116,13 +115,8 @@ export class Port implements IShape, IContextItem {
     this.internalShape.CenterOn(x, y);
   }
 
-  get PathId() {
-    return this.pathId;
-  }
-
-  get PathPosition() {
-    return this.pathPosition;
-  }
+  
+  ClearHit(){};
 
   //LinePathPoint(path: PortPath) {
   //  if (this.pathId != path.Id) { return null; }
@@ -145,6 +139,10 @@ export class Port implements IShape, IContextItem {
     this.internalShape.MoveBy(x, y);
   }
 
+  MoveTo(x: number, y: number) {
+    this.internalShape.MoveTo(x, y);
+  }
+
   Track(point: Point, tracker: AreaTracker): boolean {
 
     return false; // this.SelectContentFromPoint(point) && tracker.Reset(this);
@@ -152,11 +150,11 @@ export class Port implements IShape, IContextItem {
   }
 
   get ParentShapeId() {
-    return this._parentShapeId;
+    return this.parentShapeId;
   }
 
-  SizeBy(context : any,top: number, right: number, bottom: number, left: number) {
-    this.SetPortToParent(top, right, bottom, left);
+  SizeBy(context: any, top: number, right: number, bottom: number, left: number) {
+    this.internalShape.SizeBy(context,top, right, bottom, left);
   }
 
 
@@ -170,6 +168,7 @@ export class Port implements IShape, IContextItem {
   get Height(): number { return this.internalShape.Height; }
 
   get Center(): Point { return this.internalShape.Center; }
+
   get OffsetX() {
     return this.offsetX;
   }

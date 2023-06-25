@@ -2,11 +2,12 @@ import { IShape } from './shapes/IShape';
 import { ILine } from './lines/ILine';
 import { Point } from '../models/shapes/primitives/point';
 import { CanvasService } from '../service/canvas.service';
+import { Rectangle } from './shapes/rectangle';
 
 export class NamedValue<T> {
 
   constructor(private valueName: string = '',
-    private value: T) { }
+    private value: T) {}
 
   get Name() { return this.valueName; }
   get Value() { return this.value; }
@@ -20,7 +21,10 @@ export enum UIStates {
   color = 3,
   weight = 4,
   fontFace = 5,
-  stateCount = 6
+  gradientColor = 6,
+  gradientArea = 7,
+  gradient = 8,
+  stateCount = 9
 }
 
 export class StateIndex {
@@ -60,6 +64,9 @@ export class DisplayValues {
   private static color: NamedValue<string>[] = [];
   private static weight: NamedValue<number>[] = [];
   private static fonts: NamedValue<string>[] = [];
+  private static gradientColor: NamedValue<string>[] = [];
+  private static gradientArea: NamedValue<Rectangle>[] = [];
+  private static gradients: NamedValue<CanvasGradient>[] = [];
   public static width: number = 0;
   public static height: number = 0;
 
@@ -81,6 +88,23 @@ export class DisplayValues {
     return names;
   }
 
+  static SetContextItems(context: CanvasRenderingContext2D) {
+    this.gradientColor.forEach(v => this.CreateGradient(v, context));
+  }
+
+  static CreateGradient(value: NamedValue<string>, context: CanvasRenderingContext2D) {
+    let ga = this.gradientArea.find(g => g.Name == value.Name);
+    let area = ga.Value;
+    let gradient = context.createLinearGradient(area.Left, area.Top, area.Right, area.Bottom);
+    let x = this.color.find(c => c.Name == value.Name);
+    let clr = x.Value;
+    gradient.addColorStop(0, "#232312" );
+    gradient.addColorStop(.5, value.Value );
+    gradient.addColorStop(.5, value.Value );
+    gradient.addColorStop(1, "#232312");
+    this.gradients.push(new NamedValue(value.Name, gradient));
+  }
+
   static FGColorIndex(name: string) {
     return this.fgcolor.findIndex(c => c.Name == name);
   }
@@ -89,8 +113,40 @@ export class DisplayValues {
     return this.color.findIndex(c => c.Name == name);
   }
 
+  static GradientColorIndex(name: string) {
+    return this.gradientColor.findIndex(c => c.Name == name);
+  }
+
+  static GradientIndex(name: string) {
+    return this.gradients.findIndex(c => c.Name == name);
+  }
+
+  static GradientAreaIndex(name: string) {
+    return this.gradientArea.findIndex(c => c.Name == name);
+  }
+
   static WeightIndex(name: string) {
     return this.weight.findIndex(c => c.Name == name);
+  }
+
+  static SetGradientColor(name: string, color: string) {
+    let ndx = this.GradientColorIndex(name);
+    if (ndx >= 0) {
+      this.gradientColor.splice(ndx, 1, new NamedValue(name, color));
+    }
+    else {
+      this.gradientColor.push(new NamedValue(name, color));
+    }
+  }
+
+  static SetGradientArea(name: string, area: Rectangle) {
+    let ndx = this.GradientAreaIndex(name);
+    if (ndx >= 0) {
+      this.gradientArea.splice(ndx, 1, new NamedValue(name, area));
+    }
+    else {
+      this.gradientArea.push(new NamedValue(name, area));
+    }
   }
 
   static SetFGColor(name: string, color: string) {
@@ -153,10 +209,40 @@ export class DisplayValues {
     if (index >= this.color.length) {
       return this.GetColor(index - 1);
     }
+    if (!index || index < 0) {
+      index = 0;
+    }
+    return this.color[index].Value;
+  }
+
+  static GetGradient(index: number) {
+    if (index >= this.gradients.length) {
+      return this.GetGradient(index - 1);
+    }
+    if (!index || index < 0) {
+      index = 0;
+    }
+    return this.gradients[index].Value;
+  }
+
+  static GetGradientColor(index: number) {
+    if (index >= this.color.length) {
+      return this.GetGradientColor(index - 1);
+    }
     if (!index || index < 0) { 
       index = 0; 
     }
-    return this.color[index].Value;
+    return this.gradientColor[index].Value;
+  }
+
+  static GetGradientArea(index: number): Rectangle {
+    if (index >= this.color.length) {
+      return this.GetGradientArea(index - 1);
+    }
+    if (!index || index < 0) {
+      index = 0;
+    }
+    return this.gradientArea[index].Value;
   }
 
   static GetFGColor(index: number) {
@@ -237,16 +323,18 @@ export class DisplayValues {
    return stateIndex;
   }
 
-  static GetShapeIndex(name: string, background: string = '', border: string = ''): StateIndex {
+  static GetShapeIndex(name: string, background: string = '', border: string = '', foreground: string = ''): StateIndex {
     if (name.length <= 0) { name = 'DefaultBG'; }
     if (background.length <= 0) { background = name; }
-    if (border.length <= 0) { border = background; }
+    if (border.length <= 0) { border = name; }
+
     let stateIndex = new StateIndex(name);
-    let ndx = this.ColorIndex(background);
-    stateIndex.setState(UIStates.background, ndx);
-    ndx = this.ColorIndex(border);
-    stateIndex.setState(UIStates.weight, ndx);
-    stateIndex.setState(UIStates.foreground, ndx);
+    stateIndex.setState(UIStates.background, this.ColorIndex(background));
+    stateIndex.setState(UIStates.weight, this.WeightIndex(border));
+    stateIndex.setState(UIStates.foreground, this.FGColorIndex(name));
+    stateIndex.setState(UIStates.gradientColor, this.GradientColorIndex(name));
+    stateIndex.setState(UIStates.gradient, this.GradientIndex(name));
+
     return stateIndex;
   }
 

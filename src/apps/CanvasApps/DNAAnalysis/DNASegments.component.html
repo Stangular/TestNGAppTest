@@ -1,0 +1,52 @@
+<mat-grid-list [cols]="66"
+               [rowHeight]="30">
+  <mat-grid-tile [colspan]="1"
+                 [rowspan]="30"
+                 [style.background]="'red'">
+  </mat-grid-tile>
+
+  <mat-grid-tile [colspan]="64"
+                 [rowspan]="1"
+                 [style.background]="'transparent'"
+                 class="script-menu">
+    <button mat-button class="upload-button" (click)="fileInput.click()">Open</button>
+    <input hidden
+           type="file"
+           multiple
+           #fileInput
+           (change)="OpenDNASegments($event)">
+
+    <button mat-button class="upload-button" (click)="ProcessResult()">Process</button>
+    <button mat-button class="upload-button" (click)="FindCommon()">Common</button>
+    <button mat-button class="upload-button" (click)="FindCommonXX1()">XX1</button>
+
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="1"
+                 [rowspan]="30"
+                 [style.background]="'red'">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="10"
+                 [rowspan]="1"
+                 class="script-menu"
+                 *ngFor="let n of members">
+    <span  style="padding-left:20px">
+      <mat-checkbox
+        (change)="setMemberSelection(n)">
+        <input readonly class="member" value={{n.name}}/>
+      </mat-checkbox>
+    </span>
+  </mat-grid-tile>
+
+  <mat-grid-tile [colspan]="64"
+                 [rowspan]="canvas_size"
+                 [style.background]="'transparent'">
+    <action-canvas #dnaSegmentCanvas
+                   [canvasID]="'dna-segments'"
+                   [width]="100"
+                   [layerName]="'dna-segments'"
+                   [height]="30"></action-canvas>
+  </mat-grid-tile>
+</mat-grid-list>
+<ul>
+  <li *ngFor="let n of _matchList; index as i">{{n}}</li>
+</ul>

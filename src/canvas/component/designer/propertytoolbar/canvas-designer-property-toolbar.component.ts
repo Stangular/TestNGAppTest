@@ -18,7 +18,6 @@ import { UpdateLineDialog } from 'src/ui/components/views/form/dialogs/addline/u
 import { LineService } from 'src/canvas/models/lines/service/line.service';
 import { PortService } from 'src/canvas/models/shapes/service/port.service';
 import { eContentType } from 'src/canvas/models/shapes/shapeSelected';
-import { ePortType } from 'src/canvas/models/shapes/port';
 import { lineTypes, PortPath } from 'src/canvas/models/lines/line';
 import { PathService } from 'src/canvas/models/shapes/service/path.service';
 import { ShapePropertyDialogComponent } from '../../dialogs/shape/shapePropertyDialog.component';
@@ -323,8 +322,8 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
         freedomOfMotion: this.canvasService.ActiveShape.FreedomOfMotion,
         freedomOfSizing: this.canvasService.ActiveShape.FreedomOfSizing,
         width: this.canvasService.ActiveShape.Width,
-        height: this.canvasService.ActiveShape.Height,
-        port: { result: 'update', offsetX: 10, offsetY: 10, path: '', name: '', type: ePortType.source, paths: this.canvasService.BaseSystem.Paths }
+        height: this.canvasService.ActiveShape.Height
+  //      port: { result: 'update', offsetX: 10, offsetY: 10, path: '', name: '', type: ePortType.source, paths: this.canvasService.BaseSystem.Paths }
       }
     });
 
@@ -361,8 +360,8 @@ export class CanvasDesignerPropertyToolbarComponent implements OnInit, OnDestroy
   ManagePorts(): void {
     //  this.portService.a
     const dialogRef = this.dialog.open(UpdatePortDialog, {
-      width: '350px',
-      data: { result: 'update', offsetX: 10, offsetY: 10, path: '', name: '', type: ePortType.source, paths: this.canvasService.BaseSystem.Paths }
+      width: '350px'
+   //   data: { result: 'update', offsetX: 10, offsetY: 10, path: '', name: '', type: ePortType.source, paths: this.canvasService.BaseSystem.Paths }
     });
     dialogRef.afterClosed().subscribe(result => {
       //add to port service...

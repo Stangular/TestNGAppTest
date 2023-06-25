@@ -4,7 +4,7 @@ import { ContextLayer, ActionLayer } from "../../IContextItem";
 import { DisplayValues } from "../../DisplayValues";
 import { lineTypes } from "../../lines/line";
 import { Ellipse } from "../../shapes/ellipse";
-import { Port, ePortType } from "../../shapes/port";
+import { Port } from "../../shapes/port";
 import { Point } from "../../shapes/primitives/point";
 import { IActionItem, ActionItemsss, IMouseState } from "src/canvas/component/layers/Interfaces/IActionLayer";
 import { Action } from "rxjs/internal/scheduler/Action";

@@ -5,6 +5,7 @@ import { NAS_APPPrimaryOutletPageComponent } from 'src/NAS_App/NAS_APPPrimaryOut
 import { LoginComponent } from './login/login.component';
 import { LostCauseComponent } from 'src/apps/LostCauseAnalysis/LostCause.component';
 import { SiteMapComponent } from './common/site-map/site-map.component';
+import { DNASegmentsComponent } from 'src/apps/CanvasApps/DNAAnalysis/DNASegments.component';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,9 @@ export const routes: Routes = [
   }
   , {
     path: 'Lost_Cause', component: LostCauseComponent
+  }
+  , {
+    path: 'DNA_Segments', component: DNASegmentsComponent
   },
   {
     path: 'login', component: LoginComponent

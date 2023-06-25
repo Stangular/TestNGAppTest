@@ -1,70 +1,70 @@
 import { ImageContent } from '../Content';
-import { ContentShape } from '../ContentShape';
+//import { ContentShape } from '../ContentShape';
 import { ContextModel } from 'src/canvas/component/context.model';
 
 const localImagePath = '../images/';
 
-export class ImageShape extends ContentShape {
+//export class ImageShape extends ContentShape {
 
-  constructor(
-    id: string,
-    top: number,
-    left: number,
-    width: number,
-    height: number,
-    state: string,
-    content: ImageContent,
-    zIndex : number = 0 ) {
-    super(id, top, left, width, height,state, content,zIndex);
+//  constructor(
+//    id: string,
+//    top: number,
+//    left: number,
+//    width: number,
+//    height: number,
+//    state: string,
+//    content: ImageContent,
+//    zIndex : number = 0 ) {
+//    super(id, top, left, width, height,state, content,zIndex);
 
-  }
+//  }
 
-  DrawShape(context: CanvasRenderingContext2D): void {
+//  DrawShape(context: CanvasRenderingContext2D): void {
 
-    this.content.Draw(context, this);
+//    this.content.Draw(context, this);
 
-  }
+//  }
 
-  Draw(context: CanvasRenderingContext2D): void {
+//  Draw(context: CanvasRenderingContext2D): void {
 
-    this.DrawShape(context);
-  }
+//    this.DrawShape(context);
+//  }
 
-  get ImageIndex() {
-    return (<ImageContent>this.content).ImageIndex;
-  }
+//  get ImageIndex() {
+//    return (<ImageContent>this.content).ImageIndex;
+//  }
 
-  CopyShape(newID: string): ImageShape {
+//  CopyShape(newID: string): ImageShape {
 
-    return new ImageShape(newID, this.Top + 10, this.Left + 10, this.Width, this.Height,this.StateName, this.content as ImageContent);
-  }
+//    return new ImageShape(newID, this.Top + 10, this.Left + 10, this.Width, this.Height,this.StateName, this.content as ImageContent);
+//  }
 
-  CopyItem(newID: string) {
-    return this.CopyShape(newID);
-  }
+//  CopyItem(newID: string) {
+//    return this.CopyShape(newID);
+//  }
 
-  Save(): any {
+//  Save(): any {
 
-    return {
-      Id: this.Id,
-      Top: Math.ceil(this.Top),
-      Left: Math.ceil(this.Left),
-      Width: Math.ceil(this.width),
-      Height: Math.ceil(this.height),
-      Type: 0,
-      CornerRadius: 0,
-      Shadow: 0,
-      DisplayValueId: this.StateName,
-      Ports: [],
-      Shapes: [],
-      ImageContent: {
-        Id: this.content.Id,
-        Content: this.content.Content,
-        Code: 1,
-        ParentShapeId: this.Id,
-        DisplayValueId: this.content.State,
-        angle: this.content.Angle
-      }
-    }
-  }
-}
+//    return {
+//      Id: this.Id,
+//      Top: Math.ceil(this.Top),
+//      Left: Math.ceil(this.Left),
+//      Width: Math.ceil(this.width),
+//      Height: Math.ceil(this.height),
+//      Type: 0,
+//      CornerRadius: 0,
+//      Shadow: 0,
+//      DisplayValueId: this.StateName,
+//      Ports: [],
+//      Shapes: [],
+//      ImageContent: {
+//        Id: this.content.Id,
+//        Content: this.content.Content,
+//        Code: 1,
+//        ParentShapeId: this.Id,
+//        DisplayValueId: this.content.State,
+//        angle: this.content.Angle
+//      }
+//    }
+//  }
+//}

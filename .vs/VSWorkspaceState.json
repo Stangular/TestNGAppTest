@@ -2,15 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\src",
+    "\\src\\app",
+    "\\src\\apps",
+    "\\src\\apps\\CanvasApps",
+    "\\src\\apps\\CanvasApps\\DNAAnalysis",
     "\\src\\canvas",
-    "\\src\\canvas\\component",
-    "\\src\\canvas\\component\\dialogs",
-    "\\src\\canvas\\component\\dialogs\\shape",
-    "\\src\\canvas\\component\\layers",
-    "\\src\\canvas\\component\\layers\\Edit",
     "\\src\\canvas\\models",
-    "\\src\\canvas\\models\\concepts"
+    "\\src\\canvas\\models\\concepts",
+    "\\src\\canvas\\models\\concepts\\Family"
   ],
-  "SelectedNode": "\\src\\canvas\\component\\canvas.component.ts",
+  "SelectedNode": "\\src\\apps\\CanvasApps\\DNAAnalysis\\DNASegments.component.ts",
   "PreviewInSolutionExplorer": false
 }

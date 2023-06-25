@@ -47,7 +47,7 @@
           <mat-icon *ngIf="!sidePanelOpen" aria-label="Open Side Panel">keyboard_arrow_right</mat-icon>
         </button>
       </mat-grid-tile>
-      <mat-grid-tile [colspan]="62"
+      <!--<mat-grid-tile [colspan]="62"
                      [rowspan]="2"
                      [style.background]="'transparent'">
 
@@ -57,7 +57,7 @@
                        [height]="30"></action-canvas>
 
 
-      </mat-grid-tile>
+      </mat-grid-tile>-->
 
       <mat-grid-tile [colspan]="1"
                      [rowspan]="4"
@@ -67,6 +67,10 @@
       <mat-grid-tile [colspan]="62"
                      [rowspan]="2"
                      [style.background]="'blue'">
+        <action-canvas [canvasID]="'family-tree'"
+                       [width]="100"
+                       [layerName]="'family-tree'"
+                       [height]="30"></action-canvas>
       </mat-grid-tile>
     </mat-grid-list>
   </mat-drawer-content>

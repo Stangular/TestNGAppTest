@@ -4,12 +4,12 @@ import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
 import { IContextItem, AreaTracker, AreaSizer } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { Line, PortPath } from '../lines/line';
-import { ePortType, Port } from './port';
-import { ImageShape } from './content/image/image';
+//import { ePortType, Port } from './port';
+//import { ImageShape } from './content/image/image';
 import { IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
 import { Content, TextContent, IDynamicContent } from './content/Content';
-import { ContentShape } from './content/ContentShape';
-import { TextShape } from './content/text/text';
+//import { ContentShape } from './content/ContentShape';
+//import { TextShape } from './content/text/text';
 
 export enum OffsetStyle {
   constane = 0,   // Does not change position as parent shape is resized
@@ -26,14 +26,24 @@ export class ContainedShape {
 
 export abstract class Shape implements IShape {
 
+  
+  protected _touchedContent
   protected _hit = false;
   protected _center: Point = new Point();
   protected _unitCell: string = '';
   protected _areaType: AreaType = AreaType.normal;
   protected _freedomOfMotion: FreedomOfMotion = FreedomOfMotion.full;
   protected _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
-  protected _content: ContentShape[] = [];
   private _tracked: boolean = false;
+
+
+  public HitTest(point: Point): boolean {
+    const x = point.X;
+    const y = point.Y;
+    this._hit = (x >= this.Left && x <= this.Right
+      && y >= this.Top && y <= this.Bottom);
+    return this._hit;
+  }
 
  // protected _imageContent: ImageShape[] = [];
  // protected _generalContent: Shape[] = [];
@@ -50,14 +60,13 @@ export abstract class Shape implements IShape {
     protected height: number,
     private stateName: string,
     private _zIndex: number = 0,
-    private hitState: string = stateName ) {
+    private hitState: string = stateName) {
 
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
 
   }
-
   get zIndex() { return this._zIndex; }
 
   SetProperties(properties: any) {
@@ -107,64 +116,32 @@ export abstract class Shape implements IShape {
   abstract CopyItem(newID: string): IContextItem;
   abstract Save(): any;
 
-  ShiftContent(point: Point, boundingAreaRight: number) {
-   // this.MoveIfHit(point);
-    let self = this;
-    let len = this.Contents.length;
-    let offset = this.Contents[len - 1].Left;
-    let top = this.Contents[len - 1].Top;
-    let limit = boundingAreaRight + (this.Contents[0].Width * 3);
-    let items = this.Contents.filter(c => c.Left > limit);
-    this.Contents.splice(0, items.length);// Remove the items from the front 
-    items.forEach(function (c, i) {
-      offset -= c.Width;
-      c.MoveTo(offset, top);
-      c.Content.Update(-len);
-      self.Contents.push(c); // and add them to the end...
-    });
-    items = this.Contents.filter(c => c.Left > boundingAreaRight);
-    let lenx = 3 - items.length;
-    if (lenx > 0) {
-      items = this.Contents.splice(len - lenx, lenx).reverse();
-      offset = this.Contents[0].Right;
-      items.forEach(function (c, i) {
-        c.MoveTo(offset, top);
-        c.Content.Update(len);
-        self.Contents.unshift(c); // and add them to the end...
-        offset += c.Width;
-      });
-    }
-  }
 
+  Touch(point: Point) {}
+  
   //Resize(sizer: AreaSizer) {
   //  if (this.IsHit) {
   //    sizer.ResizeShape();
   //  }
   //}
 
-  LinePath(path: PortPath) {
-    if (path) {
-      this._ports.forEach(p => path.AddPortPoint(p.Center));
-    }
-  }
+  //LinePath(path: PortPath) {
+  //  if (path) {
+  //    this._ports.forEach(p => path.AddPortPoint(p.Center));
+  //  }
+  //}
 
   ClearHit() {
+    if (this._hit) {
+      console.error("hit to not hit");
+    }
     this._hit = false;
-    this.Contents.forEach(c => c.ClearHit());
+
+//    this.Contents.forEach(c => c.Shape.ClearHit());
   }
 
-  SelectContentFromPoint(point: Point): boolean {
-    this._hit = this.Contents.some(c => c.SelectContentFromPoint(point))
-      || this.IsPointInShape(point);
-
-    return this._hit;
-  }
-
-
-
-  Tracker(): ITracker {
-    return null;
-  }
+ 
+  
 
   //Track(point: Point = null, tracker: AreaTracker = null): boolean {
 
@@ -180,13 +157,13 @@ export abstract class Shape implements IShape {
   }
 
   Select(point: Point) {
-    let ndx = this._content.findIndex(s => s.Select(point));
-    if (ndx >= 0) {
+   // let ndx = this._content.findIndex(s => s.Shape.Select(point));
+    //if (ndx >= 0) {
 
 //      shapeSelectResult.itemCaptured = true;
  //     shapeSelectResult.id = this._textContent[ndx].Id;
-      return true;
-    }
+   //   return true;
+   // }
 //    ndx = this._imageContent.findIndex(s => s.Select(shapeSelectResult));
 //    if (ndx >= 0) {
 // //     shapeSelectResult.itemCaptured = true;
@@ -220,7 +197,8 @@ export abstract class Shape implements IShape {
   }
 
   public clearContent() {
-    this._content = [];
+  //  this._content = [];
+    this._ports = [];
   }
 
   //public clearImageContent() {
@@ -251,28 +229,28 @@ export abstract class Shape implements IShape {
 
   public DrawContent(context: any) {
     this.Draw(context);
-    this._content.forEach(s => s.Draw(context));
+ //   this._content.forEach(s => s.Draw(context));
    // this._imageContent.forEach(s => s.Draw(context));
     //this._generalContent.forEach(s => s.Draw(context));
 
     this._ports.forEach(p => p.Draw(context));
   }
 
-  SetShapes(shapes: ContentShape[] = []) {
-    this._content = shapes.concat([]);
-  }
+  //SetShapes(shapes: Content[] = []) {
+  //  this._content = shapes.concat([]);
+  //}
 
-  AddShapes(shapes: ContentShape[]) {
-    if (shapes) {
-      this._content = this._content.concat(shapes);
-    }
-  }
+  //AddShapes(shapes: Content[]) {
+  //  //if (shapes) {
+  //  //  this._content = this._content.concat(shapes);
+  //  //}
+  //}
 
-  AddContent(shape: ContentShape) {
-    if (shape) {
-      this._content.push(shape);
-    }
-  }
+  //AddContent(shape: Content) {
+  //  if (shape) {
+  //    //this._content.push(shape);
+  //  }
+  //}
 
   //AddImageShape(shape: ImageShape) {
   //  if (shape) {
@@ -286,9 +264,10 @@ export abstract class Shape implements IShape {
   //  }
   //}
 
-  get ChildShape(): Shape {
-    return this.Contents.find(s => s.IsHit ) as Shape;
-  }
+  //get ChildShape(): Shape {
+  //  var c = this.Contents.find(s => s.Shape.IsHit);
+  //  return null;
+  //}
 
   SelectShape(shapeSelectResult: ShapeSelectResult): boolean {
     return this.IsPointInShape(shapeSelectResult.point);
@@ -323,7 +302,7 @@ export abstract class Shape implements IShape {
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._ports.forEach((p, i) => p.MoveBy(x, y));
-    this._content.forEach((s, i) => s.MoveBy(x, y));
+   // this._content.forEach((s, i) => s.Shape.MoveBy(x, y));
  //   this._imageContent.forEach((s, i) => s.MoveBy(x, y));
  //   this._generalContent.forEach((s, i) => s.MoveBy(x, y));
   }
@@ -404,6 +383,7 @@ export abstract class Shape implements IShape {
     this.left = x - (this.width / 2);
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
+   // this.Contents.forEach(c => c.Shape.CenterOn(x, y));
   }
 
   positionOnTick(x: number, y: number) {
@@ -418,12 +398,23 @@ export abstract class Shape implements IShape {
   }
 
   public IsPointInShape(point: Point) {
-    return (point != null && this.top < point.Y && this.Bottom > point.Y
+    this._hit = (point != null && this.top < point.Y && this.Bottom > point.Y
       && this.left < point.X && this.Right > point.X);
+    return this._hit;
   }
 
-  public IsPointInContent(point: Point) {
-    return this._content.findIndex(c => c.IsPointInShape(point));
+  //public IsPointInContent(point: Point) {
+  //  return this._content.findIndex(c => c.Shape.IsPointInShape(point));
+  //}
+
+  public RemoveContentAtPoint(point: Point): IShape {
+    //let i = this._content.findIndex(c => c.Shape.IsPointInShape(point));
+    //if (i >= 0) {
+    //  let c = this._content[i];
+    //  this._content.splice(i, 1);
+    //  return c.Shape;
+    //}
+    return null;
   }
 
   //AddPort( id: string,
@@ -459,9 +450,9 @@ export abstract class Shape implements IShape {
     return this._ports;
   }
 
-  get Contents() {
-    return this._content;
-  }
+  //get Contents() {
+  //  return this._content;
+  //}
 
   //get ImageContent() {
   //  return this._imageContent;
@@ -485,6 +476,73 @@ export abstract class Shape implements IShape {
 //    super();
 //  }
 //}
+
+export class ShapeContainer {
+
+  constructor(
+    private Contents: IShape[] = []) {
+  }
+
+  AddContent(content: IShape) {
+    try {
+      content.ClearHit();
+      this.Contents.unshift(content);
+    }
+    catch (e) {
+      console.error("Tried to add invalid content");
+    }
+  }
+
+  RemoveItemAtPoint(point: Point) : IShape {
+    let i = this.Contents.findIndex(c => c.IsPointInShape(point));
+    let c = this.Contents.splice(i, 1);
+    return c[0];
+  }
+  //MeasureText(ctx: CanvasRenderingContext2D, content : string): number {
+  //  let result: number = 0;
+  //  ctx.save();
+  //  ctx.font = height + "px " + DisplayValues.GetFont(state.Index[UIStates.fontFace]);
+  //  let width = ctx.measureText(this.Content).width;
+  //  ctx.restore();
+  //  return result;
+  //}
+
+  ShiftContent(point: Point, boundingAreaRight: number) {
+    let self = this;
+    let len = this.Contents.length;
+    let offset = this.Contents[len - 1].Left;
+    let top = this.Contents[len - 1].Top;
+    let limit = boundingAreaRight + (this.Contents[0].Width * 3);
+    let items = this.Contents.filter(c => c.Left > limit);
+    this.Contents.splice(0, items.length);// Remove the items from the front 
+    items.forEach(function (c, i) {
+      offset -= c.Width;
+      c.MoveTo(offset, top);
+      self.Contents.push(c); // and add them to the end...
+    });
+    items = this.Contents.filter(c => c.Left > boundingAreaRight);// Remove items from the end
+    let lenx = 3 - items.length;
+    if (lenx > 0) {
+      items = this.Contents.splice(len - lenx, lenx).reverse();
+      offset = this.Contents[0].Right;
+      items.forEach(function (c, i) {
+        c.MoveTo(offset, top);
+        self.Contents.unshift(c); // and add them to the front...
+        offset += c.Width;
+      });
+    }
+  }
+
+  SelectContentFromPoint(point: Point): boolean {
+    
+    return this.Contents.some(c => c.IsPointInShape(point))
+    
+  }
+
+  public DrawContent(context: any) {
+    this.Contents.forEach(c => c.Draw(context));
+  }
+}
 
 export class TrackShape {
 

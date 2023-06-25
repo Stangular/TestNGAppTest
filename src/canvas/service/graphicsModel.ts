@@ -1,5 +1,5 @@
-import { ImageShape } from "../models/shapes/content/image/image";
-import { TextShape } from "../models/shapes/content/text/text";
+//import { ImageShape } from "../models/shapes/content/image/image";
+//import { TextShape } from "../models/shapes/content/text/text";
 
 export class DisplayValueModel {
   DisplayValueId: string = '';

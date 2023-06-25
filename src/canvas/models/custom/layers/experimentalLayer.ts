@@ -2,7 +2,7 @@ import { ContextLayer } from '../../IContextItem';
 import { Shape } from '../../shapes/shape';
 import { Rectangle } from '../../shapes/rectangle';
 import { Ellipse } from '../../shapes/ellipse';
-import { TextShape } from '../../shapes/content/text/text';
+//import { TextShape } from '../../shapes/content/text/text';
 import { Line } from '../../lines/line';
 import { DisplayValues, StateIndex, UIStates } from '../../DisplayValues'
 import { SimplePortRectangle } from '../shapes/SimplePortRectangle';

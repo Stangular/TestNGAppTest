@@ -3,10 +3,10 @@ import { Point } from "../shapes/primitives/point";
 import { StateIndex, UIStates, DisplayValues } from "../DisplayValues";
 import { Rectangle } from "../shapes/rectangle";
 import { Shape } from "../shapes/shape";
-import { TextShape } from "../shapes/content/text/text";
+//import { TextShape } from "../shapes/content/text/text";
 import { ContextLayer, IContextItem } from "../IContextItem";
 import { ShapeSelectResult } from "../shapes/shapeSelected";
-import { ImageShape } from "../shapes/content/image/image";
+//import { ImageShape } from "../shapes/content/image/image";
 import { Ellipse } from "../shapes/ellipse";
 import { Port } from "../shapes/port";
 import { Size } from "src/d3/services/d3.common.model";
@@ -249,7 +249,7 @@ export class BaseDesignerModel extends ContextLayer {
 
   point: Point;
   shapes: Shape[] = [];
-  text: TextShape[] = [];
+  //text: TextShape[] = [];
   tooltype: tooltypes = tooltypes.typecount;
   // images
   private designerpad = new StateIndex('designerpad');

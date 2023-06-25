@@ -1,8 +1,8 @@
 import { Shape } from "../models/shapes/shape";
-import { ImageShape } from "../models/shapes/content/image/image";
+//import { ImageShape } from "../models/shapes/content/image/image";
 import { IContextItem } from "../models/IContextItem";
 import { IShape } from "../models/shapes/IShape";
-import { TextShape } from "../models/shapes/content/text/text";
+//import { TextShape } from "../models/shapes/content/text/text";
 import { StateIndex, UIStates, DisplayValues } from "../models/DisplayValues";
 import { PortPath, lineTypes } from "../models/lines/line";
 import { Point } from "../models/shapes/primitives/point";

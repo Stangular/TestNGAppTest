@@ -4,8 +4,10 @@ import { Shape } from "../shape";
 import { StateIndex, DisplayValues, UIStates } from "../../DisplayValues";
 import { Point } from "../primitives/point";
 import { IContextItem } from "../../IContextItem";
+import { MessageService } from 'src/app/messaging/message.service';
 
-export abstract class Content {
+
+export abstract class Content  {
   protected _stateIndex: StateIndex = null;
 
   constructor(protected id: string,
@@ -13,11 +15,11 @@ export abstract class Content {
     protected content: string,
     protected fromSource: boolean = false,
     protected angle: number = 0) {
+    
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
-
   }
 
-  abstract Draw(context: CanvasRenderingContext2D, shape: Shape);
+  abstract Draw(context: CanvasRenderingContext2D, shape: IShape);
   abstract Update(content: any);
 
   get Id() { return this.id }
@@ -26,7 +28,6 @@ export abstract class Content {
   get Angle() { return this.angle; }
   get FromSource() { return this.fromSource; }
   get StateIndex() { return this._stateIndex; }
-
 }
 export interface IDynamicContent<T> {
   Update(content: T);
@@ -77,6 +78,7 @@ export interface IDynamicContent<T> {
 //}
 
 export class TextContent extends Content {
+  _textWidth: number = 0;
   constructor(Id: string,
     stateName: string,
     content: string,
@@ -91,46 +93,53 @@ export class TextContent extends Content {
 
   Update(content: any) { }
 
-  MeasureText(ctx: CanvasRenderingContext2D, height: number, state: StateIndex): number {
+  MeasureText(ctx: CanvasRenderingContext2D, height: number): number {
     ctx.save();
-    ctx.font = height + "px " + DisplayValues.GetFont(state.Index[UIStates.fontFace]);
-    let width = ctx.measureText(this.Content).width;
+    ctx.font = height + "px " + DisplayValues.GetFont(this.StateIndex.Index[UIStates.fontFace]);
+    this._textWidth = ctx.measureText(this.Content).width;
     ctx.restore();
-    return width;
+    return this._textWidth;
   }
 
-  public Draw(ctx: CanvasRenderingContext2D, shape: Shape) {
+  public Draw(ctx: CanvasRenderingContext2D, shape: IShape) {
 
+    //let textWidth = this.MeasureText(ctx, shape.Height, this.StateIndex);
+    //if (shape.Width <= textWidth) {
+    //  shape.SizeBy(this, shape.Top, shape.Left + textWidth, shape.Bottom, shape.Left);
+    //}
+    //   shape.Draw(ctx);
+    
     ctx.beginPath();
     ctx.save();
-    if (shape.Width <= 0) {
-      let w = this.MeasureText(ctx, shape.Height, this.StateIndex);
-      shape.SizeBy(this, shape.Top, shape.Left + w, shape.Bottom, shape.Left);
-    }
+
     ctx.translate(shape.Left, shape.Top);
     ctx.rotate(this.Angle * Math.PI / 180);
-    ctx.rect(0, 0, shape.Width, shape.Height);
-    ctx.fillStyle = DisplayValues.GetColor(shape.StateIndex.Index[UIStates.background]);
-    ctx.fill();
-    //  ctx.strokeStyle = DisplayValues.GetColor(content.StateIndex.Index[UIStates.foreground]);
+    //ctx.rect(0, 0, this.shape.Width, this.shape.Height);
+    //ctx.fillStyle = DisplayValues.GetColor(this.shape.StateIndex.Index[UIStates.background]);
+    //ctx.fill();
+    //ctx.strokeStyle = DisplayValues.GetColor(this.shape.StateIndex.Index[UIStates.foreground]);
 
-    ctx.font = shape.Height + "px " + DisplayValues.GetFont(this.StateIndex.Index[UIStates.fontFace]);
+    ctx.font = shape.Height + "px " + DisplayValues.GetFont(shape.StateIndex.Index[UIStates.fontFace]);
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'left';
-    ctx.fillStyle = DisplayValues.GetFGColor(this.StateIndex.Index[UIStates.foreground]);
+    ctx.fillStyle = DisplayValues.GetFGColor(shape.StateIndex.Index[UIStates.foreground]);
     ctx.textAlign = 'left';
-    ctx.fillText(this.Content, 0, shape.Height);
-    ctx.strokeStyle = 'transparent';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.fillText(this.content, shape.Width / 2 - this._textWidth / 2, shape.Height);// Width calculation is to center the text in the area
+  //  ctx.strokeStyle = 'transparent';
+    //ctx.lineWidth = 1;
+    //ctx.stroke();
     ctx.restore();
-    ctx.closePath();  }
+    ctx.closePath();
+  }
 }
 
 export class ImageContent extends Content {
-  constructor( Id: string,
-     stateName: string,
+  private _image: any;
+  private _ready;
+  constructor(Id: string,
+    stateName: string,
     content: string,
+    shape: IShape,
     fromSource: boolean = false,
      angle: number = 0,
     protected imageIndex: number = 0) {
@@ -139,23 +148,25 @@ export class ImageContent extends Content {
       content,
       fromSource,
       angle);
-      
+    let self = this;
+    this._image = new Image();
+    this._image.onload = () => {
+      setTimeout(() => self._ready = true, 0);
+    }
+    this._image.src = content;
   }
 
   Update(content: any) { }
 
-  public Draw(context: CanvasRenderingContext2D, shape: Shape) {
-    if (!shape) { return false; }
-    //  if (imageIndex < 0) { return false; }
-    //let img = this._images[imageIndex];
-    // if (!img) { return false; }
-    //  let ctx = this._context[this._currentLayer].Context;
-
-    return false; //img.DisplayImage(this._context, shape);  }
-  }
-
-  get ImageIndex() {
-    return this.imageIndex;
+  public Draw(context: CanvasRenderingContext2D, shape: IShape) {
+    if (!this._ready || !context) { return false; }
+    context.drawImage(
+      this._image,
+      shape.Left + 5,
+      shape.Top + 5,
+      shape.Width - 10,
+      shape.Height - 10);
+    return true;
   }
 }
 

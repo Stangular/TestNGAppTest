@@ -5,16 +5,10 @@
   <canvas #topCanvas
           class="activeCanvas"
           id="timeline"
-          (mousedown)="OnMousedownTop($event)"
-          (mouseup)="OnMouseUpTop($event)"
-          (mousemove)="OnMouseMoveTop($event)"
-          (mouseout)="OnMouseOutTop($event)">
+          (pointerdown)="OnMouseDown($event)">
   </canvas>
   <canvas #staticCanvas
           class="staticCanvas"
-          id="topLayer"
-          (mousedown)="OnMousedown($event)"
-          (mouseup)="OnMouseUp($event)"
-          (mouseout)="OnMouseOut($event)">
+          id="topLayer">
   </canvas>
 </div>

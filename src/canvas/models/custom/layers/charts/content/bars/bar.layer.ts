@@ -41,7 +41,6 @@ export class Bar implements IContextItem{
   get Id(): string { return this.area.Id; }
   get Class(): string { return ""; }
   get zIndex() { return 0; }
-
   UpdateContextState(): void {
 
   }

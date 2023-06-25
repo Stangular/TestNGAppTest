@@ -50,7 +50,7 @@ export class Ellipse extends Shape {
       Content: {}
     }
     this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
-    this.Contents.forEach((s, i) => model.Text.push(s.Save()));
+   // this.Contents.forEach((s, i) => model.Text.push(s.Shape.Save()));
     return model;
   }
 
@@ -75,9 +75,9 @@ export class Ellipse extends Shape {
 
     ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
     ctx.fill();
-    ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
-    ctx.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
-    ctx.stroke();
+    //ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    //ctx.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
+    //ctx.stroke();
 
     ctx.closePath();  }
 

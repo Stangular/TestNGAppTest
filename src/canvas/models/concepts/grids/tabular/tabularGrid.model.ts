@@ -2,7 +2,7 @@ import { ContextLayer, IContextItem, IContextSystem } from "src/canvas/models/IC
 import { Rectangle } from "src/canvas/models/shapes/rectangle";
 import { DisplayValues } from "src/canvas/models/DisplayValues";
 import { Ellipse } from "src/canvas/models/shapes/ellipse";
-import { Port, ePortType } from "src/canvas/models/shapes/port";
+import { Port } from "src/canvas/models/shapes/port";
 import { lineTypes } from "src/canvas/models/lines/line";
 import { Point } from "src/canvas/models/shapes/primitives/point";
 
@@ -64,35 +64,35 @@ export class TimeLineBaseLayerModel extends ContextLayer {
     let ports: Point[] = [];
     //  ports.push(port1.Center);
     //  ports.push(port2.Center);
-    this.AddPath('timelinePath_1', 'timeline', ports);
+   // this.AddPath('timelinePath_1', 'timeline', ports);
     let d = new Date();
     let y = d.getFullYear();
     for (; offset > area.Left; offset -= sz) {
       cnt++;
-      port1 = new Ellipse("timelineA_" + cnt, area.Top, offset, 1, 1, 'DefaultBG');
-      port2 = new Ellipse("timelineB_" + cnt, area.Bottom, offset, 1, 1, 'DefaultBG');
-      p1 = new Port("timelineA_" + cnt, 0, 0, port1, ePortType.source, 'DefaultBG', 'timelinePath_' + cnt, 0);
-      p2 = new Port("timelineB_" + cnt, 0, 0, port2, ePortType.target, 'DefaultBG', 'timelinePath_' + cnt, 1);
-      ports = [];
-      ports.push(port1.Center);
-      ports.push(port2.Center);
-      this.AddPath('timelinePath_' + cnt, 'timeline', ports);
+      //port1 = new Ellipse("timelineA_" + cnt, area.Top, offset, 1, 1, 'DefaultBG');
+      //port2 = new Ellipse("timelineB_" + cnt, area.Bottom, offset, 1, 1, 'DefaultBG');
+      //p1 = new Port("timelineA_" + cnt, 0, 0, port1, ePortType.source, 'DefaultBG', 'timelinePath_' + cnt, 0);
+      //p2 = new Port("timelineB_" + cnt, 0, 0, port2, ePortType.target, 'DefaultBG', 'timelinePath_' + cnt, 1);
+      //ports = [];
+      //ports.push(port1.Center);
+      //ports.push(port2.Center);
+      //this.AddPath('timelinePath_' + cnt, 'timeline', ports);
 
-      //    new Port("timelineA_" + cnt, 0, 0, port1, ePortType.source, 'DefaultBG', 'timelinePath_' + cnt, 0);
-      //   new Port("timelineB_" + cnt, 0, 0, port2, ePortType.target, 'DefaultBG', 'timelinePath_' + cnt, 1);
-      //    this.AddPath
-      area.AddPort(p1);
-      area.AddPort(p2);
-      if (cnt % 2 == 0) {
-        this.AddContent(new Rectangle("timelineSlot_" + cnt, area.Bottom + 1, offset - sz, sz, 30, 'EvenSlot'));
-        this.AddText(y.toString(), 'EvenSlot', 'DefaultFG', false);
+      ////    new Port("timelineA_" + cnt, 0, 0, port1, ePortType.source, 'DefaultBG', 'timelinePath_' + cnt, 0);
+      ////   new Port("timelineB_" + cnt, 0, 0, port2, ePortType.target, 'DefaultBG', 'timelinePath_' + cnt, 1);
+      ////    this.AddPath
+      //area.AddPort(p1);
+      //area.AddPort(p2);
+      //if (cnt % 2 == 0) {
+      //  this.AddContent(new Rectangle("timelineSlot_" + cnt, area.Bottom + 1, offset - sz, sz, 30, 'EvenSlot'));
+      //  this.AddText(y.toString(), 'EvenSlot', 'DefaultFG', false);
 
-      }
-      else {
-        this.AddContent(new Rectangle("timelineSlot_" + cnt, area.Bottom + 1, offset - sz, sz, 30, 'OddSlot'));
-        this.AddText(y.toString(), 'OddSlot', 'DefaultFG', false);
+      //}
+      //else {
+      //  this.AddContent(new Rectangle("timelineSlot_" + cnt, area.Bottom + 1, offset - sz, sz, 30, 'OddSlot'));
+      //  this.AddText(y.toString(), 'OddSlot', 'DefaultFG', false);
 
-      }
+      //}
       y = y - 1;
     }
   }

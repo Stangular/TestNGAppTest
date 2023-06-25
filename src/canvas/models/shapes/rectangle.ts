@@ -35,8 +35,8 @@ export class Rectangle extends Shape {
     ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
     ctx.fill();
     ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
-    ctx.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
-    ctx.stroke();
+  //  ctx.strokeStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.foreground]);
+   // ctx.stroke();
 
     ctx.closePath();
 
@@ -59,13 +59,14 @@ export class Rectangle extends Shape {
       Content: {}
     }
     this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
-    this.Contents.forEach((s, i) => model.Shapes.push(s.Save()));
+   // this.Contents.forEach((s, i) => model.Shapes.push(s.Shape.Save()));
     return model;
   }
 
   ShapeType(): number {
     return 0;
   }
+
   CopyShape(newID: string): Shape {
 
     return new Rectangle(newID, this.Top + 10, this.Left + 10, this.Width, this.Height, this.StateName);
@@ -86,6 +87,51 @@ export class Rectangle extends Shape {
   //}
 }
 
+export class GradientRectangle extends Rectangle {
+
+  private _gradient: CanvasGradient;
+
+  constructor(id: string,
+    top: number,
+    left: number,
+    width: number,
+    height: number,
+    stateName: string = '',
+    zIndex: number = 0) {
+    super(id,
+      top,
+      left,
+      width,
+      height,
+      stateName,
+      zIndex);
+  }
+
+  Draw(ctx: CanvasRenderingContext2D): void {
+
+    let ga = DisplayValues.GetGradientArea(this.StateIndex.Index[UIStates.gradientArea]);
+    let c1 = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
+    let c2 = DisplayValues.GetGradientColor(this.StateIndex.Index[UIStates.gradientColor]);
+    let x1 = this.Left; //+ (this.Left * 0.5);
+    let x2 = this.Right; // + (this.Right * 0.5);
+    let gradient = ctx.createLinearGradient(x1 , 0, x2, 0);
+    gradient.addColorStop(1, c1);
+    gradient.addColorStop(.5, c2);
+    gradient.addColorStop(.5, c2);
+    gradient.addColorStop(0, c1 );
+
+    ctx.beginPath();
+    ctx.rect(this.Left, this.Top, this.Width, this.Height);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    //ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    //ctx.strokeStyle = DisplayValues.GetFGColor(this.StateIndex.Index[UIStates.foreground]);
+    //ctx.stroke();
+
+    ctx.closePath();
+
+  }
+}
 
 
 //export class RoundedRectangle extends Shape implements IContextItem {

@@ -12,7 +12,8 @@ export class NavigationService {
     this._home = new NavigationLink('Home', '', '/home');
     this.AddTo(new NavigationLink("NAS", '', '/NAS'), 'home');
     this.AddTo(new NavigationLink("Lost Cause", '', '/Lost_Cause'), 'home');
-    this._selectedItem = this._home;
+    this.AddTo(new NavigationLink("DNA Segments", '', '/DNA_Segments'), 'home');
+   this._selectedItem = this._home;
   }
 
   AddTo(link: NavigationLink, parentName: string = '') {

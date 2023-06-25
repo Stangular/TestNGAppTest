@@ -6,13 +6,13 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Shape } from 'src/canvas/models/shapes/shape';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
 import { FormControl } from '@angular/forms';
-import { ePortType, Port } from 'src/canvas/models/shapes/port';
+import { Port } from 'src/canvas/models/shapes/port';
 import { PortPath } from 'src/canvas/models/lines/line';
 import { Observable } from 'rxjs';
 import { FreedomOfMotion, AreaType, IShape } from 'src/canvas/models/shapes/IShape';
 import { startWith, map } from 'rxjs/operators';
 import { ImageModel } from 'src/canvas/models/shapes/content/image/image.model';
-import { ContentShape } from 'src/canvas/models/shapes/content/ContentShape';
+//import { ContentShape } from 'src/canvas/models/shapes/content/ContentShape';
 import { Content } from 'src/canvas/models/shapes/content/Content';
 
 export enum ContentType {
@@ -29,16 +29,17 @@ export interface IShapeData {
   width: number;
   height: number;
   cornerRadius: number;
-  port: {
-    result: string;
-    offsetX: string;
-    offsetY: string;
-    path: string;
-    name: string;
-    type: ePortType;
-    paths: PortPath[];
-    pathPosition: number;
-  }
+  //port: {
+  //  result: string;
+  //  offsetX: string;
+  //  offsetY: string;
+  //  path: string;
+  //  name: string;
+
+
+  //  paths: PortPath[];
+  //  pathPosition: number;
+  //}
 }
 
 @Component({
@@ -54,11 +55,9 @@ export class ShapePropertyDialogComponent implements OnInit{
   @Input() okMessage: string = 'Save';
   @Input() state: string = "";
   ports: Observable<IShape[]>;
-  textContentItems: Observable<ContentShape[]>;
- //imageContentItems: Observable<ContentShape[]>;
+ // textContentItems: Observable<ContentShape[]>;
   modelName = new FormControl();
   textContentItem = new FormControl();
-  //imageContentItem = new FormControl();
   stateName = '';
   portName = new FormControl();
   pathName = new FormControl();
@@ -111,23 +110,23 @@ export class ShapePropertyDialogComponent implements OnInit{
         startWith(''),
         map(value => this._filterPort(value))
     );
-    this.textContentItems = this.textContentItem.valueChanges
-      .pipe(
-        startWith(''),
-      map(value => this._filterTextContent(value))
-    );
+    //this.textContentItems = this.textContentItem.valueChanges
+    //  .pipe(
+    //    startWith(''),
+    //  map(value => this._filterTextContent(value))
+    //);
     //this.imageContentItems = this.imageContentItem.valueChanges
     //  .pipe(
     //  startWith(''),
     //  map(value => this._filterImageContent(value))
     //  );
-    if (this.canvasService.ActiveShape.Ports.length > 0) {
-      let port = this.canvasService.ActiveShape.Ports[0];
-      this.portName.setValue(port.Id);
-      this.data.port.offsetX = (<Port>port).OffsetX.toString();
-      this.data.port.offsetY = (<Port>port).OffsetY.toString();
-      this.data.port.path = (<Port>port).PathId;
-    }
+    //if (this.canvasService.ActiveShape.Ports.length > 0) {
+    //  let port = this.canvasService.ActiveShape.Ports[0];
+    //  this.portName.setValue(port.Id);
+    //  this.data.port.offsetX = (<Port>port).OffsetX.toString();
+    //  this.data.port.offsetY = (<Port>port).OffsetY.toString();
+    //  this.data.port.path = (<Port>port).PathId;
+    //}
   }
 
   OnStateChange(statename: any) {
@@ -141,11 +140,11 @@ export class ShapePropertyDialogComponent implements OnInit{
   }
 
   PathChange(pathId: any) {
-    let path = this.canvasService.BaseSystem.Paths.findIndex(p => p.Id == pathId.value);
-    this.data.port.pathPosition = 0;
-    if (path >= 0) {
-      this.data.port.pathPosition = this.canvasService.BaseSystem.Paths[path].Ports.length;
-    }
+    //let path = this.canvasService.BaseSystem.Paths.findIndex(p => p.Id == pathId.value);
+    //this.data.port.pathPosition = 0;
+    //if (path >= 0) {
+    //  this.data.port.pathPosition = this.canvasService.BaseSystem.Paths[path].Ports.length;
+    //}
   }
 
   ImageChange(image: any) {
@@ -162,32 +161,14 @@ export class ShapePropertyDialogComponent implements OnInit{
     return 'https://localhost:44314/' + 'api/ImageUploader/StreamImageLocally?=S:\Projects\repos\Angular6Sandbox\TestNGApp2\images';
   }
 
-  private _filterTextContent(value: string): ContentShape[] {
-    const v = value.toLowerCase();
-    let list = (<ContentShape>this.canvasService.ActiveShape).Contents
-      .filter(option => option.Content.Content.toLowerCase().indexOf(v) >= 0);
-    if (list.length == 1) {
-      this.contentAngle = list[0].Content.Angle;
-      this.contentState = list[0].Content.State;
-      this.fromDataSource = list[0].Content.FromSource;
-    }
-    else {
-      this.contentAngle = 0;
-      this.contentState = "DefaultBG";
-    }
-    return list;
-  }
-
-  //private _filterImageContent(value: string): ContentShape[] {
+  //private _filterTextContent(value: string): ContentShape[] {
   //  const v = value.toLowerCase();
-  //  let list = (<ContentShape>this.canvasService.ActiveShape).ImageContent
+  //  let list = (<ContentShape>this.canvasService.ActiveShape).Contents
   //    .filter(option => option.Content.Content.toLowerCase().indexOf(v) >= 0);
   //  if (list.length == 1) {
   //    this.contentAngle = list[0].Content.Angle;
   //    this.contentState = list[0].Content.State;
   //    this.fromDataSource = list[0].Content.FromSource;
-  //    this.selectedImage = list[0].Content.Content;
-  //    this.imageContentURL = this.selectedImage;
   //  }
   //  else {
   //    this.contentAngle = 0;
@@ -200,31 +181,32 @@ export class ShapePropertyDialogComponent implements OnInit{
 
     const v = value.toLowerCase();
 
-    this.data.port.name = value;
-    this.data.port.paths = [];
-    let list = this.canvasService.ActiveShape.Ports
-      .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
-    if (list.length == 1) {
-      let port = list[0] as Port;
-      this.data.port.offsetX = port.OffsetX.toString();
-      this.data.port.offsetY = port.OffsetY.toString();
-      this.data.port.path = port.PathId;
-      this.data.port.pathPosition = port.PathPosition;
-    }
-    if (list.length <= 0) {
-      this.data.port.offsetX = "0";
-      this.data.port.offsetY = "0";
-      this.data.port.path = '';
-      let path = this.canvasService.BaseSystem.Paths.findIndex(p => p.Id == this.data.port.path);
-      this.data.port.pathPosition = 0;
-      if (path >= 0) {
-        this.data.port.pathPosition = this.canvasService.BaseSystem.Paths[path].Ports.length;
-      }
-    }
-    if (list.length > 0) {
-      this.pathName.setValue(list[0].Id);
-    }
-    return list;
+    //this.data.port.name = value;
+    //this.data.port.paths = [];
+    //let list = this.canvasService.ActiveShape.Ports
+    //  .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
+    //if (list.length == 1) {
+    //  let port = list[0] as Port;
+    //  this.data.port.offsetX = port.OffsetX.toString();
+    //  this.data.port.offsetY = port.OffsetY.toString();
+    //  this.data.port.path = port.PathId;
+    //  this.data.port.pathPosition = port.PathPosition;
+    //}
+    //if (list.length <= 0) {
+    //  this.data.port.offsetX = "0";
+    //  this.data.port.offsetY = "0";
+    //  this.data.port.path = '';
+    //  let path = this.canvasService.BaseSystem.Paths.findIndex(p => p.Id == this.data.port.path);
+    //  this.data.port.pathPosition = 0;
+    //  if (path >= 0) {
+    //    this.data.port.pathPosition = this.canvasService.BaseSystem.Paths[path].Ports.length;
+    //  }
+    //}
+    //if (list.length > 0) {
+    //  this.pathName.setValue(list[0].Id);
+    //}
+   // return list;
+    return null;
   }
 
   onUploadFinished(e: any) {
@@ -248,7 +230,7 @@ export class ShapePropertyDialogComponent implements OnInit{
         this.canvasService.AddImage(this.textContentItem.value, this.containerState, this.contentState, this.fromDataSource, 0);
         break;
       default:
-        this.canvasService.AddGeneral(this.textContentItem.value, this.containerState);
+      //  this.canvasService.AddGeneral(this.textContentItem.value, this.containerState);
         break;
     }
   }

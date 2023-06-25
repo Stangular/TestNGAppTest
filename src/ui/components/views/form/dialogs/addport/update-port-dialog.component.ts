@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { IPortPath, Line, PortPath } from 'src/canvas/models/lines/line';
 import { map, startWith } from 'rxjs/operators';
-import { ePortType, Port } from 'src/canvas/models/shapes/port';
+import { Port } from 'src/canvas/models/shapes/port';
 import { Path } from 'src/canvas/models/lines/path';
 import { CanvasService } from 'src/canvas/service/canvas.service';
 import { IShape } from 'src/canvas/models/shapes/IShape';
@@ -15,7 +15,6 @@ export interface PortData {
   offsetY: string;
   path: string;
   name: string;
-  type: ePortType;
   paths: PortPath[];
 }
 
@@ -25,8 +24,7 @@ export interface PortData {
   styleUrls: ['update-port-dialog.component.css']
 })
 export class UpdatePortDialog implements OnInit {
-  ept = ePortType;
-  portType = this.ept.source;
+ // portType = this.ept.source;
   paths: Observable<PortPath[]>;
   ports: Observable<IShape[]>;
   pathName = new FormControl();
@@ -73,7 +71,7 @@ export class UpdatePortDialog implements OnInit {
       let port = list[0] as Port;
       this.data.offsetX = port.OffsetX.toString();
       this.data.offsetY = port.OffsetY.toString();
-      this.data.path = port.PathId;
+    //  this.data.path = port.PathId;
     }
     if (list.length <= 0) {
       this.data.offsetX = "0";

@@ -6,7 +6,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Shape } from 'src/canvas/models/shapes/shape';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
 import { FormControl } from '@angular/forms';
-import { ePortType, Port } from 'src/canvas/models/shapes/port';
+import { Port } from 'src/canvas/models/shapes/port';
 import { PortPath } from 'src/canvas/models/lines/line';
 import { Observable } from 'rxjs';
 import { FreedomOfMotion, AreaType, IShape } from 'src/canvas/models/shapes/IShape';

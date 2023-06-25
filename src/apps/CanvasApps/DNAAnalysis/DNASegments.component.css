@@ -1,0 +1,14 @@
+.mat-grid-tile .mat-figure {
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+}
+
+.member {
+  font-size: 12px;
+  width: 200px;
+  border:none;
+}
+
+  .member .selected_member {
+    background-color: yellow;
+  }

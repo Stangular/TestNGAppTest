@@ -6,8 +6,6 @@ import {
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/models/navigation/navigationService';
 import { ContextLayer } from 'src/canvas/models/IContextItem';
-import { TimeLineBaseLayerModel } from 'src/canvas/models/concepts/timelines/timeLineBase.model';
-import { Rectangle } from 'src/canvas/models/shapes/rectangle';
 import { FamilyTreeModel, FamilyModel, PersonModel, Sex } from 'src/canvas/models/concepts/Family/familyTree/familyTree.model';
 import { CanvasService } from 'src/canvas/service/canvas.service';
 import { MatTabChangeEvent } from '@angular/material';
@@ -30,16 +28,16 @@ export class MESComponent implements OnInit, AfterViewInit {
     this._navMan.SelectByName(this.router, "MES", this._navMan.Home);
   //  this.timeline = new TimeLineBaseLayerModel(new Date(), 16, 20, 10);
 
-    let people: PersonModel[] = [];
-    people.push(new PersonModel('197182_0', Sex.Male, "Stanley"));
-    people.push(new PersonModel('197182_1', Sex.Male, "J.C."));
-    people.push(new PersonModel('197182_2', Sex.Male, "Joshua"));
-    people.push(new PersonModel('197182_3', Sex.Male, "William"));
-    people.push(new PersonModel('197182_4', Sex.Male, "John"));
-    people.push(new PersonModel('197182_5', Sex.Male, "John"));
-    people.push(new PersonModel('197182_6', Sex.Male, "John"));
-    people.push(new PersonModel('197182_7', Sex.Male, "Thomas"));
-    let f = new FamilyModel('197182', 'Shannon', 'R-Y34201', people);
+ //   let people: PersonModel[] = [];
+    //people.push(new PersonModel('197182_0', Sex.Male, "Stanley"));
+    //people.push(new PersonModel('197182_1', Sex.Male, "J.C."));
+    //people.push(new PersonModel('197182_2', Sex.Male, "Joshua"));
+    //people.push(new PersonModel('197182_3', Sex.Male, "William"));
+    //people.push(new PersonModel('197182_4', Sex.Male, "John"));
+    //people.push(new PersonModel('197182_5', Sex.Male, "John"));
+    //people.push(new PersonModel('197182_6', Sex.Male, "John"));
+    //people.push(new PersonModel('197182_7', Sex.Male, "Thomas"));
+    //let f = new FamilyModel('197182', 'Shannon', 'R-Y34201', people);
   //  this.family = new FamilyTreeModel(f);
  }
 

@@ -13,7 +13,7 @@ export class TimeLineService {
     switch (id.toLowerCase()) {
       case 'timeline-decade': result = new TimeLineBaseLayerModel(parentArea, new Date(), 12, 80, 0, TimeLineTypes.decade); break;
       case 'timeline-century': result = new TimeLineBaseLayerModel(parentArea, new Date(), 12, 80, 0, TimeLineTypes.century); break;
-      default: result = new TimeLineBaseLayerModel(parentArea, new Date(), 12, 80, 0, TimeLineTypes.year);
+      default: result = new TimeLineBaseLayerModel(parentArea, new Date(), 12, 80, 0, TimeLineTypes.month);
     }
 
 
