@@ -5,6 +5,8 @@ import { Ellipse } from "../../shapes/ellipse";
 import { Port } from "../../shapes/port";
 import { Observable } from "rxjs";
 import { forEach } from "@angular/router/src/utils/collection";
+import { IShape } from "../../shapes/IShape";
+import { Point } from "../../shapes/primitives/point";
 export class SegmentRange implements IContextItem {
   constructor(
     private id: string,
@@ -51,7 +53,7 @@ export class SegmentRange implements IContextItem {
     ports.push(p1);
     ports.push(p2);
 
-    context.PortPath.AddPorts(ports);
+    //context.PortPath.AddPorts(ports);
 
     //parentArea.AddPort(p1);
     //parentArea.AddPort(p2);
@@ -638,7 +640,7 @@ export class Member implements IContextItem {
   }
 
   AddAsContent(memberID: string, context: ContextLayer, parentArea: Rectangle) {
-    context.PortPath.Clear();
+  //  context.PortPath.Clear();
     for (let i = 0; i < this.matchingSegments.length; i = i + 1) {
       let s = this.matchingSegments[i];
       let segment = s.GetCommonMemberSegment(memberID);
@@ -969,6 +971,10 @@ export class DNAChromosomes extends EventContextLayer {
     //parentArea.AddPort(p2);
 
   }
+
+  GetTouchedShape(point: Point): IShape { return null }
+  ReturnTouchedShape(shape: IShape) { }
+
   Init() {
     this.ClearContent(1);
     this.ClearPaths();

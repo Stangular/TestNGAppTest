@@ -18,18 +18,19 @@ export class Rectangle extends Shape {
     width: number,
     height: number,
     stateName: string = '',
-    zIndex: number = 0) {
+    zIndex: number = 0,
+    hitstate: string = "") {
     super(id,
       top,
       left,
       width,
       height,
       stateName,
-      zIndex);
+      zIndex,
+      hitstate);
   }
 
   Draw(ctx: CanvasRenderingContext2D): void {
-
     ctx.beginPath();
     ctx.rect(this.Left, this.Top, this.Width, this.Height);
     ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
@@ -58,7 +59,7 @@ export class Rectangle extends Shape {
       Shapes: [],
       Content: {}
     }
-    this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
+ //   this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
    // this.Contents.forEach((s, i) => model.Shapes.push(s.Shape.Save()));
     return model;
   }

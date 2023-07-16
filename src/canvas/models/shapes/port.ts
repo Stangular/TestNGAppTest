@@ -81,9 +81,9 @@ export class Port implements IShape, IContextItem {
     return this.internalShape.FreedomOfSizing;
   }
 
-  public get Ports() {
-    return this.internalShape.Ports;
-  }
+  //public get Ports() {
+  //  return this.internalShape.Ports;
+  //}
 
   SetProperties(properties: any) {
 
@@ -181,4 +181,15 @@ export class Port implements IShape, IContextItem {
   }
 
   get InternalShape() { return this.internalShape; }
+}
+
+
+export class ConnectedShape {
+  constructor(private _ports: Port[]) {
+
+  }
+
+  LinePorts(lineId) {
+    return this._ports.filter(p => p.LineId == lineId);
+  }
 }

@@ -113,6 +113,10 @@ export class DisplayValues {
     return this.color.findIndex(c => c.Name == name);
   }
 
+  static GradientFontIndex(name: string) {
+    return this.fonts.findIndex(c => c.Name == name);
+  }
+
   static GradientColorIndex(name: string) {
     return this.gradientColor.findIndex(c => c.Name == name);
   }
@@ -334,7 +338,7 @@ export class DisplayValues {
     stateIndex.setState(UIStates.foreground, this.FGColorIndex(name));
     stateIndex.setState(UIStates.gradientColor, this.GradientColorIndex(name));
     stateIndex.setState(UIStates.gradient, this.GradientIndex(name));
-
+    stateIndex.setState(UIStates.fontFace, this.GradientFontIndex(name));
     return stateIndex;
   }
 

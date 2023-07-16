@@ -55,6 +55,9 @@ export class TimeLineBaseLayerModel extends EventContextLayer {
     this.ResetTimeLine(this.ParentArea, this._timeLineType);
   }
 
+  GetTouchedShape(point: Point): IShape { return null }
+  ReturnTouchedShape(shape: IShape) { }
+
   ResetTimeLine(parentArea: Rectangle, timeLineType: TimeLineTypes = TimeLineTypes.year): void {
     this.ClearContent();
     //    this.AddContent(new TimeLineSlider("year", 0, 100, 80, 300));

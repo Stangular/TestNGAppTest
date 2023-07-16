@@ -1,13 +1,14 @@
-import { IShape, AreaType, FreedomOfMotion, ITracker } from './IShape';
+import { IShape, AreaType, FreedomOfMotion, ITracker, IShapeContainer } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
 import { StateIndex, UIStates, DisplayValues } from '../DisplayValues'
 import { IContextItem, AreaTracker, AreaSizer } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
-import { Line, PortPath } from '../lines/line';
+import { Line, PortPath, PathLink } from '../lines/line';
 //import { ePortType, Port } from './port';
 //import { ImageShape } from './content/image/image';
 import { IElementDefinition } from '../../../dataManagement/model/definitions/ElementDefinition';
 import { Content, TextContent, IDynamicContent } from './content/Content';
+import { inherits } from 'util';
 //import { ContentShape } from './content/ContentShape';
 //import { TextShape } from './content/text/text';
 
@@ -26,7 +27,7 @@ export class ContainedShape {
 
 export abstract class Shape implements IShape {
 
-  
+  protected _defaultState: string = "";
   protected _touchedContent
   protected _hit = false;
   protected _center: Point = new Point();
@@ -36,22 +37,12 @@ export abstract class Shape implements IShape {
   protected _freedomOfSizing: FreedomOfMotion = FreedomOfMotion.full;
   private _tracked: boolean = false;
 
-
-  public HitTest(point: Point): boolean {
-    const x = point.X;
-    const y = point.Y;
-    this._hit = (x >= this.Left && x <= this.Right
-      && y >= this.Top && y <= this.Bottom);
-    return this._hit;
-  }
-
- // protected _imageContent: ImageShape[] = [];
- // protected _generalContent: Shape[] = [];
+  // protected _imageContent: ImageShape[] = [];
+  // protected _generalContent: Shape[] = [];
 
   //protected _textContent: Text = null;
   //protected _imageContent: ImageShape = null;
   protected _stateIndex: StateIndex = null;
-  protected _ports: IShape[] = [];
   constructor(
     private id: string,
     protected top: number,
@@ -65,7 +56,7 @@ export abstract class Shape implements IShape {
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
-
+    this._defaultState = this.stateName;
   }
   get zIndex() { return this._zIndex; }
 
@@ -79,6 +70,20 @@ export abstract class Shape implements IShape {
     this.stateName = properties.state;
     this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
     //   this.UpdateContextState();
+  }
+
+  public HitTest(point: Point): boolean {
+    const x = point.X;
+    const y = point.Y;
+    this._hit = (x >= this.Left && x <= this.Right
+      && y >= this.Top && y <= this.Bottom);
+    if (this._hit) {
+
+      this.stateName = this.hitState;
+      this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
+
+    }
+    return this._hit;
   }
 
   get UnitCell(): string {
@@ -109,7 +114,7 @@ export abstract class Shape implements IShape {
   get Center(): Point { return this._center; }
 
   abstract Draw(context: CanvasRenderingContext2D): void;
- // abstract DrawSelection(context: CanvasRenderingContext2D): void;
+  // abstract DrawSelection(context: CanvasRenderingContext2D): void;
 
   //abstract DrawShape(context: any);
   abstract CopyShape(newID: string): Shape;
@@ -117,8 +122,8 @@ export abstract class Shape implements IShape {
   abstract Save(): any;
 
 
-  Touch(point: Point) {}
-  
+  Touch(point: Point) { }
+
   //Resize(sizer: AreaSizer) {
   //  if (this.IsHit) {
   //    sizer.ResizeShape();
@@ -132,16 +137,17 @@ export abstract class Shape implements IShape {
   //}
 
   ClearHit() {
-    if (this._hit) {
-      console.error("hit to not hit");
-    }
+
     this._hit = false;
 
-//    this.Contents.forEach(c => c.Shape.ClearHit());
+
+    this.stateName = this._defaultState;
+    this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
+
   }
 
- 
-  
+
+
 
   //Track(point: Point = null, tracker: AreaTracker = null): boolean {
 
@@ -157,29 +163,29 @@ export abstract class Shape implements IShape {
   }
 
   Select(point: Point) {
-   // let ndx = this._content.findIndex(s => s.Shape.Select(point));
+    // let ndx = this._content.findIndex(s => s.Shape.Select(point));
     //if (ndx >= 0) {
 
-//      shapeSelectResult.itemCaptured = true;
- //     shapeSelectResult.id = this._textContent[ndx].Id;
-   //   return true;
-   // }
-//    ndx = this._imageContent.findIndex(s => s.Select(shapeSelectResult));
-//    if (ndx >= 0) {
-// //     shapeSelectResult.itemCaptured = true;
-////      shapeSelectResult.id = this._imageContent[ndx].Id;
-//      return true;
-//    }
-//    ndx = this._generalContent.findIndex(s => s.Select(shapeSelectResult));
-//    if (ndx >= 0) {
-//  //    shapeSelectResult.itemCaptured = true;
-//  //    shapeSelectResult.id = this._generalContent[ndx].Id;
-//      return true;
-//    }
+    //      shapeSelectResult.itemCaptured = true;
+    //     shapeSelectResult.id = this._textContent[ndx].Id;
+    //   return true;
+    // }
+    //    ndx = this._imageContent.findIndex(s => s.Select(shapeSelectResult));
+    //    if (ndx >= 0) {
+    // //     shapeSelectResult.itemCaptured = true;
+    ////      shapeSelectResult.id = this._imageContent[ndx].Id;
+    //      return true;
+    //    }
+    //    ndx = this._generalContent.findIndex(s => s.Select(shapeSelectResult));
+    //    if (ndx >= 0) {
+    //  //    shapeSelectResult.itemCaptured = true;
+    //  //    shapeSelectResult.id = this._generalContent[ndx].Id;
+    //      return true;
+    //    }
     this._hit = this.IsPointInShape(point);
     this._stateIndex = DisplayValues.GetShapeIndex(this.hitState);
- //     shapeSelectResult.itemCaptured = true;
-//     shapeSelectResult.id = this.Id;
+    //     shapeSelectResult.itemCaptured = true;
+    //     shapeSelectResult.id = this.Id;
 
 
 
@@ -192,13 +198,13 @@ export abstract class Shape implements IShape {
 
   public clearAllContent() {
     this.clearContent();
-  //  this.clearImageContent();
- //   this.clearGeneralContent();
+    //  this.clearImageContent();
+    //   this.clearGeneralContent();
   }
 
   public clearContent() {
-  //  this._content = [];
-    this._ports = [];
+    //  this._content = [];
+    //  this._ports = [];
   }
 
   //public clearImageContent() {
@@ -227,14 +233,14 @@ export abstract class Shape implements IShape {
   //  return false;
   //}
 
-  public DrawContent(context: any) {
-    this.Draw(context);
- //   this._content.forEach(s => s.Draw(context));
-   // this._imageContent.forEach(s => s.Draw(context));
-    //this._generalContent.forEach(s => s.Draw(context));
+  // public DrawContent(context: any) {
+  //   this.Draw(context);
+  ////   this._content.forEach(s => s.Draw(context));
+  //  // this._imageContent.forEach(s => s.Draw(context));
+  //   //this._generalContent.forEach(s => s.Draw(context));
 
-    this._ports.forEach(p => p.Draw(context));
-  }
+  //   //this._ports.forEach(p => p.Draw(context));
+  // }
 
   //SetShapes(shapes: Content[] = []) {
   //  this._content = shapes.concat([]);
@@ -273,6 +279,7 @@ export abstract class Shape implements IShape {
     return this.IsPointInShape(shapeSelectResult.point);
   }
 
+
   get IsHit() {
     return this._hit;
   }
@@ -282,7 +289,7 @@ export abstract class Shape implements IShape {
     this.top = y;
   }
 
-  MoveIfHit(point: Point): boolean{
+  MoveIfHit(point: Point): boolean {
     if (this.IsHit) {
       this.MoveBy(point.X, point.Y);
       return true;
@@ -301,10 +308,10 @@ export abstract class Shape implements IShape {
     this.left += x;
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-    this._ports.forEach((p, i) => p.MoveBy(x, y));
-   // this._content.forEach((s, i) => s.Shape.MoveBy(x, y));
- //   this._imageContent.forEach((s, i) => s.MoveBy(x, y));
- //   this._generalContent.forEach((s, i) => s.MoveBy(x, y));
+    // this._ports.forEach((p, i) => p.MoveBy(x, y));
+    // this._content.forEach((s, i) => s.Shape.MoveBy(x, y));
+    //   this._imageContent.forEach((s, i) => s.MoveBy(x, y));
+    //   this._generalContent.forEach((s, i) => s.MoveBy(x, y));
   }
 
   SizeBy(context: any, top: number, right: number, bottom: number, left: number) {
@@ -362,7 +369,7 @@ export abstract class Shape implements IShape {
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
 
-    this._ports.forEach((p, i) => p.SizeBy(context, top, right, bottom, left));
+    //this._ports.forEach((p, i) => p.SizeBy(context, top, right, bottom, left));
     //  this._shapes.forEach((s, i) => s.SizeBy(context,top, right, bottom, left));
   }
 
@@ -383,7 +390,7 @@ export abstract class Shape implements IShape {
     this.left = x - (this.width / 2);
     this._center.SetToPosition(this.left, this.top);
     this._center.Offset(this.width / 2, this.height / 2);
-   // this.Contents.forEach(c => c.Shape.CenterOn(x, y));
+    // this.Contents.forEach(c => c.Shape.CenterOn(x, y));
   }
 
   positionOnTick(x: number, y: number) {
@@ -398,8 +405,9 @@ export abstract class Shape implements IShape {
   }
 
   public IsPointInShape(point: Point) {
-    this._hit = (point != null && this.top < point.Y && this.Bottom > point.Y
-      && this.left < point.X && this.Right > point.X);
+    this._hit = this.HitTest(point);
+    //console.error(point.X + "-" + point.Y + ":::" + this.top + "-" + this.Bottom + "-" + this.Left + "-" + this.Right)
+ 
     return this._hit;
   }
 
@@ -426,29 +434,26 @@ export abstract class Shape implements IShape {
   //  this._ports.push(new Port(id, offsetX, offsetY, this, type, state, pathId));
   //}
 
-  AddPort(port: IShape): IShape {
-    let removedPort: IShape[] = [];
-    let index = this._ports.findIndex(p => p.Id.toLowerCase() == port.Id.toLowerCase());
-    if (index >= 0) {// Remove items with the same Id...
-      removedPort = this._ports.splice(index, 1);
-    }
-    this._ports.push(port);
-    return (removedPort.length > 0) ? removedPort[0] : null;
-  }
+  //AddPort(port: IShape): IShape {
+  //  let removedPort: IShape[] = [];
+  //  let index = this._ports.findIndex(p => p.Id.toLowerCase() == port.Id.toLowerCase());
+  //  if (index >= 0) {// Remove items with the same Id...
+  //    removedPort = this._ports.splice(index, 1);
+  //  }
+  //  this._ports.push(port);
+  //  return (removedPort.length > 0) ? removedPort[0] : null;
+  //}
 
-  RemovePort(portId: string): IShape {
-    let removedPort: IShape[] = [];
-    let index = this._ports.findIndex(p => p.Id.toLowerCase() == portId.toLowerCase());
-    if (index >= 0) {// Remove items with the same Id...
-      removedPort = this._ports.splice(index, 1);
-    }
-    return (removedPort.length > 0) ? removedPort[0] : null;
-  }
+  //RemovePort(portId: string): IShape {
+  //  let removedPort: IShape[] = [];
+  //  let index = this._ports.findIndex(p => p.Id.toLowerCase() == portId.toLowerCase());
+  //  if (index >= 0) {// Remove items with the same Id...
+  //    removedPort = this._ports.splice(index, 1);
+  //  }
+  //  return (removedPort.length > 0) ? removedPort[0] : null;
+  //}
 
 
-  get Ports(): IShape[] {
-    return this._ports;
-  }
 
   //get Contents() {
   //  return this._content;
@@ -480,21 +485,26 @@ export abstract class Shape implements IShape {
 export class ShapeContainer {
 
   constructor(
-    private Contents: IShape[] = []) {
+    private Contents: PathShape[] = [],
+    private MasterShape: IShape = null) {
   }
 
   AddContent(content: IShape) {
     try {
+
       content.ClearHit();
-      this.Contents.unshift(content);
+      this.Contents.unshift(content as PathShape);
     }
     catch (e) {
-      console.error("Tried to add invalid content");
+     // console.error("Tried to add invalid content");
     }
   }
 
-  RemoveItemAtPoint(point: Point) : IShape {
+  RemoveItemAtPoint(point: Point): IShape {
     let i = this.Contents.findIndex(c => c.IsPointInShape(point));
+    if (i < 0) {
+      return null;
+    }
     let c = this.Contents.splice(i, 1);
     return c[0];
   }
@@ -534,14 +544,121 @@ export class ShapeContainer {
   }
 
   SelectContentFromPoint(point: Point): boolean {
-    
-    return this.Contents.some(c => c.IsPointInShape(point))
-    
+
+    return this.Contents.some(c => c.IsPointInShape(point));
+
   }
 
   public DrawContent(context: any) {
-    this.Contents.forEach(c => c.Draw(context));
+    this.Contents.forEach(c => c.DrawPartial(context));
   }
+
+  public DrawPath(context: any, path: PortPath, line: Line) {
+  //  path.DrawPathLinks(context, this.Contents, line);
+  //  this.Contents.forEach(c => c.DrawPorts(context));
+  }
+}
+
+//id: string,
+//  top: number,
+//    left: number,
+//      width: number,
+//        height: number,
+//          stateName: string,
+//            _zIndex: number = 0,
+//              hitState: string = stateName
+export abstract class PathShape implements IShapeContainer {
+
+ // _partialPath: PathLink[] = [];
+  constructor(protected ports: IShape[] = [],
+    protected internalShape: IShape) {
+
+  }
+
+  get InternalShape(): IShape { return this.internalShape; }
+
+
+  get Id(): string { return this.internalShape.Id; }
+  get Top(): number { return this.internalShape.Top; }
+  get Right(): number { return this.internalShape.Right; }
+  get Bottom(): number { return this.internalShape.Bottom; }
+  get Left(): number { return this.internalShape.Left; }
+
+  get Width(): number { return this.internalShape.Width; }
+  get Height(): number { return this.internalShape.Height; }
+
+  get Center(): Point { return this.internalShape.Center; }
+  get IsHit(): boolean { return this.internalShape.IsHit; }
+
+  get StateName(): string { return this.internalShape.StateName; }
+  get AreaType(): AreaType { return this.internalShape.AreaType; }
+  get FreedomOfMotion(): FreedomOfMotion { return this.internalShape.FreedomOfMotion; }
+  get FreedomOfSizing(): FreedomOfMotion { return this.internalShape.FreedomOfSizing; }
+
+  //DrawShape(context: any);
+  MoveTo(x: number, y: number) { return this.internalShape.MoveTo(x, y); }
+  SizeBy(context: any, top: number, right: number, bottom: number, left: number) { return this.internalShape.SizeBy(context, top, right, bottom, left); }
+  CenterOn(x: number, y: number) { return this.internalShape.CenterOn(x, y); }
+  SetProperties(properties: any) { return this.internalShape.SetProperties(properties); }
+  Select(criteria: any): boolean { return this.internalShape.Select(criteria); }
+  IsPointInShape(point: Point) { return this.internalShape.IsPointInShape(point); }
+  // Track(point: Point, tracker: AreaTracker): boolean;
+
+  get StateIndex(): StateIndex { return this.internalShape.StateIndex; }
+  Touch(point: Point): any { return this.Touch(point); }
+  HitTest(point: Point): boolean { return this.HitTest(point) };
+  ClearHit(): any {
+
+    return this.InternalShape.ClearHit();
+  }
+
+  //GetPartialPath(pathLinks: PathLink[]): number[] {
+  //  let pathi: number[] = [];
+  //  let partialPath: PathLink[] = [];
+  //  this.ports.forEach(function (p, i) {
+  //    let r = pathLinks.findIndex(l => l.isSource(p) || l.isTarget(p));
+  //    if (r >= 0) {
+  //      pathi.push(r);
+  //    }
+  //  });
+  //  return pathi;
+  //}
+
+  FindPorts(pathLinks: PathLink[]) {
+
+    this.ports.forEach(function (p, i) {
+      pathLinks.some(l => l.isSource(p) || l.isTarget(p));
+    });
+
+  }
+
+  public Draw(context: any) {
+    this.internalShape.Draw(context);
+    this.DrawPorts(context);
+  }
+
+  public DrawPartial(context: any) {
+    this.internalShape.Draw(context);
+  }
+
+  public DrawPorts(context: any) {
+    this.ports.forEach(p => p.Draw(context));
+  }
+
+  public MoveBy(x: number, y: number) {
+    this.internalShape.MoveBy(x, y);
+    this.ports.forEach((p, i) => p.MoveBy(x, y));
+  }
+
+  get Ports(): IShape[] {
+    return this.ports;
+  }
+
+  get zIndex() { return this.internalShape.zIndex; }
+
+  CopyShape(newID: string): Shape { return this.CopyShape(newID); }
+  CopyItem(newID: string): IContextItem { return this.CopyItem(newID); }
+  Save(): any { return this.internalShape.Save(); }
 }
 
 export class TrackShape {

@@ -3,11 +3,12 @@
 import { Port } from '../shapes/port';
 import { Point } from '../shapes/primitives/point';
 import { IContextItem, ContextSystem } from '../IContextItem';
-import { ILine } from './Iline'
+import { ILine } from './ILine'
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { ShapeSelectResult } from '../shapes/shapeSelected';
 import { ContextModel } from 'src/canvas/component/context.model';
 import { IShape } from '../shapes/IShape';
+import { PathShape } from '../shapes/shape';
 
 export enum lineTypes {
   straight = 0,
@@ -24,13 +25,44 @@ export enum lineTypes {
 export interface IPortPath {
   Id: string
 }
+
+export class PathLink  {
+
+  sourcePosition: Point = new Point(0,0);
+  targetPosition: Point = new Point(0,0);
+
+  constructor(protected Id: string,
+    protected source: string,
+    protected target: string) { }
+
+  isSource(port: IShape): boolean {
+    if (port.Id == this.source) {
+      this.sourcePosition = port.Center;
+      return true;
+    }
+    return false;
+  }
+
+  isTarget(port: IShape): boolean {
+    if (port.Id == this.target) {
+      this.targetPosition = port.Center;
+      return true;
+    }
+    return false;
+  }
+}
+
+
+export class YDNAPath {
+
+}
+
 export class PortPath implements IPortPath {
 
+  protected ports: PathLink[] = [];
   constructor(
     protected id: string,
-    protected ports: any[] = [],
-    offsetX: number = 0,
-    offsetY: number = 0) { }
+    protected lineId: string = "") { }
 
   get Id(): string {
     return this.id;
@@ -40,33 +72,103 @@ export class PortPath implements IPortPath {
     return this.ports.length;
   }
 
-  AddPorts(ports: Port[] ) {
+
+  AddPorts(ports: PathLink ) {
     this.ports.push(ports);
   //  this.ports = this.ports.sort((a, b) => a.Position - b.Position);
   }
 
   DrawAreaPorts(context: any): void {
     this.ports.forEach(function (pp, i) {
-      pp.forEach(p => p.Draw(context));
+     // pp.forEach(p => p.Draw(context));
+    });
+  }                                     
+
+  MovePathPorts(shapeID: string, dx: number, dy: number) {
+ 
+    this.Ports.forEach(function (p, i) {
+     // let ports = p.filter(pp => pp.ParentShapeID == shapeID);
+      //if (ports.length > 0) {
+      //  let sss = 0;
+      //}
+      //ports.forEach(pp => pp.MoveBy(dx, dy));
+      
+    });
+  }
+
+  DrawActiveShapeLinks(ctx: CanvasRenderingContext2D, pathShape: PathShape, line: Line) {
+ //   pathShape.FindPorts(this.Ports);
+    line.DrawPathLinks(ctx, this.Ports);
+  }
+
+  DrawPathLinks(ctx: CanvasRenderingContext2D, contents: IShape[], line: Line) {
+
+    contents.forEach(s => (<PathShape>s).FindPorts(this.Ports));
+    line.DrawPathLinks(ctx, this.Ports);
+
+  }
+
+  DrawActiveLinks(ctx: CanvasRenderingContext2D, shape: PathShape, line: Line) {
+
+    if (shape) {
+      shape.FindPorts(this.Ports);
+      line.DrawPathLinks(ctx, this.Ports);
+    }
+  }
+
+  DrawShapePath(context: any, shapeID: string, line: ILine) {
+    this.Ports.forEach(function (p, i) {
+      //let linePorts = (<Port[]>p).filter(pp => pp.LineId == line.Id && pp.ParentShapeId == shapeID);
+      //if (linePorts.length > 0) {
+      //  line.DrawLine(context, linePorts.map(p => p.Center));
+      //}
     });
   }
 
   DrawPath(context: any, line: ILine) {
     this.ports.forEach(function (p, i) {
-      let linePorts = (<Port[]>p).filter(pp => pp.LineId == line.Id);
-      line.DrawLine(context,linePorts.map(p => p.Center));
+  //    let linePorts = (<Port[]>p).filter(pp => pp.LineId == line.Id);
+   //   line.DrawLine(context,linePorts.map(p => p.Center));
     });
   }
   
   RemovePortPoint(oldpt: Point) {
-    let i = this.ports.findIndex(p => p.Center.X == oldpt.X && p.Center.Y == oldpt.Y);
-    if (i >= 0) {
-      this.ports.splice(i, 1);
-      return true;
-    }
+    //let i = this.ports.findIndex(p => p.Center.X == oldpt.X && p.Center.Y == oldpt.Y);
+    //if (i >= 0) {
+    //  this.ports.splice(i, 1);
+    //  return true;
+    //}
     return false;
   }
 
+  ReturnActivePath(path: PathLink[]) {
+    this.ports = this.ports.concat(path);
+  }
+
+  ExtractActivePath(pathports: IShape[]): PathLink[] {
+    let path : PathLink[] = [];
+    let self = this;
+    let pathi: number[] = [];
+    pathports.forEach(function (p, i) {
+      let r = self.ports.findIndex(l => l.isSource(p) || l.isTarget(p));
+      if (r >= 0) {
+        pathi.push(r);
+      }
+    });
+    pathi.forEach(function (p, i) {
+      let port = self.ports.splice(p, 1).pop();
+      path.push(port);
+    });
+    return path;
+  }
+
+  //FindPorts(shape : ) {
+
+  //  this.ports.forEach(function (p, i) {
+  //    pathLinks.some(l => l.isSource(p) || l.isTarget(p));
+  //  });
+
+  //}
   //AddPortPoint(pt: Point, position: number = 0): number {
   //  //switch (type) {
   //  //}
@@ -151,10 +253,10 @@ export class PortPath implements IPortPath {
 
 
   ResetToPort(position: number) {
-    let port = this.ports.find(p => p.Position == position);
-    if (port) {
-      port.CenterOn(port.Center.X, port.Center.Y);
-    }
+   // let port = this.ports.find(p => p.Position == position);
+   // if (port) {
+   ////   port.CenterOn(port.Center.X, port.Center.Y);
+   // }
   }
 }
 
@@ -204,6 +306,16 @@ export class Line implements ILine {
 
   UpdateContextState() { }
 
+  DrawPathLinks(ctx: CanvasRenderingContext2D, links: PathLink[]) {
+    let self = this;
+    links.forEach(function (l, i) {
+      ctx.beginPath();
+      ctx.moveTo(l.sourcePosition.X, l.sourcePosition.Y);
+      ctx.lineTo(l.targetPosition.X, l.targetPosition.Y);
+      self.Draw(ctx);
+    });
+  }
+
   DrawLine(ctx: CanvasRenderingContext2D, path: Point[] = []): void {
     ctx.beginPath();
 
@@ -223,7 +335,6 @@ export class Line implements ILine {
   Plot(ctx: CanvasRenderingContext2D, path: Point[]) {
     path.slice(1).forEach(p => ctx.lineTo(p.X, p.Y));
   }
-
 
   CopyItem(newId: string) {
     return null;

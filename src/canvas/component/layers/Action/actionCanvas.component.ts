@@ -160,7 +160,7 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   OnMouseUp(e: any) {
     this.Clear();
-    this._contextLayer.releaseSelectedItem(this._context);
+    this._contextLayer.releaseSelectedItem(e,this._context);
     this.TopCanvas.releasePointerCapture(e.pointerId);
   }
 
@@ -179,12 +179,12 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   OnMouseMove(e: any) {
-    //this._contextLayer.mouseMove(e, this.TopContext);
-    //if (!this._autoUpdate) {
-    //  setTimeout(() =>
-    //    this.RunAutoUpdate()
-    //    , 10);
-    //}
+    this._contextLayer.mouseMove(e, this.TopContext);
+    if (!this._autoUpdate) {
+      setTimeout(() =>
+        this.RunAutoUpdate()
+        , 10);
+    }
   }
 
   setSize() {
@@ -206,7 +206,7 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     let area = this.TheCanvas.getBoundingClientRect();
     this._clientArea = new Rectangle('activeBoundingArea', area.top, area.left, area.width, area.height, 'boundingArea');
     if (!this._contextLayer) {
-      this._contextLayer = this.canvasService.GetContextLayer(this.layerName, this._clientArea, this._context);
+      this._contextLayer = this.canvasService.GetContextLayer(this.layerName, this._clientArea,this._context);
     }
     else {
       this._contextLayer.Resize(this._clientArea);

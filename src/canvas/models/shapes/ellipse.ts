@@ -2,6 +2,7 @@ import { Shape } from './shape';
 import { IContextItem, ContextSystem } from '../IContextItem';
 import { DisplayValues, StateIndex, UIStates } from '../DisplayValues'
 import { ContextModel } from 'src/canvas/component/context.model';
+import { IShape } from './IShape';
 
 export class Ellipse extends Shape {
 
@@ -49,7 +50,7 @@ export class Ellipse extends Shape {
       Shapes: [],
       Content: {}
     }
-    this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
+   // this.Ports.forEach((p, i) => model.Ports.push(p.Save()));
    // this.Contents.forEach((s, i) => model.Text.push(s.Shape.Save()));
     return model;
   }

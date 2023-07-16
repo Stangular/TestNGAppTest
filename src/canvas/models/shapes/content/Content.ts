@@ -12,6 +12,7 @@ export abstract class Content  {
 
   constructor(protected id: string,
     protected stateName: string,
+    protected hitStateName: string,
     protected content: string,
     protected fromSource: boolean = false,
     protected angle: number = 0) {
@@ -28,6 +29,15 @@ export abstract class Content  {
   get Angle() { return this.angle; }
   get FromSource() { return this.fromSource; }
   get StateIndex() { return this._stateIndex; }
+
+  Active(hit: boolean) {
+    if (hit) {
+      this._stateIndex = DisplayValues.GetShapeIndex(this.hitStateName);
+    }
+    else {
+      this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
+    }
+  }
 }
 export interface IDynamicContent<T> {
   Update(content: T);
@@ -81,18 +91,20 @@ export class TextContent extends Content {
   _textWidth: number = 0;
   constructor(Id: string,
     stateName: string,
+    hitStateName: string,
     content: string,
     fromSource: boolean = false,
     angle: number = 0) {
     super(Id,
       stateName,
+      hitStateName,
       content,
       fromSource,
       angle);
   }
 
   Update(content: any) { }
-
+  
   MeasureText(ctx: CanvasRenderingContext2D, height: number): number {
     ctx.save();
     ctx.font = height + "px " + DisplayValues.GetFont(this.StateIndex.Index[UIStates.fontFace]);
@@ -102,6 +114,8 @@ export class TextContent extends Content {
   }
 
   public Draw(ctx: CanvasRenderingContext2D, shape: IShape) {
+
+ //   console.error("DRAW C: " + this.State + ":" + this.StateIndex.State + ":" + this.StateIndex.Index)
 
     //let textWidth = this.MeasureText(ctx, shape.Height, this.StateIndex);
     //if (shape.Width <= textWidth) {
@@ -119,10 +133,10 @@ export class TextContent extends Content {
     //ctx.fill();
     //ctx.strokeStyle = DisplayValues.GetColor(this.shape.StateIndex.Index[UIStates.foreground]);
 
-    ctx.font = shape.Height + "px " + DisplayValues.GetFont(shape.StateIndex.Index[UIStates.fontFace]);
+    ctx.font = ( shape.Height - 1) + "px " + DisplayValues.GetFont(this.StateIndex.Index[UIStates.fontFace]);
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'left';
-    ctx.fillStyle = DisplayValues.GetFGColor(shape.StateIndex.Index[UIStates.foreground]);
+    ctx.fillStyle = DisplayValues.GetFGColor(this.StateIndex.Index[UIStates.foreground]);
     ctx.textAlign = 'left';
     ctx.fillText(this.content, shape.Width / 2 - this._textWidth / 2, shape.Height);// Width calculation is to center the text in the area
   //  ctx.strokeStyle = 'transparent';
@@ -138,6 +152,7 @@ export class ImageContent extends Content {
   private _ready;
   constructor(Id: string,
     stateName: string,
+    hitStateName: string,
     content: string,
     shape: IShape,
     fromSource: boolean = false,
@@ -145,6 +160,7 @@ export class ImageContent extends Content {
     protected imageIndex: number = 0) {
     super(Id,
       stateName,
+      hitStateName,
       content,
       fromSource,
       angle);

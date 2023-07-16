@@ -53,7 +53,6 @@ export interface IShape extends IContextItem {
  // Track(point: Point, tracker: AreaTracker): boolean;
 
   StateIndex: StateIndex;
-  Ports: IShape[];
   Touch(point: Point);
   HitTest(point: Point): boolean;
   ClearHit();
@@ -107,5 +106,11 @@ export class EmptyShape implements IShape {
   CopyItem(newId: string): IContextItem { return null; };
   Save(): any { };
 }
+
+
+export interface IShapeContainer extends IShape {
+  InternalShape: IShape;
+}
+
 
 

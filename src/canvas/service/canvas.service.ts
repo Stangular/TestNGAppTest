@@ -68,8 +68,9 @@ export class CanvasService {
     DisplayValues.SetWeight('TimeSpanLine', 2);
     DisplayValues.SetColor('DefaultBG', '#bbbbbb');
     DisplayValues.SetWeight('DefaultBG', 2);
-    DisplayValues.SetFont('DefaultBG', 'FontAwesome');
+    DisplayValues.SetFont('DefaultBG', 'Roboto');
     DisplayValues.SetColor('DefaultFG', '#000000');
+    DisplayValues.SetColor('DefaulthitFG', '#330000');
     DisplayValues.SetColor('OddSlot', '#bbbbbb');
     DisplayValues.SetColor('EvenSlot', '#FFE4E1');
     DisplayValues.SetGradientColor('OddSlot', '#FFE4E1');
@@ -85,12 +86,16 @@ export class CanvasService {
     DisplayValues.SetFGColor('sizerHandleA', 'yellow');
     DisplayValues.SetColor('sizerHandleB', 'transparent');
     DisplayValues.SetFGColor('sizerHandleB', 'yellow');
+    DisplayValues.SetFont('personData', 'Lato');
     DisplayValues.SetColor('personData', 'transparent');
+    DisplayValues.SetFGColor('personData', 'blue');
+    DisplayValues.SetFont('personData_hit', 'verdana');
+    DisplayValues.SetFGColor('personData_hit', 'yellow');
+    DisplayValues.SetColor('personData_hit', 'red');
     DisplayValues.SetColor('personContainer', '#ffffff');
     DisplayValues.SetColor('personContainer_hit', '#ff22ff');
     DisplayValues.SetColor('personPort1', '#555555');
     DisplayValues.SetColor('personPort2', 'yellow');
-    DisplayValues.SetFGColor('personData', '#000000');
     DisplayValues.SetColor('person', '#ffffff');
     DisplayValues.SetColor('timeLineColor', '#44121255');
     DisplayValues.SetColor('dnaSegmentLineColor', 'yellow');
@@ -479,6 +484,7 @@ export class CanvasService {
           let content = new TextContent(
             c.id,
             c.displayValueId,
+            "",
             c.content,
             c.fromSource || false,
             c.angle);
@@ -497,6 +503,7 @@ export class CanvasService {
           let content = new ImageContent(
             c.id,
             c.displayValueId,
+            "",
             c.content,
             c.fromSource || false,
             c.angle,

@@ -39,6 +39,7 @@ export class YearContent extends TextContent {
     angle: number = 0) {
     super(Id,
       stateName,
+      "",
       year.toString(),
       fromSource,
       angle);
@@ -63,6 +64,7 @@ export class MonthContent extends TextContent {
     angle: number = 0) {
     super(Id,
       stateName,
+      "",
       month.toString(),
       fromSource,
       angle);
@@ -100,6 +102,7 @@ export class DecadeContent extends TextContent {
     angle: number = 0) {
     super(Id,
       stateName,
+      "",
       year.toString(),
       fromSource,
       angle);
@@ -122,6 +125,7 @@ export class CenturyContent extends TextContent {
     angle: number = 0) {
     super(Id,
       stateName,
+      "",
       year.toString(),
       fromSource,
       angle);
@@ -270,7 +274,7 @@ export abstract class TimeLine extends Rectangle implements ITimeLine {
     angle: number): TextContent;
 
   public DrawContent(context: any) {
-    super.DrawContent(context);
+    super.Draw(context);
     //this._slider.Draw(context);
   }
 
@@ -369,7 +373,7 @@ export abstract class TimeLineByYear extends TimeLine {
     for (; position > this.Left - this.Width; position -= this._unitSize) {
       let y = refYear.toString();
       let state = (count % 2 == 0) ? 'OddSlot' : 'OddSlot';
-      let c = new TextContent("timelineSlot_text_" + y, "DefaultFG", y);
+      let c = new TextContent("timelineSlot_text_" + y, "DefaultFG", "", y);
       let s = new TimeLineMarker(
         "timelineSlot_" + count,
         this.Top,

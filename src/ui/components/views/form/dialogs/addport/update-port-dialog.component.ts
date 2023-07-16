@@ -53,10 +53,10 @@ export class UpdatePortDialog implements OnInit {
         startWith(''),
         map(value => this._filterPort(value))
     );
-    if (this.canvasService.ActiveShape.Ports.length > 0) {
-      let port = this.canvasService.ActiveShape.Ports[0];
-      this.portName.setValue(port.Id);
-    }
+    //if (this.canvasService.ActiveShape.Ports.length > 0) {
+    //  let port = this.canvasService.ActiveShape.Ports[0];
+    //  this.portName.setValue(port.Id);
+    //}
   }
 
   private _filterPort(value: string): IShape[] {
@@ -65,22 +65,22 @@ export class UpdatePortDialog implements OnInit {
      
     this.data.name = value;
     this.data.paths = [];
-    let list = this.canvasService.ActiveShape.Ports
-      .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
-    if (list.length == 1) {
-      let port = list[0] as Port;
-      this.data.offsetX = port.OffsetX.toString();
-      this.data.offsetY = port.OffsetY.toString();
-    //  this.data.path = port.PathId;
-    }
-    if (list.length <= 0) {
-      this.data.offsetX = "0";
-      this.data.offsetY = "0";
-      this.data.path = '';
-    }
-    if (list.length > 0) {
-      this.pathName.setValue(list[0].Id);
-    }
+    let list = null; //this.canvasService.ActiveShape.Ports
+    //  .filter(option => option.Id.toLowerCase().indexOf(v) >= 0);
+    //if (list.length == 1) {
+    //  let port = list[0] as Port;
+    //  this.data.offsetX = port.OffsetX.toString();
+    //  this.data.offsetY = port.OffsetY.toString();
+    ////  this.data.path = port.PathId;
+    //}
+    //if (list.length <= 0) {
+    //  this.data.offsetX = "0";
+    //  this.data.offsetY = "0";
+    //  this.data.path = '';
+    //}
+    //if (list.length > 0) {
+    //  this.pathName.setValue(list[0].Id);
+    //}
     return list;
   }
 

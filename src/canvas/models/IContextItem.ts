@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Point } from "./shapes/primitives/point";
 import { Size } from "./shapes/primitives/size";
 import { ShapeSelectResult, eContentType } from "./shapes/shapeSelected";
-import { Shape } from "./shapes/shape";
+import { Shape, PathShape } from "./shapes/shape";
 import { forEach } from "@angular/router/src/utils/collection";
-import { Line, PortPath, lineTypes, VerticalToVerticalLine, VerticaToHorizontallLine, HorizontalToVerticalLine, HorizontallToHorizontalLine, GradientLine, BezierLine } from './lines/line';
+import { Line, PortPath, lineTypes, VerticalToVerticalLine, VerticaToHorizontallLine, HorizontalToVerticalLine, HorizontallToHorizontalLine, GradientLine, BezierLine, PathLink } from './lines/line';
 import { Port } from './shapes/port';
 import { Rectangle } from './shapes/rectangle';
 import { StateIndex, UIStates, DisplayValues } from './DisplayValues';
@@ -106,7 +106,7 @@ export class GradientFillStyleTool implements IContextFillStyleTool {
 //  get StateIndex(): StateIndex { return this.content.Shape.StateIndex; };
 //  get Ports(): IShape[] { return this.content.Shape.Ports; }
 //  public HitTest(point: Point): boolean { return false;}
-  
+
 //  ClearHit(){this.content.Shape.ClearHit();};
 //}
 
@@ -117,7 +117,7 @@ class SizerHandle implements IShape {
     private side: number,
     private shape: IShape) { }
 
-   get Id(): string { return this.shape.Id; }
+  get Id(): string { return this.shape.Id; }
   get zIndex(): number { return this.shape.zIndex; }
   Draw(ctx: CanvasRenderingContext2D): void {
     this.shape.Draw(ctx);
@@ -150,8 +150,8 @@ class SizerHandle implements IShape {
   // Track(point: Point, tracker: AreaTracker): boolean;
 
   get StateIndex(): StateIndex { return this.shape.StateIndex; };
-  get Ports(): IShape[] { return this.shape.Ports; }
-  public HitTest(point: Point): boolean { return false;}
+ // get Ports(): IShape[] { return this.shape.Ports; }
+  public HitTest(point: Point): boolean { return false; }
 
   ClearHit() { this.shape.ClearHit(); };
 
@@ -260,7 +260,7 @@ export interface IContextItem {
   Draw(ctx: CanvasRenderingContext2D): void;
   CopyItem(newId: string): IContextItem;
   Save(): any;
-//  InitializeContext(context: CanvasRenderingContext2D);
+  //  InitializeContext(context: CanvasRenderingContext2D);
 }
 
 export interface IContextSystem {
@@ -294,7 +294,7 @@ export class ContextLayer implements IContextSystem {
 
   private layers: ContextLayer[] = [];
   private unitCell: UnitCell = null;
-  private _portPath: PortPath;
+ // private _portPath: PortPath;
   constructor(
     private parentArea: Rectangle,
     private id: string,
@@ -305,7 +305,7 @@ export class ContextLayer implements IContextSystem {
     protected content: IContextItem[] = [],
     protected lines: ILine[] = []) {
     this.AddCell(id, name, updatedBy, updatedOn);
-    this._portPath = new PortPath(this.id + "_paths");
+  //  this._portPath = new PortPath(this.id + "_paths");
   }
 
   get ParentArea() {
@@ -335,7 +335,7 @@ export class ContextLayer implements IContextSystem {
   get CanvasId() { return this.id; }
 
   ClearPaths() {
-   // this.paths = [];
+    // this.paths = [];
   }
 
   Draw(context: CanvasRenderingContext2D) {
@@ -346,20 +346,25 @@ export class ContextLayer implements IContextSystem {
   }
 
   DrawPaths(context: CanvasRenderingContext2D, line: ILine) {
-   // let paths = this.paths.filter(p => p.LineId == line.Id);
+    // let paths = this.paths.filter(p => p.LineId == line.Id);
     // paths.forEach(p => line.DrawPortPath(context, p));
   }
 
   DrawShape(context: CanvasRenderingContext2D, shape: Shape) {
     shape.Draw(context);
-  //  shape.Ports.forEach(p => this.DrawPortPath(context, p as Port));
-    shape.DrawContent(context);
+    //  shape.Ports.forEach(p => this.DrawPortPath(context, p as Port));
+    //shape.Draw(context);
   }
 
-  DrawPortPath(context: CanvasRenderingContext2D) {
-    this.Lines.forEach(l => this._portPath.DrawPath(context, l));
-    this._portPath.DrawAreaPorts(context);
+  DrawShapePortPath(context: CanvasRenderingContext2D,shapeId:string) {
+ //   this.Lines.forEach(l => this._portPath.DrawShapePath(context,shapeId, l));
+ //   this._portPath.DrawAreaPorts(context);
   }
+
+  //DrawPortPath(context: CanvasRenderingContext2D) {
+  //  this.Lines.forEach(l => this._portPath.DrawPath(context, l));
+  //  this._portPath.DrawAreaPorts(context);
+  //}
 
   Init(): void { };
   //AddLine(result: any) {
@@ -392,24 +397,24 @@ export class ContextLayer implements IContextSystem {
     else {
       L.Update(state);
     }
-  //  this.paths = paths.concat(this.paths);
+    //  this.paths = paths.concat(this.paths);
     //  this.paths.forEach(function (p, i) { p.SetInterimPorts(type); });
   }
 
-  AddPortPath(shape: Shape) {
-    let self = this;
-    shape.Ports.forEach(function (p, i) {
-      //let pp = self.paths.find(px => px.Id == (<Port>p).PathId);
-      //if (pp) {
-      //  pp.AddPortPoint(p.Center, (<Port>p).PathPosition);
-      //}
-      //     self.paths.push();
-    });
-  }
+  //AddPortPath(shape: Shape) {
+  //  let self = this;
+  //  shape.Ports.forEach(function (p, i) {
+  //    //let pp = self.paths.find(px => px.Id == (<Port>p).PathId);
+  //    //if (pp) {
+  //    //  pp.AddPortPoint(p.Center, (<Port>p).PathPosition);
+  //    //}
+  //    //     self.paths.push();
+  //  });
+  //}
 
-  get PortPath() {
-    return this._portPath;
-  }
+  //get PortPath() {
+  //  return this._portPath;
+  //}
   //AddPath(id: string) {
   //  this._portPath.AddPorts();
   // // this.paths.push(new PortPath(id));
@@ -516,12 +521,12 @@ export class ContextLayer implements IContextSystem {
   AddContent(content: IContextItem) {
     if (content) {
       this.content.unshift(content);
-      this.AddPortPath(content as Shape);
+     // this.AddPortPath(content as Shape);
       this.SortContentByZIndex();
     }
   }
 
-  AddText(parentShape: Shape,text: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0) {
+  AddText(parentShape: Shape, text: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0) {
     //if (!parentShape) {
     //  parentShape = this.Content[0] as Shape;
     //}
@@ -553,10 +558,10 @@ export class ContextLayer implements IContextSystem {
     //}
   }
 
- // AddGeneralShape(name: string, state: string) {
- //   let activeShape = this.Content[0] as Shape;
- ////   this.AddShape(new Rectangle(name, activeShape.Top + 10, activeShape.Left + 10, 100, 100, state));
- // }
+  // AddGeneralShape(name: string, state: string) {
+  //   let activeShape = this.Content[0] as Shape;
+  ////   this.AddShape(new Rectangle(name, activeShape.Top + 10, activeShape.Left + 10, 100, 100, state));
+  // }
 
   //AddShape(shape: IShape) {
   //  let activeShape = this.Content[0];
@@ -676,8 +681,8 @@ export class sssex extends sss {
 
 export abstract class EventContextLayer extends ContextLayer {
 
-  _mouseStateDownTracker: ITracker = new AreaSizer();
-  _mouseStateUpTracker: ITracker = new AreaTracker();
+  _mouseStateDownTracker: AreaSizer = new AreaSizer();
+  _mouseStateUpTracker: ITracker;// = new AreaTracker();
   _tracker: ITracker = null;
   //protected _actionItem: ActionItemsss;
   protected _selectedItem: IContextItem;
@@ -693,25 +698,30 @@ export abstract class EventContextLayer extends ContextLayer {
     lines: ILine[] = [],
     paths: PortPath[] = []) {
     super(parentArea, id, name, updatedBy, updatedOn, displayState, content, lines);
-   // this._actionItem = new ActionItemsss();
+    // this._actionItem = new ActionItemsss();
     //   this._selectedTracker = this._tracker;
     //   EventContextLayer._sizer = new AreaTracker(null);
+    this._mouseStateUpTracker = this.GetMouseUpTracker();
     this._tracker = this._mouseStateUpTracker;
   }
 
   abstract AutoUpdate();
-  abstract LoadCanvasData(inputData: any): Promise<any>  ;
+  abstract LoadCanvasData(inputData: any): Promise<any>;
   abstract UpdateCanvasData(inputData: any);
   abstract GetContextData(): any;
   abstract GetTouchedShape(point: Point): IShape;
   abstract ReturnTouchedShape(shape: IShape);
 
+
   get hasSelection() {
     return this._selectedItem != null;
   }
 
+  GetMouseUpTracker() {
+    return new AreaTracker();
+  }
   //InitializeContext(context: CanvasRenderingContext2D) {
-    
+
 
   //}
 
@@ -722,8 +732,11 @@ export abstract class EventContextLayer extends ContextLayer {
 
   selectItem(event: any, context: CanvasRenderingContext2D): void {
 
+    this._mouseStateDownTracker.SetTracker(this._mouseStateUpTracker);
     this._tracker = this._mouseStateDownTracker;
-//    let d = this._tracker.mouseCapture(event, this.ParentArea);
+    // 
+    this._tracker.Draw(context, true);
+    //    let d = this._tracker.mouseCapture(event, this.ParentArea);
     //if (!this._tracker.Track(d)) {
     //  let c = this.RemoveContentByPoint(d) as IShape;
     //  if (c) {
@@ -738,18 +751,38 @@ export abstract class EventContextLayer extends ContextLayer {
     //this._tracker.Draw(context, true);
   }
 
-  mouseMove(event: any, context: CanvasRenderingContext2D): void {
-    if (!this._tracker.mouseMove(event, this.ParentArea)) {
-      let c = this.GetTouchedShape(this._tracker.mousePosition) as IShape;
-      this.ReturnTouchedShape(this._tracker.Reset(c));
+  ReleaseTouchedShape( context: CanvasRenderingContext2D){
+    let c = this.GetTouchedShape(this._tracker.mousePosition) as IShape;
+    let p = this._tracker.TrackedArea;
+    if (p) {
+      p.ClearHit();
+      this._tracker.Draw(context, true);
     }
+    this._tracker.Reset(c);
     this._tracker.Draw(context, true);
+    this.ReturnTouchedShape(p);
   }
 
-  releaseSelectedItem(context: CanvasRenderingContext2D) {
+  mouseMove(event: any, context: CanvasRenderingContext2D): void {
+    if (!this._tracker.mouseMove(event, this.ParentArea)) {
+      this.ReleaseTouchedShape(context);
+    }
+    else if (this._mouseStateUpTracker.TrackedArea) {
+      let sid = this._mouseStateUpTracker.TrackedArea.Id;
+      this.ClearContext(context);
+   //   this.PortPath.MovePathPorts(sid, this._tracker.dX, this._tracker.dY);
+      this._tracker.Draw(context, true);
+ //     this.DrawShapePortPath(context, sid);
+    }
+  }
+
+  releaseSelectedItem(event: any, context: CanvasRenderingContext2D) {
 
     this._tracker = this._mouseStateUpTracker;
-  //  this._actionItem.mouseRelease();
+    this.ReleaseTouchedShape(context);
+  //  this._mouseStateDownTracker.Reset(null);
+   // this._tracker.Draw(context, true);
+    //  this._actionItem.mouseRelease();
     //this.PutContentItem(this._tracker.TrackedArea);
     //this._tracker.Reset(this._tracker.TrackedArea);
     //this.ClearContext(context);
@@ -768,11 +801,11 @@ export abstract class EventContextLayer extends ContextLayer {
   Draw(context: CanvasRenderingContext2D, initial: boolean = false) {
     this.ClearContext(context);
     this.content.forEach(s =>
-      (<Shape>s).DrawContent(context));
+      (<Shape>s).Draw(context));
     //this.content.forEach(s =>
     //  (<Shape>s).Ports.forEach(p => this.DrawPortPath(context, p as Port)));
-    this.DrawPortPath(context);
-    
+//    this.DrawPortPath(context);
+
     if (initial) {
       this._tracker.Draw(context, true);
     }
@@ -784,8 +817,8 @@ export interface ITracker {
   MoveItem(dx: number, dy: number);
   Reset(shape: IShape): IShape;
   Draw(context: CanvasRenderingContext2D, initial: boolean);
-  RegisterShape(shapeId: string): void;
-  ForShape(shapeId: string): boolean;
+  //  RegisterShape(shapeId: string): void;
+  // ForShape(shapeId: string): boolean;
   mouseMove(event: any, boundingArea: Rectangle): boolean;
   Track(point: Point): boolean;
   TrackedArea: IShape;
@@ -794,32 +827,33 @@ export interface ITracker {
   mouseCapture(event: any, boundingArea: Rectangle): Point;
   mousePosition: Point;
   Id: string;
+  dX: number;
+  dY: number;
 }
 
 export class AreaTracker implements ITracker {
 
   protected _trackedArea: IShape;
-  private _shapes: string[] = [];
-
   protected _mousePosition: Point = new Point();
   private _previousPosition: Point = new Point();
   private _delta: Point = new Point();
+  protected _trackerPaths: PortPath = new PortPath("", "");
 
-  constructor(private id: string = "no_tracking") {}
+  constructor(private id: string = "no_tracking") { }
 
   get Id(): string { return this.id; }
 
   get mousePosition() { return this._mousePosition; }
 
-  RegisterShape(shapeId: string) {
-    if (!this.ForShape(shapeId)) {
-      this._shapes.push(shapeId);
-    }
-  }
+  //RegisterShape(shapeId: string) {
+  //  if (!this.ForShape(shapeId)) {
+  //    this._shapes.push(shapeId);
+  //  }
+  //}
 
-  ForShape(shapeId: string): boolean {
-    return this._shapes.findIndex(s => s == shapeId) >= 0;
-  }
+  //ForShape(shapeId: string): boolean {
+  //  return this._shapes.findIndex(s => s == shapeId) >= 0;
+  //}
 
   get TrackedArea(): IShape {
     return this._trackedArea;
@@ -827,12 +861,16 @@ export class AreaTracker implements ITracker {
 
   MoveItem(dx: number, dy: number) { }
 
-  Draw(context: CanvasRenderingContext2D, initial: boolean = false) { }
+  Draw(context: CanvasRenderingContext2D, initial: boolean = false) {
+    if (this._trackedArea) {
+      this._trackedArea.Draw(context);
+    }
+  }
 
   Reset(shape: IShape): IShape {
     let previousArea = this._trackedArea;
     this._trackedArea = shape;
-    console.error("TA ID " + this._trackedArea.Id);
+    //    console.error("TA ID " + this._trackedArea.Id);
     return previousArea;
   }
 
@@ -840,8 +878,8 @@ export class AreaTracker implements ITracker {
     return false;
   }
 
-  HitTest() : boolean {
-    return (<IShape>this._trackedArea).IsPointInShape(this.mousePosition);
+  HitTest(): boolean {
+    return this._trackedArea && (<IShape>this._trackedArea).IsPointInShape(this.mousePosition);
   }
 
   Action(): boolean {
@@ -876,7 +914,7 @@ export class AreaTracker implements ITracker {
   get dY() { return this._delta.Y; }
 
   mouseCapture(event: any, boundingArea: Rectangle): Point {
- 
+
     this.positionFromEvent(event, boundingArea);
     this._previousPosition.SetToPosition(this.mousePosition.X, this.mousePosition.Y);
     return this.mousePosition;
@@ -889,13 +927,48 @@ export class AreaTracker implements ITracker {
     this.mousePosition.SetToPosition(offsetX, offsetY);
   }
 
-
-
   mouseRelease(): void {
     this._previousPosition.SetToPosition(0, 0);
     this.mousePosition.SetToPosition(0, 0);
   }
+}
 
+export class PathShapeTracker extends AreaTracker {
+
+  private _path: PathLink[] = [];
+  constructor(private line: Line, id: string = "no_tracking") {
+    super(id);
+  }
+
+  SetActivePath(activePath: PathLink[],line: Line) {
+    this._path = activePath.concat([]);
+    this.line = line;
+  }
+
+  get ActivePath(): PathLink[] {
+    return this._path;
+  }
+
+  ClearActivePath() {
+    this._path = [];
+  }
+
+  Draw(context: CanvasRenderingContext2D, initial: boolean = false) {
+    if (this._trackedArea) {
+      console.error("PATH Draw trackedarea Top:" + this._trackedArea.Top + " Left:" + this._trackedArea.Left);
+      let area = this._trackedArea as PathShape;
+      area.Draw(context);
+      if (this.line && this._path.length > 1) {
+        console.error("***************S " + this._path[0].sourcePosition.X + " *************** " + this._path[0].sourcePosition.Y );
+        console.error("***************T " + this._path[1].targetPosition.X + " *************** " + this._path[1].targetPosition.Y )
+
+        this.line.DrawPathLinks(context, this._path);
+        area.DrawPorts(context);
+      }
+
+    }
+  }
+ 
 }
 
 export class AreaSizer extends AreaTracker {
@@ -903,6 +976,7 @@ export class AreaSizer extends AreaTracker {
   private _handles: SizerHandle[] = [];
   private _activeHandles: SizerHandle[] = [];
   private _sideSelected: boolean = false;
+  private _parentTracker: ITracker;
 
   constructor(id: string = "size_tracking") {
 
@@ -911,12 +985,17 @@ export class AreaSizer extends AreaTracker {
 
     this._handles.push(new SizerHandle('sizerTopLeft', 0, 0, r.CopyShape(r.Id + '_handle_text_TopLeft')));
     this._handles.push(new SizerHandle('sizerTop', 1, 1, r.CopyShape(r.Id + '_handle_text_Top')));
-    this._handles.push(new SizerHandle('sizerTopRight', 0, 2, r.CopyShape(r.Id + '_handle_text_TopRight') ));
+    this._handles.push(new SizerHandle('sizerTopRight', 0, 2, r.CopyShape(r.Id + '_handle_text_TopRight')));
     this._handles.push(new SizerHandle('sizerRight', 2, 3, r.CopyShape(r.Id + '_handle_text_right')));
     this._handles.push(new SizerHandle('sizerBottomRight', 0, 4, r.CopyShape(r.Id + '_handle_text_BottomRight')));
     this._handles.push(new SizerHandle('sizerBottom', 1, 5, r.CopyShape(r.Id + '_handle_text_Bottom')));
     this._handles.push(new SizerHandle('sizerBottomLeft', 0, 6, r.CopyShape(r.Id + '_handle_text_BottomLeft')));
     this._handles.push(new SizerHandle('sizerLeft', 2, 7, r.CopyShape(r.Id + '_handle_text_left')));
+
+  }
+
+  SetTracker(tracker: ITracker) {
+    this._parentTracker = tracker;
   }
 
   Track(point: Point): boolean {
@@ -999,45 +1078,45 @@ export class AreaSizer extends AreaTracker {
   Reset(shape: IShape): IShape {
 
     this.Deactivate();
-    let oldShape = super.Reset(shape);
-   
-    let xhalf = this._trackedArea.Left + (this._trackedArea.Width / 2);
-    let yhalf = this._trackedArea.Top + (this._trackedArea.Height / 2);
-    this._handles[0].CenterOn(this._trackedArea.Left, this._trackedArea.Top);
-    this._handles[1].CenterOn(xhalf, this._trackedArea.Top);
-    this._handles[2].CenterOn(this._trackedArea.Right, this._trackedArea.Top);
-    this._handles[3].CenterOn(this._trackedArea.Right, yhalf);
-    this._handles[4].CenterOn(this._trackedArea.Right, this._trackedArea.Bottom);
-    this._handles[5].CenterOn(xhalf, this._trackedArea.Bottom);
-    this._handles[6].CenterOn(this._trackedArea.Left, this._trackedArea.Bottom);
-    this._handles[7].CenterOn(this._trackedArea.Left, yhalf);
+ //   let oldShape = this._parentTracker.Reset(shape);
+    let area = this._parentTracker.TrackedArea;
+    if( !area ){
+      return area;
+    }
+    let xhalf = area.Left + (area.Width / 2);
+    let yhalf = area.Top + (area.Height / 2);
+    this._handles[0].CenterOn(area.Left, area.Top);
+    this._handles[1].CenterOn(xhalf, area.Top);
+    this._handles[2].CenterOn(area.Right, area.Top);
+    this._handles[3].CenterOn(area.Right, yhalf);
+    this._handles[4].CenterOn(area.Right, area.Bottom);
+    this._handles[5].CenterOn(xhalf, area.Bottom);
+    this._handles[6].CenterOn(area.Left, area.Bottom);
+    this._handles[7].CenterOn(area.Left, yhalf);
     this.Activate();
-    return oldShape;
+    return area;
   }
 
   get TrackedArea(): IShape {
-    return this._trackedArea;
+    return this._parentTracker.TrackedArea
   }
 
   Draw(context: CanvasRenderingContext2D, initial: boolean = false) {
-    if (this._trackedArea) {
-      if (initial) {
-        this._trackedArea.Draw(context);
-      }
-      let activeHandles = this._handles.filter(h => h.IsActive);
-      activeHandles.forEach(h => h.Draw(context));
-    }
+    this._parentTracker.Draw(context, initial);
+    let activeHandles = this._handles.filter(h => h.IsActive);
+    activeHandles.forEach(h => h.Draw(context));
+
   }
 
   mouseMove(event: any, boundingArea: Rectangle): boolean {
-    let r = super.mouseMove(event, boundingArea);
-    this.MoveItem(this.dX, this.dY);
-    return r;
+    this._parentTracker.mouseMove(event, boundingArea);
+    this.MoveItem(this._parentTracker.dX, this._parentTracker.dY);
+    return true;
   }
 
   MoveItem(dx: number, dy: number) {
     if (!this.MoveSide(dx, dy)) {
-      this._trackedArea.MoveBy(dx, dy);
+      this._parentTracker.TrackedArea.MoveBy(dx, dy);
     }
   }
 
@@ -1065,8 +1144,8 @@ export class LinearTracker extends AreaTracker {
 
     if (this._trackedArea) {
 
-   //   (<Shape>this._trackedArea).Contents.forEach((s, i) => s.Shape.MoveBy(dx, 0));
-   //   (<Shape>this._trackedArea).ShiftContent(new Point(dx, dy), this.parentAreaRight);
+      //   (<Shape>this._trackedArea).Contents.forEach((s, i) => s.Shape.MoveBy(dx, 0));
+      //   (<Shape>this._trackedArea).ShiftContent(new Point(dx, dy), this.parentAreaRight);
     }
   }
 
@@ -1075,12 +1154,12 @@ export class LinearTracker extends AreaTracker {
     if (this._trackedArea) {
 
       this._trackedArea.Draw(context);
-      (<Shape>this._trackedArea).DrawContent(context);
+      (<Shape>this._trackedArea).Draw(context);
     }
   }
 
   Reset(shape: IShape): IShape {
-  //  this._trackedArea = shape;
+    //  this._trackedArea = shape;
     return this._trackedArea;
   }
 
@@ -1103,7 +1182,7 @@ export class TrackerFactory {
     this._trackers = [];
   }
   static GetTracker(shapeId: string) {
-    return this._trackers.find(t => t.ForShape(shapeId));
+    //return this._trackers.find(t => t.ForShape(shapeId));
   }
 
   static RegisterTracker(trackerId: string, shapeId: string) {
@@ -1111,7 +1190,7 @@ export class TrackerFactory {
     if (!t) {
       return;
     }
-    t.RegisterShape(shapeId);
+    //   t.RegisterShape(shapeId);
 
   }
 }
@@ -1232,13 +1311,13 @@ export class ActionLayer extends ContextLayer {// uses separate context
   DrawPartial(context: CanvasRenderingContext2D) {
     for (let i = 1; i < this._layer.Content.length; i++) {
       this.DrawLayerShape(context, this._layer.Content[i] as Shape);
-      (<Shape>this._layer.Content[i]).DrawContent(context);
+      (<Shape>this._layer.Content[i]).Draw(context);
     }
   }
 
   DrawLayerShape(context: CanvasRenderingContext2D, shape: Shape) {
     shape.Draw(context);
-    shape.Ports.forEach(p => this.DrawLayerPortPath(context, p as Port));
+ //   shape.Ports.forEach(p => this.DrawLayerPortPath(context, p as Port));
   }
 
   DrawLayerPortPath(context: CanvasRenderingContext2D, port: Port) {
@@ -1255,8 +1334,8 @@ export class ActionLayer extends ContextLayer {// uses separate context
 
     if (!this._layer) { return; }
     this._layer.Content[0].Draw(context);
-    (<Shape>this._layer.Content[0]).DrawContent(context);
-    this._layer.DrawPortPath(context);
+    (<Shape>this._layer.Content[0]).Draw(context);
+  //  this._layer.DrawPortPath(context);
     this._tracker.Draw(context);
     let I = this;
     this._layer.Lines.forEach(l => I.DrawPaths(context, l));
@@ -1388,7 +1467,7 @@ export class ContextSystem implements IContextSystem {
   }
 
   AddText(text: string, containerStateName: string, contentStateName: string, fromSource: boolean, angle: number = 0) {
- //   this.SelectedLayer.AddText(text, containerStateName, contentStateName, fromSource, angle);
+    //   this.SelectedLayer.AddText(text, containerStateName, contentStateName, fromSource, angle);
   }
 
   AddImage(imageName: any, containerStateName: string, contentStateName: string, fromSource: boolean, angle = 0, imageIndex = 0) {

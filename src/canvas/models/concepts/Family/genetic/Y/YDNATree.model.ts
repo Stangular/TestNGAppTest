@@ -5,6 +5,8 @@ import { Ellipse } from "src/canvas/models/shapes/ellipse";
 import { Port } from "src/canvas/models/shapes/port";
 import { lineTypes } from "src/canvas/models/lines/line";
 import { generate } from "rxjs";
+import { IShape } from "src/canvas/models/shapes/IShape";
+import { Point } from "src/canvas/models/shapes/primitives/point";
 
 export class STRModel {
   constructor(
@@ -246,4 +248,7 @@ export class YDNATreeLayer extends EventContextLayer {
   GetContextData(): any {
     return null;
   }
+
+  GetTouchedShape(point: Point): IShape { return null }
+  ReturnTouchedShape(shape: IShape) { }
 }

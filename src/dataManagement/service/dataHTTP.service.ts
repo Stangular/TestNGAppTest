@@ -165,6 +165,7 @@ export class DataHTTPService {
         this.processData(response),
         catchError(this.handleError)));
   }
+
   //https://medium.com/@danielimalmeida/creating-a-file-upload-component-with-angular-and-rxjs-c1781c5bdee
   uploadFiles(event): void {
    // const files = event?.target?.files;  need typescript !3.7 for this!
@@ -180,8 +181,6 @@ export class DataHTTPService {
       });
   }
   
-
-
   //https://medium.com/@danielimalmeida/creating-a-file-upload-component-with-angular-and-rxjs-c1781c5bdee
   private validateFile(file: File): Observable<IUploadedFile> {
     const fileReader = new FileReader();
