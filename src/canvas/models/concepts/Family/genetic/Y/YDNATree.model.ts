@@ -248,6 +248,7 @@ export class YDNATreeLayer extends EventContextLayer {
   GetContextData(): any {
     return null;
   }
+  GetSelectedShape(point: Point): IShape { return null };
 
   GetTouchedShape(point: Point): IShape { return null }
   ReturnTouchedShape(shape: IShape) { }

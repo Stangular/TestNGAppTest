@@ -317,7 +317,7 @@ export abstract class TimeLine extends Rectangle implements ITimeLine {
 }
 
 export abstract class TimeLineByYear extends TimeLine {
-  _contents: ShapeContainer = new ShapeContainer();
+  _contents: ShapeContainer;// = new ShapeContainer();
   constructor(id: string,
     top: number,
     left: number,

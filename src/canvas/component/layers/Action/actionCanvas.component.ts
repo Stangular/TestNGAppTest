@@ -130,12 +130,6 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.canvasService.SSR.PositionFromEvent(e, rect);
   }
 
-  OnMouseDown(e: PointerEvent) {
-    this._contextLayer.selectItem(e, this.TopContext);
-    this._contextLayer.Draw(this._context);
-    this.TopCanvas.setPointerCapture(e.pointerId);
-  }
-
   RunAutoUpdate() {
     this._autoUpdate = this._contextLayer.AutoUpdate();
     if (this._autoUpdate) {
@@ -146,7 +140,6 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       setTimeout(() =>
         this.RunAutoUpdate()
         , 10);
-
     }
   }
 
@@ -158,10 +151,22 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this._clientArea.Height);
   }
 
+  OnMouseDown(e: PointerEvent) {
+
+    this.Clear();
+    this._contextLayer.selectItem(e, this.TopContext);
+ //   this._contextLayer.Draw(this._context);
+    this.TopCanvas.setPointerCapture(e.pointerId);
+    this._contextLayer.Draw(this._context);
+
+  }
+
   OnMouseUp(e: any) {
     this.Clear();
     this._contextLayer.releaseSelectedItem(e,this._context);
     this.TopCanvas.releasePointerCapture(e.pointerId);
+    this._contextLayer.Draw(this._context);
+
   }
 
   OnMouseOver(e: any) {

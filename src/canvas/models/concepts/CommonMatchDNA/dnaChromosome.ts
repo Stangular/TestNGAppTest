@@ -975,6 +975,10 @@ export class DNAChromosomes extends EventContextLayer {
   GetTouchedShape(point: Point): IShape { return null }
   ReturnTouchedShape(shape: IShape) { }
 
+  GetSelectedShape(point: Point): IShape {
+    return null;
+  };
+
   Init() {
     this.ClearContent(1);
     this.ClearPaths();

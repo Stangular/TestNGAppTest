@@ -4,13 +4,15 @@
     "\\src",
     "\\src\\app",
     "\\src\\apps",
-    "\\src\\apps\\CanvasApps",
-    "\\src\\apps\\CanvasApps\\DNAAnalysis",
     "\\src\\canvas",
-    "\\src\\canvas\\models",
-    "\\src\\canvas\\models\\concepts",
-    "\\src\\canvas\\models\\concepts\\Family"
+    "\\src\\canvas\\component",
+    "\\src\\canvas\\component\\layers",
+    "\\src\\canvas\\component\\layers\\Static",
+    "\\src\\NAS_App",
+    "\\src\\NAS_App\\MES",
+    "\\src\\NAS_App\\MES\\New Folder",
+    "\\src\\NAS_App\\Tools"
   ],
-  "SelectedNode": "\\src\\apps\\CanvasApps\\DNAAnalysis\\DNASegments.component.ts",
+  "SelectedNode": "\\src\\NAS_App\\MES\\MES.component.html",
   "PreviewInSolutionExplorer": false
 }

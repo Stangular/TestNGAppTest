@@ -2,7 +2,7 @@
 <mat-drawer-container class="example-container">
   <mat-drawer #sidePanel mode="side" closed>
     <div style="padding:10px">
-      <section class="example-section">
+      <!--<section class="example-section">
         <ul>
           <li>
             <span class="example-list-section">
@@ -32,7 +32,12 @@
             </span>
           </li>
         </ul>
-      </section>
+      </section>-->
+      <!--<select>
+        <option></option>
+      </select>-->
+      <button>Load ISOGG</button>
+      <input type="text"/>
     </div>
   </mat-drawer>
   <mat-drawer-content>
@@ -59,14 +64,14 @@
 
       </mat-grid-tile>-->
 
-      <mat-grid-tile [colspan]="1"
+      <!--<mat-grid-tile [colspan]="1"
                      [rowspan]="4"
                      [style.background]="'#aaaaaa'">
 
-      </mat-grid-tile>
-      <mat-grid-tile [colspan]="62"
+      </mat-grid-tile>-->
+      <mat-grid-tile [colspan]="63"
                      [rowspan]="2"
-                     [style.background]="'blue'">
+                     [style.background]="'transparent'">
         <action-canvas [canvasID]="'family-tree'"
                        [width]="100"
                        [layerName]="'family-tree'"

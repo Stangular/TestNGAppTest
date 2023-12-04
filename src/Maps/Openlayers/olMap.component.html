@@ -21,6 +21,12 @@
         </div>
         <div>    </div>
         <mat-slide-toggle [(ngModel)]="showTopo" (change)="ToggleTopo($event)">Show Topo</mat-slide-toggle>
+        <button mat-icon-button (click)="LoadPath1()">
+          path1
+        </button>
+        <button mat-icon-button (click)="LoadPath2()">
+          path2
+        </button>
         <div style="padding-left:5px; padding-right:5px">
           <mat-label>Year</mat-label>
         </div>
@@ -28,7 +34,8 @@
           <button mat-icon-button [disabled]="Year <= 1600" (click)="PreviousDecade()">
             <mat-icon aria-label="Example icon-button with a heart icon">arrow_back</mat-icon>
           </button>
-        </div>  <div style="display:inline-block; padding-right:5px">
+        </div>
+        <div style="display:inline-block; padding-right:5px">
           <input matInput placeholder="Favorite food" step="10" readonly min="1600" max="1900" style="text-align:center; font-size:large; width:50px" value="Year" [(ngModel)]="Year">
         </div>
         <div style="display:inline-block; padding-right:5px">

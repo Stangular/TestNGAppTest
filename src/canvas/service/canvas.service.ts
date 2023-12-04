@@ -66,7 +66,7 @@ export class CanvasService {
     DisplayValues.SetColor('TimeSpansss', '#aad8e699');
     DisplayValues.SetColor('TimeSpanLine', 'orange');
     DisplayValues.SetWeight('TimeSpanLine', 2);
-    DisplayValues.SetColor('DefaultBG', '#bbbbbb');
+    DisplayValues.SetColor('DefaultBG', 'red');
     DisplayValues.SetWeight('DefaultBG', 2);
     DisplayValues.SetFont('DefaultBG', 'Roboto');
     DisplayValues.SetColor('DefaultFG', '#000000');
@@ -81,13 +81,13 @@ export class CanvasService {
     DisplayValues.SetFGColor('EvenSlot', '#2F4F4F');
     DisplayValues.SetWeight('OddSlot', 0);
     DisplayValues.SetWeight('EvenSlot', 0);
-    DisplayValues.SetColor('boundingArea', 'yellow');
+    DisplayValues.SetColor('boundingArea', 'purple');
     DisplayValues.SetColor('sizerHandleA', '#d8ade699');
     DisplayValues.SetFGColor('sizerHandleA', 'yellow');
     DisplayValues.SetColor('sizerHandleB', 'transparent');
     DisplayValues.SetFGColor('sizerHandleB', 'yellow');
     DisplayValues.SetFont('personData', 'Lato');
-    DisplayValues.SetColor('personData', 'transparent');
+    DisplayValues.SetColor('personData', '#F8F0E3');
     DisplayValues.SetFGColor('personData', 'blue');
     DisplayValues.SetFont('personData_hit', 'verdana');
     DisplayValues.SetFGColor('personData_hit', 'yellow');
@@ -95,13 +95,13 @@ export class CanvasService {
     DisplayValues.SetColor('personContainer', '#ffffff');
     DisplayValues.SetColor('personContainer_hit', '#ff22ff');
     DisplayValues.SetColor('personPort1', '#555555');
-    DisplayValues.SetColor('personPort2', 'yellow');
+    DisplayValues.SetColor('personPort2', '#555555');
     DisplayValues.SetColor('person', '#ffffff');
     DisplayValues.SetColor('timeLineColor', '#44121255');
     DisplayValues.SetColor('dnaSegmentLineColor', 'yellow');
-
+    
     DisplayValues.SetColor('dnaSegments', '#d8ade699');
-
+    DisplayValues.SetColor('familyTree', 'white');
 
     this.GetImageList();
   //  this.contextModel = new ContextModel();
@@ -133,13 +133,21 @@ export class CanvasService {
     people.push(new PersonModel("R-Y34202 ", Sex.Male, "R-Y34202"));
     people.push(new PersonModel("R-E306", Sex.Male, "R-E306"));
     people.push(new PersonModel("R-Y23202", Sex.Male, "R-Y23202"));
+    people.push(new PersonModel("R-Y23202", Sex.Male, "R-Y23555"));
     people.push(new PersonModel("R-FR123394", Sex.Male, "R-FR123394"));
+    people.push(new PersonModel("R-FR123394", Sex.Male, "R-FGC71677"));
     people.push(new PersonModel("R-1211", Sex.Male, "R-1211"));
-    let f = new FamilyModel('197182', 'Shannon', 'R-Y34201', people);
+    people.push(new PersonModel("R-1211", Sex.Male, "R-A8500"));
+    people.push(new PersonModel("R-1211", Sex.Male, "R-S1199"));
+    people.push(new PersonModel("R-1211", Sex.Male, "R-S1196"));
+    people.push(new PersonModel("R-1211", Sex.Male, "R-A8469"));
+    people.push(new PersonModel("R-1211", Sex.Male, "R-S14328"));
+    this.GetISOGG();
+ //   let f = new FamilyModel('197182',context,area, 'Shannon', 'R-Y34201', people);
 
     switch (id.toLowerCase()) {
       case 'dna-segments': result = new DNAChromosomes(area); break;
-      case 'family-tree': result = new FamilyTreeModel(area, f, context); break;
+      case 'family-tree': result = new FamilyTreeModel(context, area, people); break;
       case 'timeline-decade': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.decade); break;
       case 'timeline-century': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.century); break;
       default: result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.year,1844);
@@ -261,6 +269,19 @@ export class CanvasService {
       this.contextSystems[this.selectedSystem].AddNewContent(this.SSR);
     }
   }
+
+  GetISOGG() {
+    let path = "https://localhost:44346/api/ISOGGHaplogroup/sss";
+    this.httpService.getContent(null, path)
+      .subscribe(
+      data => { this.ISOGGResult(data) },
+        err => { this.Fail(err) });
+  }
+
+  ISOGGResult(data: any) {
+
+  }
+
 
   GetImageList() {
     let path = "https://localhost:44314/api/ImageUploader/GetAvailableImageList?=" + 'S:\\Projects\\repos\\Angular6Sandbox\\TestNGApp2\\images';

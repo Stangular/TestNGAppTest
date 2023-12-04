@@ -36,16 +36,21 @@ export class PathLink  {
     protected target: string) { }
 
   isSource(port: IShape): boolean {
+
+ //   console.error("Try Set Source: " + port.Id + " ----------- " + this.source);
     if (port.Id == this.source) {
       this.sourcePosition = port.Center;
+    //  console.error("Set Source: "  +  port.Id);
       return true;
     }
     return false;
   }
 
   isTarget(port: IShape): boolean {
+   // console.error("Try Set Target: " + port.Id + " ----------- " + this.source);
     if (port.Id == this.target) {
       this.targetPosition = port.Center;
+   //   console.error("Set Target: " +  port.Id);
       return true;
     }
     return false;
@@ -148,17 +153,19 @@ export class PortPath implements IPortPath {
   ExtractActivePath(pathports: IShape[]): PathLink[] {
     let path : PathLink[] = [];
     let self = this;
-    let pathi: number[] = [];
+   // let pathi: number[] = [];
     pathports.forEach(function (p, i) {
       let r = self.ports.findIndex(l => l.isSource(p) || l.isTarget(p));
       if (r >= 0) {
-        pathi.push(r);
+        let port = self.ports.splice(r, 1).pop();
+        path.push(port);
+       // pathi.push(r);
       }
     });
-    pathi.forEach(function (p, i) {
-      let port = self.ports.splice(p, 1).pop();
-      path.push(port);
-    });
+    //pathi.forEach(function (p, i) {
+    //  let port = self.ports.splice(p, 1).pop();
+    //  path.push(port);
+    //});
     return path;
   }
 
@@ -312,6 +319,9 @@ export class Line implements ILine {
       ctx.beginPath();
       ctx.moveTo(l.sourcePosition.X, l.sourcePosition.Y);
       ctx.lineTo(l.targetPosition.X, l.targetPosition.Y);
+
+   //   console.error("link source ------------> " + i.toString() + " --------- " + l.sourcePosition.X.toString() + "/" + l.sourcePosition.Y.toString());
+   //   console.error("link target ------------> " + i.toString() + " --------- " + l.targetPosition.X.toString()+ "/" + l.targetPosition.Y.toString());
       self.Draw(ctx);
     });
   }

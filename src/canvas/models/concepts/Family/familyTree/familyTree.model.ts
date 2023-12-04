@@ -1,4 +1,4 @@
-import { ContextLayer, IContextItem, IContextSystem, EventContextLayer, PathShapeTracker } from "src/canvas/models/IContextItem";
+import { ContextLayer, IContextItem, IContextSystem, EventContextLayer, PathShapeTracker, ITracker, MousePosition } from "src/canvas/models/IContextItem";
 import { Rectangle } from "src/canvas/models/shapes/rectangle";
 import { DisplayValues, StateIndex } from "src/canvas/models/DisplayValues";
 import { Ellipse } from "src/canvas/models/shapes/ellipse";
@@ -6,8 +6,8 @@ import { Port } from "src/canvas/models/shapes/port";
 import { lineTypes, PathLink, PortPath, Line } from "src/canvas/models/lines/line";
 import { generate } from "rxjs";
 import { TextContent, Content } from "src/canvas/models/shapes/content/Content";
-import { ShapeContainer, PathShape } from "src/canvas/models/shapes/shape";
-import { IShape } from "src/canvas/models/shapes/IShape";
+import { ShapeContainer, PathShape, Shape } from "src/canvas/models/shapes/shape";
+import { IShape, IShapeContainer } from "src/canvas/models/shapes/IShape";
 import { Point } from "src/canvas/models/shapes/primitives/point";
 import { PathService } from "src/canvas/models/shapes/service/path.service";
 
@@ -80,7 +80,7 @@ export class PersonArea extends PathShape {
     this.content.Draw(context, this);
   }
 }
-export class PersonModel implements IContextItem {
+export class PersonModel  {
 
   constructor(
     private id: string,
@@ -138,37 +138,67 @@ export class PersonModel implements IContextItem {
 
 }
 
-export class FamilyModel implements IContextItem {
+export class FamilyModel extends ShapeContainer {
 
- 
-  protected _content: ShapeContainer = new ShapeContainer();
+  protected _pathLine: Line = new Line("familyPath", "timeLineColor", 0);
+  protected _portPath: PortPath = new PortPath("FamilyPath", "family");
+
+ // protected _content: ShapeContainer; // = new ShapeContainer();
 
   constructor(
     private id: string,
+    context: CanvasRenderingContext2D,
+    private parentArea: Rectangle,
     private surname: string = '',
     private yDNATerminalHaplogroup = '',
     private members: PersonModel[] = []) {
+
+    super(parentArea.CopyItem(id + "_internal"));
+    this.Init(context, 100);
   }
 
   get Id() { return this.id; }
   get zIndex() { return 0; }
+  get PathLine() { return this._pathLine;}
+ // get PathL
+  //MoveContent(dx: number, parentArea: Shape, context: CanvasRenderingContext2D): void {
+  //  this._content.ShiftDiscreteContent(dx, parentArea.Right);
+  //  this._content.DrawContent(context);
+  //}
 
-  Draw(context: any) {
-    this._content.DrawContent(context);
-  }
+  //Draw(context: any) {
+  //  this._content.DrawContent(context);
+  //}
 
-  DrawAll(context: any, portPath: PortPath, line: Line) {
+  DrawAll(context: any) {
     this.Draw(context);
-    this._content.DrawPath(context, portPath, line);
+    if (!this._selected) {
+      this.DrawPath(context, this._portPath, this._pathLine);
+    }
   }
 
-  DrawPortPath(context: CanvasRenderingContext2D, portPath: PortPath, pathLine: Line) {
-    this._content.DrawPath(context, portPath, pathLine);
-
+  SetPortPath(tracker: PathShapeTracker) {
+    if (tracker.TrackedArea) {
+      let path = this._portPath.ExtractActivePath((tracker.TrackedArea as PathShape).Ports);
+      tracker.SetActivePath(path, this.PathLine);
+    }
   }
+
+  GetShape(point: Point): IShape {
+
+    let c = this.Contents.filter(c => c.IsPointInShape(point));
+
+    if (c.length > 0) {
+      return c[0];
+    }
+    return null;
+  }
+  
+  //DrawPortPath(context: CanvasRenderingContext2D, portPath: PortPath, pathLine: Line) {
+  //  this._content.DrawPath(context, portPath, pathLine);
+  //}
 
   CopyItem(newId: string): IContextItem {
-    
     return null;
   }
 
@@ -176,23 +206,83 @@ export class FamilyModel implements IContextItem {
     return '';
   }
 
+  RemoveContent(point: Point) {
+//    let c = this._content;
+    
+  }
+
+  ShiftDiscreteContent(dx: number, boundingAreaRight: number) {
+    super.ShiftDiscreteContent(dx, boundingAreaRight);
+
+  }
+
+  GetMouseUpTracker() {
+    return new PathShapeTracker(this._pathLine);
+  }
+
   GetTouchedMember(point: Point): IShape {
-    let m = this._content.RemoveItemAtPoint(point);
+   
+    let m = this.RemoveItemAtPoint(point);
+
+   // remove selected items on button down
+   // redraw base
+   // add removed items to active state (top)
+   // redraw top 
+
+    // if m is null but in internalshape
+    // all contents must be lifted into the tracker
+      //if (!m) {
+      //  m = this._content;
+      //  this._content = null;
+      //}
+      return m;
     //if (m) {
     //  console.error((<PersonArea>m).InternalShape.GetName());
     //}
     //else {
     //  console.error("No content returned");
     //}
-    return m;
+   // return null;
   }
 
   ReturnMember(member: IShape) {
-    //if (member) {
-    //  console.error("RETURN: " + (<PersonArea>member).GetName());
+    if (member) {
+      console.error("Returned Shape: " + member.Id);
 
-    //}
-    this._content.AddContent(member);
+    }
+    else {
+      let sss = 0;
+      console.error("Returned Shape is null");
+    }
+      this.AddContent(member);
+  }
+
+
+  public MoveBy(x: number, y: number) {
+    let t = this;
+    super.MoveBy(x, y);
+    let l = t._trackdContents.length -1;
+    if (l >= 0 && t._trackdContents[l].Left > 0) {
+      super.MoveBy(-t._trackdContents[l].Left,0);
+    }
+  }
+
+  public UnSelect() {
+    if (this.IsSelected) {
+      super.UnSelect();
+      this.Contents = this._trackdContents.concat([]);
+      this._trackdContents = [];
+
+    }
+  }
+
+  public Selected(point: Point): boolean {
+    if (super.Selected(point)) {
+      this._trackdContents = this.Contents.concat([]);
+      this.Contents = [];
+      return true;
+    }
+    return false;
   }
 
   get Content(): TextContent []{
@@ -215,14 +305,18 @@ export class FamilyModel implements IContextItem {
     return width;
   }
 
-  AddContent(ctx: CanvasRenderingContext2D, contentName: string, parent: ContextLayer,path: PortPath, parentArea: Rectangle, sz: number, offset: number) {
-    let width = sz;
+  ReturnActivePath(path: PathLink[]) {
+    this._portPath.ReturnActivePath(path);
+  }
+
+  Init(ctx: CanvasRenderingContext2D, width: number) {
     let self = this;
+   // this._content = new ShapeContainer(parentArea.CopyShape("123_" + parentArea.Id));
 
     let contents: TextContent[] = [];
-    let r = new Rectangle(contentName, 0, 10, sz, 20, 'FamilyName');
-    parent.AddContent(r);
-    parent.AddText(r, this.surname + " " + this.yDNATerminalHaplogroup, 'FamilyName', 'DefaultFG', false);
+ //   let r = new Rectangle(contentName, 0, 10, sz, 20, 'FamilyName');
+ //   parent.AddContent(content);
+ //   parent.AddText(r, this.surname + " " + this.yDNATerminalHaplogroup, 'FamilyName', 'DefaultFG', false);
     let offsetx = 10;
     let generation = 0; //this.members.length - 1;
     let ports: IShape[] = [];
@@ -248,7 +342,7 @@ export class FamilyModel implements IContextItem {
         ports.push(porttarget);
 
         let pathLink = new PathLink(pathID + "_LINK_", pathIdSource, pathIdTarget);
-        path.AddPorts(pathLink);
+        self._portPath.AddPorts(pathLink);
       }
 
       pathIdSource = pathID + '_S';
@@ -257,7 +351,7 @@ export class FamilyModel implements IContextItem {
 
       offsetx += (width + 20);
       let personArea = new PersonArea(c,ports, r);
-      self._content.AddContent(personArea);
+      self.AddContent(personArea);
 
 
 
@@ -291,10 +385,14 @@ export class FamilyModel implements IContextItem {
 
 export class FamilyTreeModel extends EventContextLayer {
 
-  protected _pathLine: Line = new Line("familyPath", "timeLineColor", 0);
-  protected _portPath: PortPath = new PortPath("FamilyPath", "family");
 
-  constructor(parentArea: Rectangle, private familyData: FamilyModel, context : CanvasRenderingContext2D) {
+  protected _mousePosition: MousePosition = new MousePosition();
+
+ // protected _pathLine: Line = new Line("familyPath", "timeLineColor", 0);
+ // protected _portPath: PortPath = new PortPath("FamilyPath", "family");
+ // familyData: FamilyModel;
+
+  constructor(context: CanvasRenderingContext2D, parentArea: Rectangle, private people: PersonModel[] = []) {
 
     super(parentArea,
       'familyTree'
@@ -310,16 +408,22 @@ export class FamilyTreeModel extends EventContextLayer {
     //PortPath.
     //   this.Set();
     //   (<Rectangle>this.Content[0].).AddPort().
-    this.Init(context);
+
+    // parentArea.CopyItem('197182'_internal");
+    let a = new Rectangle('197182_internal', -20, -20, parentArea.Width + 20, parentArea.Height + 20, 'familyTree', 0, 'familyTree');
+    let familyData = new FamilyModel('197182', context, a, 'Shannon', 'R-Y34201', people);
+    this.AddContent(familyData);
+    this.Init();
   }
 
-  Init(context: CanvasRenderingContext2D = null) {
+ Init() {
+    super.Init();
     this.ClearContent(1);
     this.ClearPaths();
     this.AddLine("familyPath", "timeLineColor", lineTypes.straight);
-    this.AddContent(new Rectangle('familyTree', 0, 0, this.ParentArea.Width, this.ParentArea.Height / 2, 'familyTree'));
+  //  this.AddContent(new Rectangle('familyTree', 0, 0, this.ParentArea.Width, this.ParentArea.Height / 2, 'familyTree'));
 
-    this.familyData.AddContent(context, 'familydata', this, this._portPath, this.Content[0] as Rectangle, 100, 0);
+  //  this.familyData.AddContent(context, 'familydata', this, this._portPath, this.Content[0] as Rectangle, 100, 0);
   }
   LoadCanvasData(inputData: any): Promise<any>  { return null; }
   UpdateCanvasData(inputData: any) {}
@@ -329,50 +433,98 @@ export class FamilyTreeModel extends EventContextLayer {
     return null;
   }
 
+  get FData(): FamilyModel {
+    return this.Content[0] as FamilyModel;
+  }
+
+  GetSelectedShape(point: Point): IShape {
+    return this.FData.GetTouchedMember(point);
+  }
+
   Draw(context: CanvasRenderingContext2D, initial: boolean = false) {
     this.ClearContext(context);
-    this.familyData.DrawAll(context, this._portPath, this._pathLine);
+    this.content.forEach(c => c.Draw(context));
+    this.FData.DrawAll(context);
     //this.content.forEach(s =>
     //  (<Shape>s).Ports.forEach(p => this.DrawPortPath(context, p as Port)));
-   // this.DrawPortPath(context);
+    //this.DrawPortPath(context);
 
-    if (initial) {
-      this._tracker.Draw(context, true);
-    }
+    //if (initial) {
+    //  this._tracker.Draw(context, true);
+    //}
   }
 
   GetMouseUpTracker() {
-    return new PathShapeTracker(this._pathLine);
+    return this.FData.GetMouseUpTracker();
   }
 
   GetTouchedShape(point: Point): IShape {
 
-    return this.familyData.GetTouchedMember(point);
-
+    let s = this.FData.GetShape(point);
+    //if (s == null) {
+    //  if (this.FData.InternalShape.IsPointInShape(point)) {
+    //    let x = this.Content.splice(0);
+    //    s = x[0] as IShape;
+    //  }
+    //}
+    return s;
   }
 
   ReturnTouchedShape(shape: IShape) {
-    this.familyData.ReturnMember(shape);
+    //if( shape){
+
+    //  console.error("ReturnTouchedShape:" + shape.Id);
+    //}
+    //else{
+    //  console.error("ReturnTouchedShape:null" );
+    //}
+    //if (this.content.length <= 0 && shape) {
+    //  this.AddContent(shape);
+    //}
+    //else {
+      this.FData.ReturnMember(shape);
+    //}
   }
 
   selectItem(event: any, context: CanvasRenderingContext2D): void {
+    if (this._tracker && !this._tracker.TrackedArea && this.FData.Selected(this._tracker.mousePosition.mousePosition))
+    {
+      super.selectItem(event, context);
+      this._mousePosition.Init(event, this.ParentArea);
+      return;
+    }
+    //  for moving individualitems.
     let t = this._tracker as PathShapeTracker;
-
-    let path = this._portPath.ExtractActivePath((t.TrackedArea as PathShape).Ports);
-    t.SetActivePath(path, this._pathLine);
-
+    this.FData.SetPortPath(t);
     super.selectItem(event, context);
-    
+
+    // 1) lift everything from the main layer.
+
+    // test to grab main
+      ////let s = this.content[1] as IShape;
+    ////if (s.IsPointInShape(t.mousePosition)) {
+    ////  let xxx = 0;
+    ////}
   }
 
   mouseMove(event: any, context: CanvasRenderingContext2D): void {
-    super.mouseMove(event, context);
+    if (this.FData.IsSelected) {
+
+      this._mousePosition.Update(event, this.ParentArea);
+      this.FData.MoveBy(this._mousePosition.Delta.X, 0);
+      this.FData.Draw(context);
+      context.clearRect(this.ParentArea.Left, this.ParentArea.Top, this.ParentArea.Width, this.ParentArea.Height);
+    }
+    else {
+      super.mouseMove(event, context);
+    }
   }
 
   releaseSelectedItem(event: any, context: CanvasRenderingContext2D) {
+    this.FData.UnSelect();
     super.releaseSelectedItem(event, context);
     let t = this._tracker as PathShapeTracker;
-    this._portPath.ReturnActivePath(t.ActivePath);
+    this.FData.ReturnActivePath(t.ActivePath);
     t.ClearActivePath();
   }
 }
