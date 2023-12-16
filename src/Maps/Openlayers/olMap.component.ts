@@ -12,6 +12,7 @@ import * as ol from 'ol';
 // https://jsfiddle.net/grabantot/3gq5wbqz/
 // http://viglino.github.io/ol-ext/
 // https://digital.newberry.org/ahcb/downloads/states.html
+//https://fontawesome.com/search?o=r&c=punctuation-symbols
 
 import Map from 'ol/map.js';
 import OSM from 'ol/source/OSM.js';
@@ -66,58 +67,36 @@ export interface IIndexer {
   Set(index: number): boolean;
 }
 
+export class Person {
+  _id: string = "";
+  _name: string[] = [];
+  _fatherId: string = "";
+  _motherId: string = "";
+}
+
+export class Document {
+  _source: string = "";
+  _title: string = "";
+  _people: string[] = [];
+  _year: number = 0;
+}
+
 export class GeoEvent {
 
   _mapped: number = 0;
   _layerName: string = '';
   _lat: number = 0;
   _lon: number = 0;
- 
+  _document: Document;
+  _confirmationScore: number = 0;  // percentage of  yes,no,perhpas.
   _center: any;
 
   // _stylesCounties = [];
   constructor(private _place: string[] = [],
-    private _year: number = 0) {
-
-   
-
-    //this._stylesCounties = [
-    //  /* We are using two different styles for the polygons:
-    //   *  - The first style is for the polygons themselves.
-    //   *  - The second style is to draw the vertices of the polygons.
-    //   *    In a custom `geometry` function the vertices of a polygon are
-    //   *    returned as `MultiPoint` geometry, which will be used to render
-    //   *    the style.
-    //   */
-    //  new Style({
-    //    stroke: new Stroke({
-    //      color: 'rgba(20, 178, 178, 0.8)',
-    //      width: 0.5
-    //    }),
-    //    fill: new Fill({
-    //      color: 'rgba(200, 255, 200)'
-    //    }),
-    //    //text: new Text({
-    //    //  font: 'normal 18px FontAwesome',
-    //    //  fill: new Fill({ color: 'blue' }),
-    //    //  stroke: new Stroke({
-    //    //    color: '#fff', width: 2
-    //    //  }),
-    //    //  text: '\uf041'
-    //    //})
-
-    //  })
-    //];
+    private _year: number = 0,
+    private _state: number = 0 ) {  // theory or validated
 
   }
-
-  //get PathStyleLine() {
-  //  return this._stylesPathyLine;
-  //}
-
-  //get PathStyleMarker() {
-  //  return this._stylesPathyMarker;
-  //}
 
 
   PlacePart(offset: number): string {
@@ -127,31 +106,9 @@ export class GeoEvent {
     return "";
   }
 
-  //MapFeature(point: any) {
-
-  //  this._mapped = true;
-  //  return new Feature({
-  //    geometry: point,
-  //    name: 'Path_' + this.PlacePart(1) + "-" + this.Year
-  //  });
-  //}
-
-  //Map(state: string, county: string): boolean {
-  //  this._mapped = this.IsPlace(state, 0) && this.IsPlace(county, 1);
-  //  return this._mapped;
-  //}
-
-  //get Mapped(): boolean {
-  //  return this._mapped == MappedState.mapped;
-  //}
-
-  //get Tested(): boolean {
-  //  return this._mapped == MappedState.tested;
-  //}
-
-  //get Untested(): boolean {
-  //  return this._mapped == MappedState.untested;
-  //}
+  get State(): number {
+    return this._state;
+  }
 
   get MapState(): number {
     return this._mapped;
@@ -195,7 +152,6 @@ export class GeoEvent {
 
 
   async fetchJSON(file: string, features: any[]) {
-    let self = this;
     return fetch(file)
       .then(res => res.json())
       .then((res: any) => {
@@ -204,77 +160,7 @@ export class GeoEvent {
       });
   }
 
-  //async ResolveHistoryFeatures(map: Map, history: any[]) {
-  //  const featureResults = {
-  //    'type': 'FeatureCollection',
-  //    'crs': {
-  //      'type': 'name',
-  //      'properties': {
-  //        'name': 'EPSG:3857',
-  //      },
-  //    },
-  //    'features': [],
-  //  };
-  //  let self = this;
-  //  let state = this.PlacePart(0);
-  //  let counties = history.filter(f => f.SourceFile.indexOf(state + "_") == 0);
-  //  for (const c of counties) {
-  //    c.range = c.range.filter(rrr => rrr.Y1 <= self.Year && self.Year < rrr.Y2);
-  //    if (c.range.length > 0) {
-  //      for (const rangeItem of c.range) {
-  //        let fileName = 'naturalearth2GeoJson/ushistory/' + c.SourceFile + '/' + rangeItem.File + '.geojson';
-  //        await this.fetchJSON(fileName, featureResults.features);
-  //      }
-  //    }
-  //  }
-  //  await this.MapHistoryLayer(map, featureResults);
-  //}
 
-  //async MapHistoryLayer(map: Map, features: any) {
-  //  let self = this;
-  //  let vlayer;
-
-  //  try {
-  //    let source = new VectorSource({
-  //      format: new GeoJSON()
-  //    });
-  //    source.addFeatures(new GeoJSON().readFeatures(features, {
-  //      dataProjection: 'EPSG:4326',
-  //      featureProjection: 'EPSG:3857'
-  //    }));
-  //    vlayer = new VectorLayer({
-  //      style: self._stylesCounties,
-  //      source: source,
-  //      maxResolution: 5000
-  //    });
-  //    let state = self.PlacePart(0);
-  //    let county = self.PlacePart(1);
-  //    vlayer.set('name', 'PATH_' + state);
-  //    vlayer.set('state', state);
-  //    vlayer.set('year', self._year);
-
-  //    vlayer.on('postcompose', function (event) {
-  //      if (vlayer.getVisible()) {
-  //        let src = vlayer.getSource();
-  //        let features = src.getFeatures();
-  //        let feature = features.find(f => self.IsPlace( f.get('Name') || f.get('NAME'), 1 ));
-  //        if (feature) {
-  //          let geometry = feature.get('geometry');
-  //          let extent = geometry.getExtent();
-  //          let p = new geom.Point(getCenter(extent));
-  //          let ffff = new Feature({
-  //            geometry: p,
-  //            name: 'Path_' + county + "-" + self.Year
-  //          });
-  //          self._mapped = true;
-  //        }
-  //      }
-  //    });
-
-  //    map.addLayer(vlayer);
-
-  //  }
-  //}
 }
 
 export class GeoEventPath {
@@ -286,37 +172,39 @@ export class GeoEventPath {
   _pathFeatures: Feature[] = [];
 
   _stylesPathyLine: any[] = [];
+  _stylesPathyLine2: any[] = [];
   _stylesPathyMarker: any[] = [];
+  _stylesPathyMarker2: any[] = [];
  
   constructor(private _name: string) {
-    let e = new GeoEvent(["OK", "Washita", "Cordell"], 1940);
-    //   this._path.push(e);
+    let e = new GeoEvent(["OK", "Washita", "Cordell"], 19400000);
+      this._initialPath.push(e);
 
-    e = new GeoEvent(["TX", "Brown"], 1910);
+    e = new GeoEvent(["TX", "Brown"], 19100000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["AR", "Drew"], 1880);
+    e = new GeoEvent(["AR", "Drew"], 18800000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["MS", "Attala"], 1860);
+    e = new GeoEvent(["MS", "Attala"], 18600000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["MS", "Winston"], 1840);
+    e = new GeoEvent(["MS", "Winston"], 18400000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["AL", "Pickens"], 1830);
+    e = new GeoEvent(["AL", "Pickens"], 18300000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["SC", "Pickens"], 1790);
+    e = new GeoEvent(["SC", "Pickens"], 17900000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["GA", "Wilkes"], 1780);
+    e = new GeoEvent(["GA", "Wilkes"], 17800000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["VA", "Pittsylvania"], 1767);
+    e = new GeoEvent(["VA", "Pittsylvania"], 17670000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["DE", "New Castle"], 1755);
+    e = new GeoEvent(["DE", "New Castle"], 17550000,1);
     this._initialPath.push(e);
 
     this._initialPath = this._initialPath.sort((a, b) => b.Year - a.Year);
@@ -324,7 +212,15 @@ export class GeoEventPath {
     this._stylesPathyLine = [
       new Style({
         stroke: new Stroke({
-          width: 6, color: [237, 212, 0, 0.8]
+          width:4, color: [200,200,200]
+        })
+      })
+    ];
+
+    this._stylesPathyLine2 = [
+      new Style({
+        stroke: new Stroke({
+          width: 4, color: [255, 0, 0], lineDash: [5, 5, 1, 5]
         })
       })
     ];
@@ -352,7 +248,36 @@ export class GeoEventPath {
           stroke: new Stroke({
             color: '#fff', width: 2
           }),
-          text: '\uf041'
+          text: '\uf041' //\uf059'
+        })
+
+      })
+    ];
+
+    this._stylesPathyMarker2 = [
+      /* We are using two different styles for the polygons:
+       *  - The first style is for the polygons themselves.
+       *  - The second style is to draw the vertices of the polygons.
+       *    In a custom `geometry` function the vertices of a polygon are
+       *    returned as `MultiPoint` geometry, which will be used to render
+       *    the style.
+       */
+
+      new Style({
+        stroke: new Stroke({
+          color: 'rgba(20, 178, 178, 0.8)',
+          width: 0.5
+        }),
+        fill: new Fill({
+          color: 'rgba(255, 200, 200)'
+        }),
+        text: new Text({
+          font: 'normal 18px FontAwesome',
+          fill: new Fill({ color: 'blue' }),
+          stroke: new Stroke({
+            color: '#fff', width: 2
+          }),
+          text: '\uf059'
         })
 
       })
@@ -394,14 +319,14 @@ export class GeoEventPath {
     return this._initialPath.some(e => e.MapPlace(state, county, feature));
   }
 
-  async GetHistoryPath(map: Map, history: any[], pass: number = 0) {
+  async GetHistoryPath(map: Map, history: any, pass: number = 0) {
 
     let event = this._initialPath.find(e => e.MapState == 0);
     await this.ResolveHistoryFeatures(map, history, event, event.Year);
 
   }
 
-  async ResolveHistoryFeatures(map: Map, history: any[], event: GeoEvent, initialYear: number) {
+  async ResolveHistoryFeatures(map: Map, history: any, event: GeoEvent, initialYear: number) {
 
     if (event) {
       await this.ReadHistory(map, history, event, initialYear);
@@ -411,7 +336,7 @@ export class GeoEventPath {
     }
   }
 
-  async ReadHistory(map: Map, history: any[], event: GeoEvent, initialYear: number) {
+  async ReadHistory(map: Map, history: any, event: GeoEvent, initialYear: number) {
     const featureResults = {
       'type': 'FeatureCollection',
       'crs': {
@@ -424,14 +349,14 @@ export class GeoEventPath {
     };
     let self = this;
     let state = event.PlacePart(0);
-    let counties = history.filter(f => f.SourceFile.indexOf(state + "_") == 0);
+    let counties = history.itemlist.filter(f => f.state == state );
     for (const c of counties) {
-      c.range = c.range.sort((a, b) => b.Y2 - a.Y2);
-      let year = (initialYear < c.range[0].Y2) ? initialYear : c.range[0].Y2 - 1;
-      let range = c.range.filter(rrr => rrr.Y1 <= initialYear && year < rrr.Y2);
+      let range = c.itemlist.sort((a, b) => b.finalYear - a.firstYear);
+      let year = (initialYear < range[0].finalYear) ? initialYear : range[0].finalYear - 1;
+      let rangex = range.filter(rrr => rrr.firstYear <= initialYear && year < rrr.finalYear);
+      range = range.filter( rrr => rrr.firstYear < 20000000 && 20000000 < rrr.finalYear);
       for (const rangeItem of range) {
-        let fileName = 'naturalearth2GeoJson/ushistory/' + c.SourceFile + '/' + rangeItem.File + '.geojson';
-        await event.fetchJSON(fileName, featureResults.features);
+        await event.fetchJSON(rangeItem.path, featureResults.features);
       }
     }
     await this.MapHistoryLayer(map, featureResults, event, history, initialYear);
@@ -483,44 +408,27 @@ export class GeoEventPath {
     let self = this;
     let layers = map.getLayers().getArray();
     layers = layers.filter(l => (l.get('name') || "").indexOf('PATH_') >= 0 );
-    layers.forEach(function (lll, i) {
-      let name = lll.get('name') || "";
-      // if (name.indexOf('PATH_') >= 0) {
-
-      let sss = lll.getSource();
-      let state: string = lll.get('state') || "";
-      if (sss && sss.getFeatures) {
-        let fff = sss.getFeatures();
-        fff.forEach(function (ffx, iix) {
-          let county = ffx.get('Name');
+    layers.forEach(function (layer, i) {
+      let source = layer.getSource();
+      let state: string = layer.get('state') || "";
+      if (source && source.getFeatures) {
+        let features = source.getFeatures();
+        features.forEach(function (f, i) {
+          let county = f.get('Name');
           if (!county || county.length <= 0) {
-            county = ffx.get('NAME') || '';
+            county = f.get('NAME') || '';
           }
-          console.error(state || 'NO STATE');
-          console.error(county || 'NO COUNTY');
-
-          self.MapEvent(state, county, ffx);
-          // let geometry = ffx.get('geometry');
-          //let extent = geometry.getExtent();
-          //   let center = getCenter(extent);
-          //   pathCoordinates.push(getCenter(extent));
-          // self.AddPathLayers(map,nextEvent,year1,year2);
-          //let p = new geom.Point(center);
-          //let fff = new Feature({
-          //  geometry: p,
-          //  name: 'Path_' + ffx.get('Name') + "-" + year1 + "-" + year2
-          //});
-          //trailfeatures.push(fff);
-
-          // }
+          self.MapEvent(state, county, f);
         });
       }
-      //   }
     });
-
-    this._initialPath.forEach(e => trailfeatures.push(e.GetFeature()));
-    this._initialPath.forEach(e => pathCoordinates.push(e.Center));
-
+    // get confirmed path.
+    // get unconfirmed path.
+    let path = this._initialPath.filter(e => e.State == 0);
+    
+    path.forEach(e => trailfeatures.push(e.GetFeature()));
+    path.forEach(e => pathCoordinates.push(e.Center));
+    // 
     if (trailfeatures.length > 0) {
 
       var polyline = new geom.LineString(pathCoordinates);
@@ -545,6 +453,50 @@ export class GeoEventPath {
       let vectorLayerMarkerTrail = new VectorLayer({
         source: markertrailSource,
         style: self._stylesPathyMarker
+      });
+
+      map.addLayer(vectorLayerPath);
+      map.addLayer(vectorLayerMarkerTrail);
+      trailfeatures = [];
+    }
+
+    let pathlen = pathCoordinates.length - 1;
+    let endLoc = null;
+    if (pathlen > 0) {
+      endLoc = pathCoordinates[pathlen];
+    }
+    path = this._initialPath.filter(e => e.State == 1);
+    pathCoordinates = [];
+    path.forEach(e => trailfeatures.push(e.GetFeature()));
+    path.forEach(e => pathCoordinates.push(e.Center));
+    if (endLoc) {
+      pathCoordinates.unshift(endLoc);
+    }
+    // 
+    if (trailfeatures.length > 0) {
+
+      var polyline = new geom.LineString(pathCoordinates);
+      const pathFeature = new Feature({
+        type: 'path',
+        geometry: polyline,
+      });
+
+      let pathSource = new VectorSource({
+        features: [pathFeature] //add an array of features
+      });
+
+      let vectorLayerPath = new VectorLayer({
+        source: pathSource,
+        style: self._stylesPathyLine2
+      });
+
+      let markertrailSource = new VectorSource({
+        features: trailfeatures //add an array of features
+      });
+
+      let vectorLayerMarkerTrail = new VectorLayer({
+        source: markertrailSource,
+        style: self._stylesPathyMarker2
       });
 
       map.addLayer(vectorLayerPath);
@@ -1196,7 +1148,8 @@ export class OlMapComponent implements AfterViewInit {
     let msz = this._map.getSize();
     let ext = this._map.getView().calculateExtent();
     let historyIndex;
-    this.http.get("../naturalearth2geojson/ushistory/historyindex.json")
+  //  "..\..\..\.."
+    this.http.get("../USCountyHistory/historyindex.json") //../naturalearth2geojson/ushistory/historyindex.json")
       .subscribe((success) => {
         // 'naturalearth2/GeoJson/'
         //this.navItems = success.json();
@@ -1465,25 +1418,6 @@ export class OlMapComponent implements AfterViewInit {
             if (!county || county.length <= 0) {
               county = ffx.get('NAME') || '';
             }
-            //   let state = ffx.SourceFile.split('_')[0];
-            //console.error(name);
-            //console.error(state || 'NO STATE');
-            //console.error(county || 'NO COUNTY');
-            //console.error(iix);
-
-            //if (path.MapEvent(state, county)) {
-            //  //console.error("SUCCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            //  // (ffx.get('Name') == 'PITTSYLVANIA') {
-            //  let geometry = ffx.get('geometry');
-            //  let extent = geometry.getExtent();
-            //  let oo1 = getCenter(extent);
-            //  let p = new geom.Point(oo1);
-            //  let fff = new Feature({
-            //    geometry: p,
-            //    name: 'Path_' + ffx.get('Name') + "-" + year1 + "-" + year2
-            //  });
-            //  trailfeatures.push(fff);
-            //}
           });
         }
       }
@@ -1507,76 +1441,17 @@ export class OlMapComponent implements AfterViewInit {
 
     try {
       await path.GetHistoryPath(this._map, this._historyIndex);
-      //  let source = new VectorSource({
-      //    format: new GeoJSON()
-      //  });
-      //  source.addFeatures(new GeoJSON().readFeatures(featureResults, {
-      //    dataProjection: 'EPSG:4326',
-      //    featureProjection: 'EPSG:3857'
-      //  }));
-      //  vlayer = new VectorLayer({
-      //    style: self._stylesCounties,
-      //    source: source,
-      //    maxResolution: 5000
-      //  });
-      //  vlayer.set('name', 'PATH_' + "xxx");
-      //  vlayer.set('state', "xxx");
-      //  vlayer.set('year1', year1);
-      //  vlayer.set('year2', year2);
-
-      //  vlayer.on('postcompose', function (event) {
-      //    if (vlayer.getVisible()) {
-      //      //   alert("!!!!!!!!!!!!!!!!!!!!!!!");
-      //      // self.AddPathLayers(self._shannonPath,year1, year2);
-      //      let sss = vlayer.getSource();
-      //      let state: string = vlayer.get('state') || "";
-      //      if (sss && sss.getFeatures) {
-      //        let fff = sss.getFeatures();
-      //        fff.forEach(function (ffx, iix) {
-      //          let xyz = 0;
-      //          let county = ffx.get('Name');
-      //          if (!county || county.length <= 0) {
-      //            county = ffx.get('NAME') || '';
-      //          }
-      //          //   let state = ffx.SourceFile.split('_')[0];
-      //          //console.error(name);
-      //          //console.error(state || 'NO STATE');
-      //          //console.error(county || 'NO COUNTY');
-      //          //console.error(iix);
-
-      //          if (path.MapEvent(state, county)) {
-      //            //console.error("SUCCESS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      //            // (ffx.get('Name') == 'PITTSYLVANIA') {
-      //            let sss222 = 0;
-      //            let geometry = ffx.get('geometry');
-      //            let extent = geometry.getExtent();
-      //            let oo1 = getCenter(extent);
-      //            let p = new geom.Point(oo1);
-      //            let ffff = new Feature({
-      //              geometry: p,
-      //              name: 'Path_' + ffx.get('Name') + "-" + year1 + "-" + year2
-      //            });
-      //            //  trailfeatures.push(fff);
-      //          }
-      //        });
-      //      }
-      //    }
-      //  });
-
-      //  self._map.addLayer(vlayer);
-
     }
     catch (ex) {
       console.error(ex.message);
     }
   }
 
-
   AddCountyLayers(state: string, year: number) {
     let self = this;
     let vlayer;
     let trailfeatures: Feature[] = [];
-    let results = this._historyIndex.filter(f => f.SourceFile.indexOf(state + "_") == 0);
+    let results = this._historyIndex.itemlist.filter(f => f.state == state );
     results.forEach(function (f, i) {
 
       let features = f.range.filter(r => r.Y1 <= year && year < r.Y2);
@@ -1657,6 +1532,7 @@ export class OlMapComponent implements AfterViewInit {
   //https://ogre.adc4gis.com/
   //https://www.statsilk.com/maps/convert-esri-shapefile-map-geojson-format#ogr2ogr
   //https://github.com/aourednik/historical-basemaps/tree/master/geojson
+  //https://digital.newberry.org/ahcb/
   IncrementYear(increment: number) {
     this.Year += increment;
     //  this.States = [];
@@ -1666,77 +1542,6 @@ export class OlMapComponent implements AfterViewInit {
       this._map.removeLayer(this._historylayer);
       this._historylayer = null;
     }
-    //if (this.Year <= 1630) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //else if (this.Year <= 1640) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Virginia", "VA", this.Year, true);
-    //  this.SwitchCountyLayer("Maryland", "MD", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //else if (this.Year <= 1660) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Virginia", "VA", this.Year, true);
-    //  this.SwitchCountyLayer("Maryland", "MD", this.Year, true);
-    //  this.SwitchCountyLayer("New Hampshire", "NH", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //else if (this.Year <= 1670) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Virginia", "VA", this.Year, true);
-    //  this.SwitchCountyLayer("Maryland", "MD", this.Year, true);
-    //  this.SwitchCountyLayer("New Hampshire", "NH", this.Year, true);
-    //  this.SwitchCountyLayer("North Carolina", "NC", this.Year, true);
-    //  this.SwitchCountyLayer("Connecticut", "CT", this.Year, true);
-    //  this.SwitchCountyLayer("Pennsylvania", "PA", this.Year, true);
-    //  this.SwitchCountyLayer("New York", "NY", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //else if (this.Year <= 1710) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Virginia", "VA", this.Year, true);
-    //  this.SwitchCountyLayer("Maryland", "MD", this.Year, true);
-    //  this.SwitchCountyLayer("New Hampshire", "NH", this.Year, true);
-    //  this.SwitchCountyLayer("North Carolina", "NC", this.Year, true);
-    //  this.SwitchCountyLayer("Connecticut", "CT", this.Year, true);
-    //  this.SwitchCountyLayer("Pennsylvania", "PA", this.Year, true);
-    //  this.SwitchCountyLayer("New Jersey", "NJ", this.Year, true);
-    //  this.SwitchCountyLayer("Delaware", "DE", this.Year, true);
-    //  this.SwitchCountyLayer("New York", "NY", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //else if (this.Year <= 1750) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Virginia", "VA", this.Year, true);
-    //  this.SwitchCountyLayer("Maryland", "MD", this.Year, true);
-    //  this.SwitchCountyLayer("New Hampshire", "NH", this.Year, true);
-    //  this.SwitchCountyLayer("North Carolina", "NC", this.Year, true);
-    //  this.SwitchCountyLayer("Connecticut", "CT", this.Year, true);
-    //  this.SwitchCountyLayer("Pennsylvania", "PA", this.Year, true);
-    //  this.SwitchCountyLayer("New Jersey", "NJ", this.Year, true);
-    //  this.SwitchCountyLayer("Delaware", "DE", this.Year, true);
-    //  this.SwitchCountyLayer("New York", "NY", this.Year, true);
-    //  this.SwitchCountyLayer("South Carolina", "SC", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //else if (this.Year <= 1780) {
-    //  this.SwitchCountyLayer("Massachusetts", "MA", this.Year, true);
-    //  this.SwitchCountyLayer("Virginia", "VA", this.Year, true);
-    //  this.SwitchCountyLayer("Maryland", "MD", this.Year, true);
-    //  this.SwitchCountyLayer("New Hampshire", "NH", this.Year, true);
-    //  this.SwitchCountyLayer("North Carolina", "NC", this.Year, true);
-    //  this.SwitchCountyLayer("Connecticut", "CT", this.Year, true);
-    //  this.SwitchCountyLayer("Pennsylvania", "PA", this.Year, true);
-    //  this.SwitchCountyLayer("New Jersey", "NJ", this.Year, true);
-    //  this.SwitchCountyLayer("Delaware", "DE", this.Year, true);
-    //  this.SwitchCountyLayer("New York", "NY", this.Year, true);
-    //  this.SwitchCountyLayer("Georgia", "GA", this.Year, true);
-    //  this.SwitchCountyLayer("South Carolina", "SC", this.Year, true);
-    //  this.SwitchCountyLayer("Rhode Island", "RI", this.Year, true);
-    //}
-    //  else {
 
     this._historylayer = new VectorLayer({
       style: this._stylesState,
