@@ -1,15 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\node_modules",
+    "\\node_modules\\@angular",
+    "\\node_modules\\@angular\\compiler",
+    "\\node_modules\\@angular\\compiler-cli",
+    "\\node_modules\\@angular\\compiler\\src",
+    "\\node_modules\\codelyzer",
+    "\\node_modules\\codelyzer\\angular",
     "\\projects",
-    "\\src",
-    "\\src\\canvas",
-    "\\src\\canvas\\service",
-    "\\src\\dataManagement",
-    "\\src\\dataManagement\\service",
-    "\\src\\dataManagement\\service\\mongodb",
-    "\\src\\dataManagement\\service\\mongodb\\routes"
+    "\\src"
   ],
-  "SelectedNode": "\\src\\dataManagement\\service\\mongodb\\mongoDB.service.ts",
+  "SelectedNode": "\\package.json",
   "PreviewInSolutionExplorer": false
 }
