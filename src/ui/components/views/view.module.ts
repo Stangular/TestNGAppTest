@@ -40,6 +40,7 @@ import { SiteMapComponent } from 'src/app/common/site-map/site-map.component';
 import { DashboardPageComponent } from 'src/canvas/dashboard/dashboard-page/dashboard-page.component';
 import { ContentGridComponent } from 'src/app/common/content_display/contentGrid.component';
 import { ContentRowComponent } from 'src/app/common/content_display/contentRow.component';
+import { FamilyDataComponent } from 'src/components/familyData/family.component';
 
 library.add(
   faCoffee
@@ -78,6 +79,7 @@ library.add(
     , CanvasShapePropertyDialogComponent
     , PlaceComponent
     , PlaceTreeComponent
+    , FamilyDataComponent
     , SandboxComponent
     , ContentUtilityComponent
     , LoginComponent

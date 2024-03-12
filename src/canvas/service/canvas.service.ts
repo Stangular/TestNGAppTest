@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ChartContentModel } from '../models/custom/layers/charts/models/contentModel';
 import { ShapeSelectResult, eContentType } from '../models/shapes/shapeSelected';
 import { BaseDesignerModel, EditModel } from '../models/designer/base.model';
-import { ContextSystem, ContextLayer, ActionLayer, UnitCell, IContextItem, EventContextLayer } from '../models/IContextItem';
+import { ContextSystem, ContextLayer, ActionLayer, UnitCell, IContextItem, EventContextLayer, IDataResult } from '../models/IContextItem';
 import { PathService } from '../models/shapes/service/path.service';
 import { Line, PortPath, lineTypes, VerticalToVerticalLine, VerticaToHorizontallLine, HorizontalToVerticalLine, HorizontallToHorizontalLine, GradientLine, BezierLine } from '../models/lines/line';
 import { DisplayValues } from '../models/DisplayValues';
@@ -13,7 +13,7 @@ import { Point } from '../models/shapes/primitives/point';
 import { Port } from '../models/shapes/port';
 import { MatDialog, MatDialogRef, MatDialogConfig, MAT_DIALOG_DATA } from '@angular/material';
 import { Rectangle } from '../models/shapes/rectangle';
-import { MessageService } from 'src/app/messaging/message.service';
+import { InformationExchange, MessageService } from 'src/app/messaging/message.service';
 import { Path } from '../models/lines/path';
 import { Ellipse } from '../models/shapes/ellipse';
 import { Content, TextContent, ImageContent } from '../models/shapes/content/Content';
@@ -23,10 +23,12 @@ import { ContextModel } from '../component/context.model';
 import { emptyGuid } from '../../const/constvalues.js';
 import { IShape } from '../models/shapes/IShape';
 //import { ImageShape } from '../models/shapes/content/image/image';
-import { TimeLineBaseLayerModel, TimeLineTypes } from '../models/concepts/timelines/timeLineBase.model';
+import { TimeLineBaseLayerModel, TimeLineTypes, TimeLineDataResult } from '../models/concepts/timelines/timeLineBase.model';
 import { ILine } from '../models/lines/ILine';
 import { FamilyTreeModel, PersonModel, FamilyModel, Sex } from '../models/concepts/Family/familyTree/familyTree.model';
 import { DNAChromosomes } from '../models/concepts/CommonMatchDNA/dnaChromosome';
+import { AreaSizer } from '../models/shapes/sizing/sizer';
+import { RangeCatalog, TimeLineRange } from 'src/components/timeline/service/timeLine.model';
 //import { ContentShape } from '../models/shapes/content/ContentShape';
 
 export enum objectTypes {
@@ -41,6 +43,9 @@ export enum objectTypes {
 @Injectable()
 export class CanvasService {
   editOn: boolean = false;
+
+  private message = new InformationExchange('1001');
+  private messageB = new InformationExchange('1002');
   private contextModel: ContextModel;
   private _activeShape: IShape = null;
   public _layerName: '';
@@ -54,6 +59,9 @@ export class CanvasService {
   private _loadingData: boolean = false;
   private contextSystems: ContextSystem[] = [];
   private selectedSystem: number = 0;
+  private _externalDataExchange: IDataResult[] = [];
+  private _updateFlag: number = 0;
+
   readonly datapath: string = 'https://localhost:44328/api/canvas';
   constructor(
     private pathService: PathService,
@@ -61,10 +69,10 @@ export class CanvasService {
     public dialog: MatDialog,
     private messageService: MessageService) {
 
-
     DisplayValues.Clear();
-    DisplayValues.SetColor('TimeSpansss', '#aad8e699');
-    DisplayValues.SetColor('TimeSpanLine', 'orange');
+
+    DisplayValues.SetColor('TimeSpansss', '#aad8e650');
+    DisplayValues.SetColor('TimeSpanLine', 'blue');
     DisplayValues.SetWeight('TimeSpanLine', 2);
     DisplayValues.SetColor('DefaultBG', 'red');
     DisplayValues.SetWeight('DefaultBG', 2);
@@ -74,15 +82,15 @@ export class CanvasService {
     DisplayValues.SetColor('OddSlot', '#bbbbbb');
     DisplayValues.SetColor('EvenSlot', '#FFE4E1');
     DisplayValues.SetGradientColor('OddSlot', '#FFE4E1');
-    DisplayValues.SetGradientArea('OddSlot', new Rectangle('sss',10, 0, 50, 0));
+ //   DisplayValues.SetGradientArea('OddSlot', new Rectangle('sss', 10, 0, 50, 0));
     DisplayValues.SetGradientColor('EvenSlot', '#bbbbbb');
-    DisplayValues.SetGradientArea('EvenSlot', new Rectangle('sss', 10, 0, 50, 0));
+   // DisplayValues.SetGradientArea('EvenSlot', new Rectangle('sss', 10, 0, 50, 0));
     DisplayValues.SetFGColor('OddSlot', '#2F4F4F');
     DisplayValues.SetFGColor('EvenSlot', '#2F4F4F');
     DisplayValues.SetWeight('OddSlot', 0);
     DisplayValues.SetWeight('EvenSlot', 0);
     DisplayValues.SetColor('boundingArea', 'purple');
-    DisplayValues.SetColor('sizerHandleA', '#d8ade699');
+    DisplayValues.SetColor('sizerHandleA', 'black');
     DisplayValues.SetFGColor('sizerHandleA', 'yellow');
     DisplayValues.SetColor('sizerHandleB', 'transparent');
     DisplayValues.SetFGColor('sizerHandleB', 'yellow');
@@ -99,12 +107,16 @@ export class CanvasService {
     DisplayValues.SetColor('person', '#ffffff');
     DisplayValues.SetColor('timeLineColor', '#44121255');
     DisplayValues.SetColor('dnaSegmentLineColor', 'yellow');
-    
+
     DisplayValues.SetColor('dnaSegments', '#d8ade699');
     DisplayValues.SetColor('familyTree', 'white');
 
-    this.GetImageList();
-  //  this.contextModel = new ContextModel();
+
+    AreaSizer.Init(new Ellipse('sizer', 0, 0, 24, 16, 'sizerHandleA'));
+
+   // this.GetImageList();
+
+    //  this.contextModel = new ContextModel();
   }
 
   get SelectedUnitCellId() { return this.selectedUnitCellId; }
@@ -118,7 +130,7 @@ export class CanvasService {
   //  //  portData.path);
   //}
 
-  GetContextLayer(id: string, area: Rectangle,context: CanvasRenderingContext2D): EventContextLayer {
+  GetContextLayer(id: string, area: Rectangle, context: CanvasRenderingContext2D): EventContextLayer {
     let result: EventContextLayer = null;
     let people: PersonModel[] = [];
     people.push(new PersonModel('197182_0', Sex.Male, "Stanley"));
@@ -143,14 +155,14 @@ export class CanvasService {
     people.push(new PersonModel("R-1211", Sex.Male, "R-A8469"));
     people.push(new PersonModel("R-1211", Sex.Male, "R-S14328"));
     this.GetISOGG();
- //   let f = new FamilyModel('197182',context,area, 'Shannon', 'R-Y34201', people);
-
+    //   let f = new FamilyModel('197182',context,area, 'Shannon', 'R-Y34201', people);
+   
     switch (id.toLowerCase()) {
       case 'dna-segments': result = new DNAChromosomes(area); break;
       case 'family-tree': result = new FamilyTreeModel(context, area, people); break;
-      case 'timeline-decade': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.decade); break;
-      case 'timeline-century': result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.century); break;
-      default: result = new TimeLineBaseLayerModel(area,new Date(), 12, 80, 0, TimeLineTypes.year,1844);
+      case 'timeline-decade': result = new TimeLineBaseLayerModel(area, new Date(), 12, 80, 0, TimeLineTypes.decade); break;
+      case 'timeline-century': result = new TimeLineBaseLayerModel(area, new Date(), 12, 80, 0, TimeLineTypes.century); break;
+      default: result = new TimeLineBaseLayerModel(area, new Date(), 12, 80, 0, TimeLineTypes.year, new Date() );
     }
 
     return result;
@@ -162,12 +174,12 @@ export class CanvasService {
 
   UpdateCanvas() {
     setTimeout(() =>
-      this.messageService.sendMessage(1001)
+      this.messageService.sendMessage(this.message)
       , 0);
   }
 
   SetLayerContext(layername: string, ctx: CanvasRenderingContext2D) {
- //   this.contextModel.SetLayerContext(layername, ctx);
+    //   this.contextModel.SetLayerContext(layername, ctx);
     this.selectedSystem = this.contextSystems.findIndex(s => s.Id === layername);
   }
 
@@ -198,7 +210,7 @@ export class CanvasService {
   }
 
   MoveSystem() {
-  //  this.BaseSystem.Move(this.contextModel, this.shapeSelectResult);
+    //  this.BaseSystem.Move(this.contextModel, this.shapeSelectResult);
   }
 
   SetActiveShape(shape: IShape) {
@@ -274,7 +286,7 @@ export class CanvasService {
     let path = "https://localhost:44346/api/ISOGGHaplogroup/sss";
     this.httpService.getContent(null, path)
       .subscribe(
-      data => { this.ISOGGResult(data) },
+        data => { this.ISOGGResult(data) },
         err => { this.Fail(err) });
   }
 
@@ -305,7 +317,7 @@ export class CanvasService {
     if (this.BaseSystem.SelectedLayer.Content.length > 0) {
       this.selectedUnitCellId = unitCellId || emptyGuid;
       setTimeout(() =>
-        this.messageService.sendMessage(1001)
+        this.messageService.sendMessage(this.message)
         , 0);
       return;
     }
@@ -459,7 +471,7 @@ export class CanvasService {
     //data.paths.forEach(function (d, i) {
     //  self.BaseSystem.Paths.push(new PortPath(d.pathId, d.lineId));
     //});
-    setTimeout(() => this.messageService.sendMessage(1002), 0);
+    setTimeout(() => this.messageService.sendMessage(this.messageB), 0);
   }
 
   RetrievePathSuccess(data: any[]) {
@@ -481,7 +493,7 @@ export class CanvasService {
     this.BaseSystem.ResetPaths();
     this.selectedUnitCellId = unitCellId || emptyGuid;
     setTimeout(() =>
-      this.messageService.sendMessage(1001)
+      this.messageService.sendMessage(this.message)
       , 0);
 
   }
@@ -509,18 +521,9 @@ export class CanvasService {
             c.content,
             c.fromSource || false,
             c.angle);
-          //s = new TextShape(
-          //  shape.id,
-          //  shape.top,
-          //  shape.left,
-          //  shape.width,
-          //  shape.height,
-          //  shape.displayValueId,
-          //  content);
         }
         else if (shape.imageContent) {
           let c = shape.imageContent;
-          //      let imageIndex = this.contextModel.AddImage(c.content, this.messageService);
           let content = new ImageContent(
             c.id,
             c.displayValueId,
@@ -529,15 +532,6 @@ export class CanvasService {
             c.fromSource || false,
             c.angle,
             0);
-
-          //s = new ImageShape(
-          //  shape.id,
-          //  shape.top,
-          //  shape.left,
-          //  shape.width,
-          //  shape.height,
-          //  shape.displayValueId,
-          //  content);
         }
         else {
           s = new Rectangle(
@@ -550,29 +544,6 @@ export class CanvasService {
         }
         break;
     }
-    //shape.ports.forEach(function (p, i) {
-    //  let port = new Port(
-    //    p.portId,
-    //    p.offsetX,
-    //    p.offsetY, s,
-    //    ePortType.source,
-    //    '',
-    //    p.pathId,
-    //    p.pathOrder);
-    //  s.AddPort(port);
-    //});
-    //shape.shapes.forEach(function (shp, i) {
-    //  let child = self.LoadShape(shp, s);
-    //  if (shp.textContent) {
-    //    s.AddContent(child as TextShape);
-    //  }
-    //  else if (shp.imageContent) {
-    //    s.AddContent(child as ImageShape);
-    //  }
-    //  else {
-    //    s.AddContent(child as ContentShape);
-    //  }
-    //});
     return s;
   }
 
@@ -590,14 +561,14 @@ export class CanvasService {
 
   AddText(textContent: any, containerState: string, contentState: string, fromSource: boolean, angle = 0) {
     this.BaseSystem.AddText(textContent, containerState, contentState, fromSource, angle);
-    setTimeout(() => this.messageService.sendMessage(1001), 0);
+    setTimeout(() => this.messageService.sendMessage(this.message), 0);
 
   }
 
   AddImage(imageName: any, containerState: string, contentState: string, fromSource: boolean, angle = 0) {
     //   let imageIndex = this.contextModel.AddImage(imageName, this.messageService);
     //   this.BaseSystem.AddImage(imageName, containerState, contentState, fromSource, angle, imageIndex);
-    setTimeout(() => this.messageService.sendMessage(1001), 0);
+    setTimeout(() => this.messageService.sendMessage(this.message), 0);
   }
 
   //AddGeneral(id: any, containerState: string) {
@@ -642,4 +613,30 @@ export class CanvasService {
   AddPath() {
     // this.BaseSystem.AddPathSegment()
   }
+
+  //ChangeTab(tab: MatTabChangeEvent) {
+  //  let sss = 0
+
+  //}
+
+  //Toggle(sidePanel: any) {
+  //  this.sidePanelOpen = !this.sidePanelOpen;
+  //  sidePanel.toggle();
+  //}
+
+  setExternalDataExchange(externalDataExchange: IDataResult) {
+    let i = this._externalDataExchange.findIndex(d => d.ID == externalDataExchange.ID);
+    if (i >= 0) {
+      this._externalDataExchange[i] = externalDataExchange;
+    }
+    else {
+      this._externalDataExchange.push(externalDataExchange);
+    }
+  }
+
+  getExternalDataExchange(id: string): IDataResult {
+    return this._externalDataExchange.find(d => d.ID == id );
+  }
+
+
 }

@@ -2,15 +2,18 @@ import { IShape } from './shapes/IShape';
 import { ILine } from './lines/ILine';
 import { Point } from '../models/shapes/primitives/point';
 import { CanvasService } from '../service/canvas.service';
-import { Rectangle } from './shapes/rectangle';
+//import { Rectangle } from './shapes/rectangle';
+
 
 export class NamedValue<T> {
 
-  constructor(private valueName: string = '',
-    private value: T) {}
+  constructor(private valueName: string,
+    private value: T,
+    private category: string = 'General') { }
 
   get Name() { return this.valueName; }
   get Value() { return this.value; }
+  get Category() { return this.category; }
 
 }
 
@@ -65,7 +68,7 @@ export class DisplayValues {
   private static weight: NamedValue<number>[] = [];
   private static fonts: NamedValue<string>[] = [];
   private static gradientColor: NamedValue<string>[] = [];
-  private static gradientArea: NamedValue<Rectangle>[] = [];
+  private static gradientArea: NamedValue<any>[] = [];
   private static gradients: NamedValue<CanvasGradient>[] = [];
   public static width: number = 0;
   public static height: number = 0;
@@ -89,21 +92,21 @@ export class DisplayValues {
   }
 
   static SetContextItems(context: CanvasRenderingContext2D) {
-    this.gradientColor.forEach(v => this.CreateGradient(v, context));
+  //  this.gradientColor.forEach(v => this.CreateGradient(v, context));
   }
 
-  static CreateGradient(value: NamedValue<string>, context: CanvasRenderingContext2D) {
-    let ga = this.gradientArea.find(g => g.Name == value.Name);
-    let area = ga.Value;
-    let gradient = context.createLinearGradient(area.Left, area.Top, area.Right, area.Bottom);
-    let x = this.color.find(c => c.Name == value.Name);
-    let clr = x.Value;
-    gradient.addColorStop(0, "#232312" );
-    gradient.addColorStop(.5, value.Value );
-    gradient.addColorStop(.5, value.Value );
-    gradient.addColorStop(1, "#232312");
-    this.gradients.push(new NamedValue(value.Name, gradient));
-  }
+  //static CreateGradient(value: NamedValue<string>, context: CanvasRenderingContext2D) {
+  //  let ga = this.gradientArea.find(g => g.Name == value.Name);
+  //  let area = ga.Value;
+  //  let gradient = context.createLinearGradient(area.Left, area.Top, area.Right, area.Bottom);
+  //  let x = this.color.find(c => c.Name == value.Name);
+  //  let clr = x.Value;
+  //  gradient.addColorStop(0, "#232312" );
+  //  gradient.addColorStop(.5, value.Value );
+  //  gradient.addColorStop(.5, value.Value );
+  //  gradient.addColorStop(1, "#232312");
+  //  this.gradients.push(new NamedValue(value.Name, gradient));
+  //}
 
   static FGColorIndex(name: string) {
     return this.fgcolor.findIndex(c => c.Name == name);
@@ -125,9 +128,9 @@ export class DisplayValues {
     return this.gradients.findIndex(c => c.Name == name);
   }
 
-  static GradientAreaIndex(name: string) {
-    return this.gradientArea.findIndex(c => c.Name == name);
-  }
+  //static GradientAreaIndex(name: string) {
+  //  return this.gradientArea.findIndex(c => c.Name == name);
+  //}
 
   static WeightIndex(name: string) {
     return this.weight.findIndex(c => c.Name == name);
@@ -143,15 +146,15 @@ export class DisplayValues {
     }
   }
 
-  static SetGradientArea(name: string, area: Rectangle) {
-    let ndx = this.GradientAreaIndex(name);
-    if (ndx >= 0) {
-      this.gradientArea.splice(ndx, 1, new NamedValue(name, area));
-    }
-    else {
-      this.gradientArea.push(new NamedValue(name, area));
-    }
-  }
+  //static SetGradientArea(name: string, area: Rectangle) {
+  //  let ndx = this.GradientAreaIndex(name);
+  //  if (ndx >= 0) {
+  //    this.gradientArea.splice(ndx, 1, new NamedValue(name, area));
+  //  }
+  //  else {
+  //    this.gradientArea.push(new NamedValue(name, area));
+  //  }
+  //}
 
   static SetFGColor(name: string, color: string) {
     if (!name || name.length <= 0 || !color || color.length <= 0) { return; }
@@ -239,15 +242,15 @@ export class DisplayValues {
     return this.gradientColor[index].Value;
   }
 
-  static GetGradientArea(index: number): Rectangle {
-    if (index >= this.color.length) {
-      return this.GetGradientArea(index - 1);
-    }
-    if (!index || index < 0) {
-      index = 0;
-    }
-    return this.gradientArea[index].Value;
-  }
+  //static GetGradientArea(index: number): Rectangle {
+  //  if (index >= this.color.length) {
+  //    return this.GetGradientArea(index - 1);
+  //  }
+  //  if (!index || index < 0) {
+  //    index = 0;
+  //  }
+  //  return this.gradientArea[index].Value;
+  //}
 
   static GetFGColor(index: number) {
     if (index >= this.fgcolor.length) {
@@ -366,14 +369,55 @@ export class TheCanvasState {
 
   constructor() {
 
-    DisplayValues.Clear();
-    DisplayValues.SetColor('DefaultBG', '#777777');
-    DisplayValues.SetWeight('DefaultBG', 2);
-    DisplayValues.SetFont('DefaultBG', 'verdana');
-    DisplayValues.SetColor('DefaultFG', '#ffffff');
-    DisplayValues.SetColor('default.edit.background', 'yellow');
-    DisplayValues.SetWeight('default.edit.background', 2);
+    //DisplayValues.Clear();
+    //DisplayValues.SetColor('DefaultBG', '#777777');
+    //DisplayValues.SetWeight('DefaultBG', 2);
+    //DisplayValues.SetFont('DefaultBG', 'verdana');
+    //DisplayValues.SetColor('DefaultFG', '#ffffff');
+    //DisplayValues.SetColor('default.edit.background', 'yellow');
+    //DisplayValues.SetWeight('default.edit.background', 2);
 
+
+    DisplayValues.Clear();
+    DisplayValues.SetColor('TimeSpansss', '#aad8e650');
+    DisplayValues.SetColor('TimeSpanLine', 'orange');
+    DisplayValues.SetWeight('TimeSpanLine', 2);
+    DisplayValues.SetColor('DefaultBG', 'red');
+    DisplayValues.SetWeight('DefaultBG', 2);
+    DisplayValues.SetFont('DefaultBG', 'Roboto');
+    DisplayValues.SetColor('DefaultFG', '#000000');
+    DisplayValues.SetColor('DefaulthitFG', '#330000');
+    DisplayValues.SetColor('OddSlot', '#bbbbbb');
+    DisplayValues.SetColor('EvenSlot', '#FFE4E1');
+    DisplayValues.SetGradientColor('OddSlot', '#FFE4E1');
+  //  DisplayValues.SetGradientArea('OddSlot', new Rectangle('sss', 10, 0, 50, 0));
+    DisplayValues.SetGradientColor('EvenSlot', '#bbbbbb');
+  //  DisplayValues.SetGradientArea('EvenSlot', new Rectangle('sss', 10, 0, 50, 0));
+    DisplayValues.SetFGColor('OddSlot', '#2F4F4F');
+    DisplayValues.SetFGColor('EvenSlot', '#2F4F4F');
+    DisplayValues.SetWeight('OddSlot', 0);
+    DisplayValues.SetWeight('EvenSlot', 0);
+    DisplayValues.SetColor('boundingArea', 'purple');
+    DisplayValues.SetColor('sizerHandleA', 'black');
+    DisplayValues.SetFGColor('sizerHandleA', 'yellow');
+    DisplayValues.SetColor('sizerHandleB', 'transparent');
+    DisplayValues.SetFGColor('sizerHandleB', 'yellow');
+    DisplayValues.SetFont('personData', 'Lato');
+    DisplayValues.SetColor('personData', '#F8F0E3');
+    DisplayValues.SetFGColor('personData', 'blue');
+    DisplayValues.SetFont('personData_hit', 'verdana');
+    DisplayValues.SetFGColor('personData_hit', 'yellow');
+    DisplayValues.SetColor('personData_hit', 'red');
+    DisplayValues.SetColor('personContainer', '#ffffff');
+    DisplayValues.SetColor('personContainer_hit', '#ff22ff');
+    DisplayValues.SetColor('personPort1', '#555555');
+    DisplayValues.SetColor('personPort2', '#555555');
+    DisplayValues.SetColor('person', '#ffffff');
+    DisplayValues.SetColor('timeLineColor', '#44121255');
+    DisplayValues.SetColor('dnaSegmentLineColor', 'yellow');
+
+    DisplayValues.SetColor('dnaSegments', '#d8ade699');
+    DisplayValues.SetColor('familyTree', 'white');
   }
 
   

@@ -1,0 +1,43 @@
+<nav-menu></nav-menu>
+<mat-grid-list [cols]="32" [rowHeight]="200">
+  <mat-grid-tile [colspan]="10" [rowspan]="2">
+    <mat-card style="height:280px; width:200px">
+      <mat-card-header>
+        <mat-card-title>Family</mat-card-title>
+        <mat-card-subtitle>
+          Sub title
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form>
+          <mat-grid-list [cols]="32" [rowHeight]="200">
+            <mat-grid-tile [colspan]="4" [rowspan]="2">
+              <mat-form-field floatlabel="'never'">
+                <mat-label>Surname:</mat-label>
+                <input matInput />
+              </mat-form-field>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="4" [rowspan]="2">
+              <mat-form-field floatlabel="'never'">
+                <mat-label>Terminal Haplogroup:</mat-label>
+                <input matInput />
+              </mat-form-field>
+            </mat-grid-tile>
+          </mat-grid-list>
+          </form>
+      </mat-card-content>
+    </mat-card>
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="4" [rowspan]="2">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="4" [rowspan]="2">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="4" [rowspan]="2">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="4" [rowspan]="2">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="4" [rowspan]="2">
+  </mat-grid-tile>
+  <mat-grid-tile [colspan]="2" [rowspan]="2">
+  </mat-grid-tile>
+</mat-grid-list>

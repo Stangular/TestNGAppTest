@@ -185,9 +185,7 @@ export class EditCanvasComponent implements OnInit, AfterViewInit, OnDestroy, Do
   }
 
   OnMousedown(e: any) {
-  // Select Item and remove from static content
-  // Place in AreaTracker
-  
+
     this.PositionFromEvent(e);
     if (this.canvasService.EditOn) {
       let selected = this._actionLayer.ShapeSelected;

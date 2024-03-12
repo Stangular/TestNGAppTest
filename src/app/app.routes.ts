@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { LostCauseComponent } from 'src/apps/LostCauseAnalysis/LostCause.component';
 import { SiteMapComponent } from './common/site-map/site-map.component';
 import { DNASegmentsComponent } from 'src/apps/CanvasApps/DNAAnalysis/DNASegments.component';
+import { FamilyDataComponent } from 'src/components/familyData/family.component';
 
 export const routes: Routes = [
   {

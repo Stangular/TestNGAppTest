@@ -1,6 +1,6 @@
 import { Rectangle } from "../../shapes/rectangle";
 import { IShape } from "../../shapes/IShape";
-import { ContextLayer, ActionLayer, EventContextLayer, TrackerFactory, AreaSizer, AreaTracker, LinearTracker } from "../../IContextItem";
+import { ContextLayer, ActionLayer, EventContextLayer, MousePosition, ITracker, IDataResult } from "../../IContextItem";
 import { DisplayValues } from "../../DisplayValues";
 import { lineTypes } from "../../lines/line";
 import { Ellipse } from "../../shapes/ellipse";
@@ -14,7 +14,9 @@ import { Text } from "@angular/compiler";
 import { ITimeLine, TimeLineByYearModelH, TimeByDecadeModelH, TimeByCenturyModelH, YearContent, TimeMonthModel, TimeLine, TimeLineSlider, DateRange } from "src/components/timeline/service/timeLine.model";
 import { ContextModel } from "src/canvas/component/context.model";
 import { TimeLineSpanLayerModel } from "./timeLineSpan.model";
-import { Shape } from "../../shapes/shape";
+import { Shape, ShapeContainer } from "../../shapes/shape";
+import { TimeLineService } from "src/components/timeline/service/timeLine.service";
+import { AreaSizer } from "../../shapes/sizing/sizer";
 
 export enum TimeLineTypes {
   year = 0,
@@ -26,11 +28,46 @@ export enum TimeLineTypes {
   minute = 6
 }
 
+export class TimeLineDataResult implements IDataResult {
+
+
+  constructor(private dateRange: Date[] = []) {
+    let d = new Date();
+
+    this.dateRange.push(new Date(d));
+    this.dateRange.push(new Date(d));
+    this.dateRange.push(new Date(d));
+  }
+
+  public get ID() { return "timelinedata";}
+  private setDate(offset: number, date: Date) {
+    this.dateRange[offset].setFullYear(date.getFullYear());
+    this.dateRange[offset].setMonth(date.getMonth());
+    this.dateRange[offset].setDate(date.getDate());
+  }
+
+  public Update(data: any) {
+    for (let i = 0; i < 3; i++) {
+      this.setDate(i, data[i] as Date);
+    }
+  }
+
+  get Data(): any {
+    return this.dateRange;
+  }
+
+  get Flag(): any {
+    return 1;
+  }
+
+
+}
+
+
 export class TimeLineBaseLayerModel extends EventContextLayer {
 
-  //  private _contextOffset = 0;
-  //_timeLine: ITimeLine[] = [];
-  // protected _activeSlider: TimeLineSlider = null;
+  
+  dateRange: TimeLineDataResult = new TimeLineDataResult();
 
   constructor(
     parentArea: Rectangle,
@@ -39,7 +76,7 @@ export class TimeLineBaseLayerModel extends EventContextLayer {
     private _size: number, // size of time line unit?   level: time part counting from...
     private _level: number,
     private _timeLineType: TimeLineTypes = TimeLineTypes.year,
-    protected year: number = -1) {
+    protected _date: Date = new Date) {
 
     super(
       parentArea,
@@ -48,36 +85,50 @@ export class TimeLineBaseLayerModel extends EventContextLayer {
       , 'sss'
       , new Date()
       , '');
-    TrackerFactory.Clear();
-    TrackerFactory.AddTracker(new AreaTracker());
-    TrackerFactory.AddTracker(new AreaSizer());
-    TrackerFactory.AddTracker(new LinearTracker(this.ParentArea.Right));
+
+    //DisplayValues.SetColor('TimeSpansss', '#aad8e650');
+    //DisplayValues.SetColor('TimeSpanLine', 'blue');
+    //DisplayValues.SetWeight('TimeSpanLine', 2);
+
     this.ResetTimeLine(this.ParentArea, this._timeLineType);
+    super.Init();
+  }
+  
+  GetTouchedShape(point: Point): IShape {
+    if (this.Content.length > 1 && (<IShape>this.Content[1]).IsPointInShape(point)) {
+      return (<IShape>this.Content[1]);
+    }
+    return null;
   }
 
-  GetTouchedShape(point: Point): IShape { return null }
-  ReturnTouchedShape(shape: IShape) { }
-
-  GetSelectedShape(point: Point): IShape { return null; }
+  ReturnTouchedShape(shape: IShape) {
+    if (this.Content.length == 1) {
+      this.Content.push(shape);
+    }
+  }
 
   ResetTimeLine(parentArea: Rectangle, timeLineType: TimeLineTypes = TimeLineTypes.year): void {
     this.ClearContent();
     //    this.AddContent(new TimeLineSlider("year", 0, 100, 80, 300));
     switch (timeLineType) {
       case TimeLineTypes.century:
-        this.AddContent(new TimeByCenturyModelH('timeline1', 0, 0, parentArea.Width, 30, 'boundingArea', this.year, 100));
+        this.AddContent(new TimeByCenturyModelH('timeline1', 0, 0, parentArea.Width, 30, 'boundingArea', this._date.getFullYear(), 100));
         break;
       case TimeLineTypes.decade:
-        this.AddContent(new TimeByDecadeModelH('timeline1', 0, 0, parentArea.Width, 30, 'boundingArea', this.year, 100));
+        this.AddContent(new TimeByDecadeModelH('timeline1', 0, 0, parentArea.Width, 30, 'boundingArea', this._date.getFullYear(), 100));
         break;
       case TimeLineTypes.month:
         this.AddContent(new TimeMonthModel('timeline_month', 40, 0, parentArea.Width, 16, 'boundingArea', 100));
         this.AddContent(new TimeLineSlider('timelineSpan_timeline_span', 40, 100, 80, 16));
         break;
       default:
-        this.AddContent(new TimeLineByYearModelH('timeline_year', 0, 0, parentArea.Width, 16, 'boundingArea', this.year, 100));
-        this.AddContent(new TimeLineSlider('timelineSpan_timeline_span', 0, 100, 80, 16));
-        this._tracker.Reset(this.Content[1] as IShape);
+        let timeLine = new TimeLineByYearModelH('timeline_year', 0, 0, parentArea.Width, 16, 'boundingArea', this._date.getFullYear(), 100);
+        let offset = timeLine.ConvertDateToTimeOffset(this._date) - 50;
+        let slider = new TimeLineSlider('timeline_span', 0, offset, 80, 16);
+
+        this.AddContent(slider);
+        this.AddContent(timeLine);
+
     }
     this._timeLineType = timeLineType;
 
@@ -86,14 +137,10 @@ export class TimeLineBaseLayerModel extends EventContextLayer {
   get TimeLineType() { return this._timeLineType; }
 
   resetTimeLine() {
-    this.Content[0]
+    //this.Content[0]
   }
 
-  Area(which: number = 0) {
-    return this.Content[which] as Rectangle;
-  }
-
-  LoadCanvasData(inputData: any): Promise<any> { return null;}
+  LoadCanvasData(inputData: any): Promise<any> { return null; }
   UpdateCanvasData(inputData: any) { }
 
   GetContextData(): any {
@@ -101,105 +148,130 @@ export class TimeLineBaseLayerModel extends EventContextLayer {
   }
 
   AutoUpdate(): boolean {
-
-    if (this._tracker.TrackedArea &&
-      this._tracker.TrackedArea.Id == 'timelineSpan_timeline_span') {
-      let direction = 0;
-      if (this._tracker.TrackedArea.Left < this.ParentArea.Left) {
-        let d = this.ParentArea.Left - this._tracker.TrackedArea.Left;
-        direction = Math.floor((d / this.ParentArea.Width) * 10 ) + 1;
-      }
-      if (this._tracker.TrackedArea.Right > this.ParentArea.Right) {
-        let d = this._tracker.TrackedArea.Right - this.ParentArea.Right;
-        direction = -Math.floor((d / this.ParentArea.Width) * 10) - 1;
-      }
-      if (direction) {
-        let timeLine = this.ContentFromID('timeline_year') as TimeLine;
-    //    timeLine.Contents.forEach((s, i) => s.Shape.MoveBy(direction, 0));
-    //    timeLine.ShiftContent(new Point(0, 0), this.ParentArea.Right);
-        return true;
-      }
+    let d = 0;
+    if (this.theSlider.Left < 0) {
+      d = 1;
     }
-    return false;
+    else if (this.theSlider.Right > this.theTimeLine.Right) {
+      d = -1
+    }
+    else {
+      return false;
+    }
+    this.theTimeLine.MoveBy(d, 0);
+    this.setDateRange();
+    return true;
+  }
+
+  ReturnMember(member: IShape) {
+    if (member) {
+      console.error("Returned Shape: " + member.Id);
+
+    }
+    else {
+      this._mousePosition.Init
+      let sss = 0;
+      console.error("Returned Shape is null");
+    }
+    this.AddContent(member);
+  }
+  
+  mouseMove(event: any, context: CanvasRenderingContext2D): void {
+
+    super.mouseMove(event, context);
+    this.setDateRange();
+
+  }
+
+  GetDataResult(): IDataResult {
+    return this.dateRange;
+  }
+  
+  //GetDateResult(): IDataResult {
+  //  return this;
+  //}
+
+  SetDate(date:Date) {
+    
+    this.theTimeLine.InitToDate(date);
+
+    let t = date.getTime();
+    let d1 = this.dateRange.Data[0] as Date;
+    let d2 = this.dateRange.Data[1] as Date;
+    let t1 = d1.getTime();
+    let t2 = d2.getTime();
+    let d = (t2 - t1) / 2;
+    t1 = t - d;
+    t2 = t + d;
+    d1.setTime(t1);
+    d2.setTime(t2);
+    let offset1 = this.theTimeLine.ConvertDateToTimeOffset(d1);
+    let offset2 = this.theTimeLine.ConvertDateToTimeOffset(d2);
+    this.theSlider.UpdatePosition(offset1, offset2);
+    this._date = date;
+  }
+
+  SetDataResult(data: IDataResult, changeType: any) {
+    let d = data as TimeLineDataResult;
+    if (changeType == 2) {
+      this.SetDate(d.Data[2] as Date);
+      return;
+    }
+
+ 
+    let d1 = d.Data[0] as Date;
+    let d2 = d.Data[1] as Date;
+    let offset1 = this.theTimeLine.ConvertDateToTimeOffset(d1);
+    let offset2 = this.theTimeLine.ConvertDateToTimeOffset(d2);
+    
+    if (this.theSlider.UpdatePosition(offset1, offset2)) {
+      this.dateRange = d;
+
+      offset2 -= offset1
+      offset2 /= 2;
+      offset2 += d1.getTime();
+      this._date.setTime(offset2);
+
+    }
+  }
+
+  private get theTimeLine(): TimeLine {
+    return this.Content.find(c => c.Id == "timeline_year") as TimeLine;
+  }
+
+  private get theSlider(): TimeLineSlider {
+    return this.Content.find(c => c.Id == "timeline_span") as TimeLineSlider;
+  }
+
+  private setDateRange() {
+    this.theTimeLine.CalculatDataFromTimeSpan(this.theSlider, this.dateRange);
   }
 
 
-  //selectItem(event: any, context: CanvasRenderingContext2D): void {
 
-  //  super.selectItem(event, context);
-  //  let d = this._tracker.mouseCapture(event, this.ParentArea);
-  //  let t = this._tracker.TrackedArea;
-  //  if (!this._tracker.Track(d)) {
-  //    let c = this.RemoveContentByPoint(d) as IShape;
-  //    if (c) {
-  //      this._tracker = TrackerFactory.GetTracker(c.Id);
-  //      this._tracker.Reset(c);
-  //    }
-  //    else {
-  //      this._tracker.Reset(null);
-  //    }
-
-  //  }
-  //  else if (t) {
-  //    this.RemoveContentById(t.Id);
-  //  }
-  //  this.ClearContext(context);
-  //  this._tracker.Draw(context, true);
-  //}
-
-  //releaseSelectedItem(context: CanvasRenderingContext2D) {
-
-  ////  this._tracker.mouseRelease();
-
-  //  this.PutContentItem(this._tracker.TrackedArea);
-  //  if ((!this._tracker || !this._tracker.TrackedArea) && this.content.length != 2) {
-  //    this.ClearContent();
-  //    this._tracker = new AreaSizer();
-  //    this.AddContent(new TimeLineByYearModelH('timeline_year', 0, 0, this.ParentArea.Width, 16, 'boundingArea', this.year, 100));
-  //    this.AddContent(new TimeLineSlider('timelineSpan_timeline_span', 0, 100, 80, 16));
-  //    this._tracker.Reset(this.Content[1] as IShape);
-  //    this.ClearContext(context);
-  //    this.Draw(context);
-  //    return;
-  //  }
-  //  this.ClearContext(context);
-  //  this.Draw(context);
-
-  //  if (this._tracker.TrackedArea && this._tracker.TrackedArea.Id == 'timelineSpan_timeline_span') {
-  //    this._tracker.Reset(this._tracker.TrackedArea);
-  //    this._tracker.Draw(context, false);
-  //  }
-  //  else {
-  //    this._tracker = TrackerFactory.GetTracker('timelineSpan_timeline_span');
-  //    if (this._tracker) {
-  //      this._tracker.Reset(this.content[1] as IShape);
-  //      this._tracker.Draw(context, false);
-  //    }
-  //  }
-
-
-  //  let span = this.ContentFromID('timelineSpan_timeline_span') as Rectangle;
-  //  let timeLine = this.ContentFromID('timeline_year') as TimeLine;
-  //  if (timeLine) {
-  //    let dr: DateRange = timeLine.DateFromArea(span);
-  //  }
-
-  //}
-
-  //mouseMove(event: any, context: CanvasRenderingContext2D): Point {
-  //  return super.mouseMove(event, context);
-  //  if (p.X <= 0 && p.Y <= 0) { return p; }
-  //  //if (this._tracker.TrackedArea && this._tracker.TrackedArea.Id == 'timelineSpan_timeline_year');
-  //  //{
-  //  //  let d = this._tracker.TrackedArea.Left;
-  //  //  if (d < 0) {
-  //  //    let timeLine = this.ContentFromID('timeline_year') as TimeLine;
-  //  //    timeLine.Contents.forEach((s, i) => s.Shape.MoveBy(-d, 0));
-  //  //    timeLine.ShiftContent(new Point(-d, 0), this.ParentArea.Right);
-  //  //   timeLine.DrawContent(context);
-  //  //    this._tracker.TrackedArea.Draw(context);
-  //  //  }
+  //Draw(context: CanvasRenderingContext2D, initial: boolean = false) {
+  //  super.Draw(context, false);
+  //  this._selectedItem.Draw(context);
+  //  //if (initial) {
+  //  //  this.theSlider.Draw(context);
+  //  //  this._sizeAbleArea.Draw(context);
   //  //}
-  //  return p;
   //}
+
+  get ContentModel(): TimeLine {
+    return this.Content[0] as TimeLine;
+  }
+
+  GetSelectedShape(point: Point): IShape {
+
+    if (this.Content.length > 1 && (<TimeLineSlider>this.Content[1]).IsPointInShape(point)) {
+      let item = this.Content.splice(1, 1);
+      return item[0] as TimeLineSlider;
+    }
+    if ((<TimeLine>this.Content[0]).IsPointInShape(point)) {
+      return this.Content[0] as TimeLine;
+    }
+    return null;
+  }
+
 }

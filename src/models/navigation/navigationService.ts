@@ -91,8 +91,8 @@ export class NavigationService {
     this.UnselectAll(this._home);
     let selection = this.FindItem(item, startFrom) || this._home;
     if (selection) {
+      this._selectedItem = selection;
       if (selection.HasSubLinks) {
-        this._selectedItem = selection;
         this._selectedItem.SubLinks[0].Select();
       }
       selection.Go(router);

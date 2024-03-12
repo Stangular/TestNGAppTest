@@ -31,6 +31,9 @@ export class Rectangle extends Shape {
   }
 
   Draw(ctx: CanvasRenderingContext2D): void {
+   // if( this.stateName == 'personContainer_hit'){
+    //  console.error("Text: " + this.stateName );
+  //  }
     ctx.beginPath();
     ctx.rect(this.Left, this.Top, this.Width, this.Height);
     ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
@@ -40,8 +43,9 @@ export class Rectangle extends Shape {
    // ctx.stroke();
 
     ctx.closePath();
-
-
+    if (this.Id.indexOf("197182_internal") >= 0  && this.Top == 0) {
+      let sss = 0;
+    }
   }
 
   Save(): any {
@@ -110,7 +114,7 @@ export class GradientRectangle extends Rectangle {
 
   Draw(ctx: CanvasRenderingContext2D): void {
 
-    let ga = DisplayValues.GetGradientArea(this.StateIndex.Index[UIStates.gradientArea]);
+   // let ga = DisplayValues.GetGradientArea(this.StateIndex.Index[UIStates.gradientArea]);
     let c1 = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);
     let c2 = DisplayValues.GetGradientColor(this.StateIndex.Index[UIStates.gradientColor]);
     let x1 = this.Left; //+ (this.Left * 0.5);
@@ -125,6 +129,15 @@ export class GradientRectangle extends Rectangle {
     ctx.rect(this.Left, this.Top, this.Width, this.Height);
     ctx.fillStyle = gradient;
     ctx.fill();
+    //ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
+    //ctx.strokeStyle = DisplayValues.GetFGColor(this.StateIndex.Index[UIStates.foreground]);
+    //ctx.stroke();
+
+    //ctx.beginPath();
+    //ctx.rect(this.Left, this.Top, this.Width, this.Height);
+    //ctx.fillStyle = DisplayValues.GetColor(this.StateIndex.Index[UIStates.background]);;
+    //ctx.fill();
+
     //ctx.lineWidth = DisplayValues.GetWeight(this.StateIndex.Index[UIStates.weight]);
     //ctx.strokeStyle = DisplayValues.GetFGColor(this.StateIndex.Index[UIStates.foreground]);
     //ctx.stroke();

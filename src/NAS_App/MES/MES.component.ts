@@ -1,7 +1,7 @@
 import {
   Component,
-  AfterViewInit,
-  OnInit
+  OnInit,
+  OnChanges
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavigationService } from 'src/models/navigation/navigationService';
@@ -15,14 +15,18 @@ import { MatTabChangeEvent } from '@angular/material';
   templateUrl: './MES.component.html',
   styleUrls: ['./MES.component.css']
 })
-export class MESComponent implements OnInit, AfterViewInit {
-  sidePanelOpen: boolean = false;
+
+export class MESComponent implements OnInit {
+ 
+  sidePanelOpen: boolean = true;
   _timeLineType = 'timeline-year';
   family: FamilyTreeModel;
 
   constructor(private _navMan: NavigationService,
     public canvasService: CanvasService,
-    private router: Router) { }
+    private router: Router) {
+    
+  }
 
   ngOnInit() {
     this._navMan.SelectByName(this.router, "MES", this._navMan.Home);
@@ -41,25 +45,15 @@ export class MESComponent implements OnInit, AfterViewInit {
   //  this.family = new FamilyTreeModel(f);
  }
 
-  ngAfterViewInit(): void {
-   
-  }
-
   get Family(): ContextLayer {
     return this.family;
   }
 
-  ChangeTab(tab: MatTabChangeEvent) {
-    let sss = 0
 
-  }
 
   setTimeLineType(event: any) {
     this._timeLineType = 'timeline-decade';
   }
 
-  Toggle(sidePanel:any) {
-    this.sidePanelOpen = !this.sidePanelOpen;
-    sidePanel.toggle();
-  }
+
 }

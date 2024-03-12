@@ -22,7 +22,8 @@ export enum ActionType {
 })
 export class DetailViewComponent implements OnDestroy {
   [x: string]: any;
-
+  rowspan = "3";
+  colspan = "3";
   color = 'primary';
   mode = 'indeterminate';
   value = 50;
@@ -94,7 +95,7 @@ export class DetailViewComponent implements OnDestroy {
     //   console.error('Destroy Detail');
   }
 
-   saveSuccess(data: any) {
+  saveSuccess(data: any) {
   //  this.source.LoadData(data.content, [], data.recordCount);
     this.saveing = false;
     this.Snack('Save succeeded');

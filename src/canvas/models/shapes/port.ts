@@ -1,7 +1,7 @@
-import { IShape, ITracker } from './IShape';
+import { IShape } from './IShape';
 import { Point, TrackingPoint } from './primitives/point';
 import { Ellipse } from './ellipse';
-import { IContextItem, AreaTracker } from '../IContextItem';
+import { IContextItem } from '../IContextItem';
 import { ShapeSelectResult } from './shapeSelected';
 import { StateIndex, DisplayValues } from '../DisplayValues';
 
@@ -10,7 +10,9 @@ import { StateIndex, DisplayValues } from '../DisplayValues';
 //  target = 1
 //}
 export class Port implements IShape, IContextItem {
-  
+
+  private _sourcePortId: string;
+
   private _stateIndex: StateIndex;
   private _hit: boolean = false;
 
@@ -29,7 +31,7 @@ export class Port implements IShape, IContextItem {
   get LineId() {
     return this.lineId;
   }
-
+  CopyShape(newID: string): IShape { return null; }
   //InitializeContext(context: CanvasRenderingContext2D) { };
 
   get StateIndex(): StateIndex {
@@ -141,12 +143,6 @@ export class Port implements IShape, IContextItem {
 
   MoveTo(x: number, y: number) {
     this.internalShape.MoveTo(x, y);
-  }
-
-  Track(point: Point, tracker: AreaTracker): boolean {
-
-    return false; // this.SelectContentFromPoint(point) && tracker.Reset(this);
-
   }
 
   get ParentShapeId() {

@@ -1,14 +1,10 @@
-<!--<wait [Width]="TheCanvas.width" [Height]="TheCanvas.height" *ngIf="canvasService.DataLoading"></wait>-->
-
 
 <div>
-  <canvas #topCanvas
+  <canvas #touchCanvas
           class="activeCanvas"
-          id="timeline"
-          (pointerdown)="OnMouseDown($event)">
-  </canvas>
+          id="touchCanvas"
+          (pointerdown)="OnMouseDown($event)"></canvas>
   <canvas #staticCanvas
           class="staticCanvas"
-          id="topLayer">
-  </canvas>
+          id="topLayer"></canvas>
 </div>

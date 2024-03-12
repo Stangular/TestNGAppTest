@@ -411,10 +411,6 @@ export abstract class Records<T> implements IRecordManager, ISequenceNavigator<T
       if (fldElm) {
         fldElm.RefreshPage(c.values);
       }
-      // if (fldElm) {
-      //   self._fields.push(self.New(c));
-      ////   fldElm.ResetToDefault(fldElm.DefaultValue);
-      // }
     });
     if (recordCount > 0 && this._selectedItem >= recordCount - 1) {
       this._selectedItem = recordCount - 1;

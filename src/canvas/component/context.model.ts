@@ -7,7 +7,7 @@ import { StateIndex, UIStates, DisplayValues } from "../models/DisplayValues";
 import { PortPath, lineTypes } from "../models/lines/line";
 import { Point } from "../models/shapes/primitives/point";
 import { ILine } from "../models/lines/ILine";
-import { MessageService } from 'src/app/messaging/message.service';
+import { MessageService, InformationExchange } from 'src/app/messaging/message.service';
 import { TextContent } from "../models/shapes/content/Content";
 
 // Add display state object
@@ -26,7 +26,7 @@ export class LayerContext {
 }
 
 export class ImageModel {
-
+  private message = new InformationExchange('1015');
   private _image: HTMLImageElement;
   private _ready: boolean = false;
   constructor(private imageName: string
@@ -35,10 +35,9 @@ export class ImageModel {
     this._image = new Image();
     this._image.src = "";
     let self = this;
-
     this._image.onload = () => {
       self._ready = true;
-      setTimeout(() => messageService.sendMessage(1015), 0);
+      setTimeout(() => messageService.sendMessage(this.message), 0);
     }
     this._image.src = this.path + this.imageName;
 

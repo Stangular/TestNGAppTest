@@ -8,6 +8,7 @@ import { DetailViewComponent } from 'src/ui/components/views/detail/detail-view.
 import { TableViewComponent } from 'src/ui/components/views/table/table-view.component';
 import { HomeDefaultComponent } from 'src/app/home-default/home-default.component';
 import { MESComponent } from './MES/MES.component';
+import { FamilyDataComponent } from 'src/components/familyData/family.component';
 
 const routes: Routes = [
 
@@ -15,6 +16,13 @@ const routes: Routes = [
   { path: 'MES', component: MESComponent },
   {
     path: 'systeminventory', component: SystemInventoryComponent,
+    children: [
+      { path: 'detail/:sourceName', component: DetailViewComponent },
+      { path: 'table/:sourceName', component: TableViewComponent }
+    ]
+  },
+  {
+    path: 'family_data', component: FamilyDataComponent,
     children: [
       { path: 'detail/:sourceName', component: DetailViewComponent },
       { path: 'table/:sourceName', component: TableViewComponent }

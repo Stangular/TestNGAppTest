@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material';
 import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
 import { ChartLayer } from '../../../../canvas/models/custom/layers/charts/chart.layer';
 import { ShapeSelectResult } from 'src/canvas/models/shapes/shapeSelected';
-import { MessageService } from 'src/app/messaging/message.service';
+import { MessageService, InformationExchange } from 'src/app/messaging/message.service';
 import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 import { TabDefinitionModel } from 'src/models/tabs/tabdef';
 //import { Router } from '@angular/router';
@@ -45,7 +45,7 @@ export class EntityRemoveModel {
   styleUrls: ['form.component.css']
 })
 export class FormComponent implements OnInit, AfterContentInit {
-
+  private message = new InformationExchange('10');
   private sourceID: number;
   @Input() sourceName: string = '';
   elements: any;
@@ -103,8 +103,7 @@ export class FormComponent implements OnInit, AfterContentInit {
 
   UpdateElement(elmId = { id: 0, value: '' }) {
   //  this.Source.UpdateRecord(elmId.id, this.edfs);
-  } 
-  
+  }
 
   Snack(message: string) {
 
@@ -113,7 +112,7 @@ export class FormComponent implements OnInit, AfterContentInit {
   
   OnStateChange() {
   setTimeout(() =>
-    this.messageService.sendMessage(10), 0);
+    this.messageService.sendMessage(this.message), 0);
   }
   
   page(code: number) {

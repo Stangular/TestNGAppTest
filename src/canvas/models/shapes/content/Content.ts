@@ -5,6 +5,7 @@ import { StateIndex, DisplayValues, UIStates } from "../../DisplayValues";
 import { Point } from "../primitives/point";
 import { IContextItem } from "../../IContextItem";
 import { MessageService } from 'src/app/messaging/message.service';
+import { Size } from "../primitives/size";
 
 
 export abstract class Content  {
@@ -21,6 +22,7 @@ export abstract class Content  {
   }
 
   abstract Draw(context: CanvasRenderingContext2D, shape: IShape);
+  abstract ContextInit(tx: CanvasRenderingContext2D, size: Size);
   abstract Update(content: any);
 
   get Id() { return this.id }
@@ -31,9 +33,13 @@ export abstract class Content  {
   get StateIndex() { return this._stateIndex; }
 
   Active(hit: boolean) {
-    if (hit) {
+
+    if (hit) { //touched
       this._stateIndex = DisplayValues.GetShapeIndex(this.hitStateName);
     }
+    //else if (selected) {
+    //  this._stateIndex = DisplayValues.GetShapeIndex(this.selectedStateName);
+    //}
     else {
       this._stateIndex = DisplayValues.GetShapeIndex(this.stateName);
     }
@@ -103,7 +109,11 @@ export class TextContent extends Content {
       angle);
   }
 
-  Update(content: any) { }
+  ContextInit(ctx: CanvasRenderingContext2D, size: Size) {
+    this.MeasureText(ctx, size.Height);
+  };
+
+  Update(content: any) { this.content = content.toString(); }
   
   MeasureText(ctx: CanvasRenderingContext2D, height: number): number {
     ctx.save();
@@ -115,9 +125,10 @@ export class TextContent extends Content {
 
   public Draw(ctx: CanvasRenderingContext2D, shape: IShape) {
 
+ // console.error("Text: " + this.stateName + ":" + this.content);
  //   console.error("DRAW C: " + this.State + ":" + this.StateIndex.State + ":" + this.StateIndex.Index)
 
-    //let textWidth = this.MeasureText(ctx, shape.Height, this.StateIndex);
+    let textWidth = this.MeasureText(ctx, shape.Height);
     //if (shape.Width <= textWidth) {
     //  shape.SizeBy(this, shape.Top, shape.Left + textWidth, shape.Bottom, shape.Left);
     //}
@@ -138,7 +149,9 @@ export class TextContent extends Content {
     ctx.textAlign = 'left';
     ctx.fillStyle = DisplayValues.GetFGColor(this.StateIndex.Index[UIStates.foreground]);
     ctx.textAlign = 'left';
-    ctx.fillText(this.content, shape.Width / 2 - this._textWidth / 2, shape.Height);// Width calculation is to center the text in the area
+    ctx.fillText(this.content, shape.Width / 2 - textWidth / 2, shape.Height);// Width calculation is to center the text in the area
+
+  //  console.error("Draw Text:" + this.content + '_' + shape.Width + '_' + this.stateName);
   //  ctx.strokeStyle = 'transparent';
     //ctx.lineWidth = 1;
     //ctx.stroke();
@@ -172,7 +185,9 @@ export class ImageContent extends Content {
     this._image.src = content;
   }
 
-  Update(content: any) { }
+  ContextInit(tx: CanvasRenderingContext2D, size: Size) { }
+
+  Update(content: any) { this._image.src = content.toString(); }
 
   public Draw(context: CanvasRenderingContext2D, shape: IShape) {
     if (!this._ready || !context) { return false; }

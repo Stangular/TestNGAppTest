@@ -31,6 +31,7 @@ import { DataHTTPService } from 'src/dataManagement/service/dataHTTP.service';
 import { NAS_AppModule } from 'src/NAS_App/NAS_App.module';
 import { ngMaterialModule } from 'src/ui/module/ngMaterialUI.module';
 import { DNASegments_AppModule } from 'src/apps/CanvasApps/DNAAnalysis/DNASegments.module';
+import { MongoDataService } from 'src/dataManagement/service/mongodb/mongoDB.service';
 
 @NgModule({
   imports: [
@@ -61,6 +62,7 @@ import { DNASegments_AppModule } from 'src/apps/CanvasApps/DNAAnalysis/DNASegmen
   ],
   providers: [
     AppDataService
+    , MongoDataService
     , TokenService
     , UserService
     , LayoutService

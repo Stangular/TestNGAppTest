@@ -15,6 +15,7 @@ import { FilerComponent } from './CommonComponents/filter.component';
 import { ElementDefinitionFactoryService } from 'src/dataManagement/service/elementDefinitionFactoryService';
 import { RouterModule } from '@angular/router';
 import { MESComponent } from './MES/MES.component';
+import { TimeLineModule } from 'src/components/timeline/module/timeLine.module';
 // Add an icon to the library for convenient access in other components
 library.add(
   faCoffee
@@ -31,6 +32,7 @@ library.add(
     , ViewModule
     , FontAwesomeModule
     , RouterModule
+    , TimeLineModule
   ],
 
   declarations: [

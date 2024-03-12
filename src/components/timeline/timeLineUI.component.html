@@ -1,0 +1,79 @@
+<div style="width:100px">
+  <mat-label>From:</mat-label>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           style="width:80px; text-align:right"
+           (change)="OnChangeFromYear1($event)"
+           [ngModel]="timeLineRangeFirstYear">
+  </div>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           min="1" max="12"
+           style="width:80px; text-align:right"
+           (change)="OnChangeFromMonth1($event)"
+           [ngModel]="timeLineRangeFirstMonth">
+  </div>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           min="1"
+           style="width:80px; text-align:right"
+           (change)="OnChangeFromDay1($event)"
+           [ngModel]="timeLineRangeFirstDay">
+  </div>
+  <mat-label>To:</mat-label>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           style="width:80px; text-align:right"
+           (change)="OnChangeFromYear2($event)"
+           [ngModel]="timeLineRangeFinalYear">
+  </div>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           min="1" max="12"
+           style="width:80px; text-align:right"
+           (change)="OnChangeFromMonth2($event)"
+           [ngModel]="timeLineRangeFinalNonth">
+  </div>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           min="1"
+           style="width:80px; text-align:right"
+           (change)="OnChangeFromDay2($event)"
+           [ngModel]="timeLineRangeFinalDay">
+  </div>
+  <mat-label>Date:</mat-label>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           style="width:80px; text-align:right"
+           (change)="OnChangeDateYear($event)"
+           [ngModel]="timeLineRangeYear">
+  </div>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           min="1" max="12"
+           style="width:80px; text-align:right"
+           (change)="OnChangeDateMonth($event)"
+           [ngModel]="timeLineRangeMonth">
+  </div>
+  <div style="padding-bottom:5px">
+    <input matInput
+           type="number"
+           min="1"
+           style="width:80px; text-align:right"
+           (change)="OnChangeDateDay($event)"
+           [ngModel]="timeLineRangeDay">
+  </div>
+  <div style="padding-bottom:5px">
+    <button mat-button (click)="ChangeDate()">
+      Change Date
+    </button>
+  </div>
+</div>

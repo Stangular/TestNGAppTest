@@ -23,17 +23,17 @@ export class TimeLineBaseLayerModel extends ContextLayer {
       , ''
       , [new Rectangle('timeline', 0, 0, -1, 10, 'timeline')]);
 
-    DisplayValues.Clear();
-    DisplayValues.SetColor('DefaultBG', '#ddd11d');
-    DisplayValues.SetColor('EvenSlot', '#fffff2');
-    DisplayValues.SetColor('OddSlot', '#fbf7f5');
+    //DisplayValues.Clear();
+    //DisplayValues.SetColor('DefaultBG', '#ddd11d');
+    //DisplayValues.SetColor('EvenSlot', '#fffff2');
+    //DisplayValues.SetColor('OddSlot', '#fbf7f5');
 
-    DisplayValues.SetWeight('DefaultBG', 2);
-    DisplayValues.SetFont('DefaultBG', 'verdana');
-    DisplayValues.SetColor('DefaultFG', '#000000');
-    DisplayValues.SetColor('default.edit.background', 'yellow');
-    DisplayValues.SetWeight('default.edit.background', 2);
-    DisplayValues.SetColor('timeLineColor', 'red');
+    //DisplayValues.SetWeight('DefaultBG', 2);
+    //DisplayValues.SetFont('DefaultBG', 'verdana');
+    //DisplayValues.SetColor('DefaultFG', '#000000');
+    //DisplayValues.SetColor('default.edit.background', 'yellow');
+    //DisplayValues.SetWeight('default.edit.background', 2);
+    //DisplayValues.SetColor('timeLineColor', 'red');
     //  this.GetContentItem
     //PortPath.
     this.AddLine("timeline", "timeLineColor", lineTypes.straight);

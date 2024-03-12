@@ -1,4 +1,4 @@
-import { ContextLayer, IContextItem, IContextSystem, EventContextLayer } from "src/canvas/models/IContextItem";
+import { ContextLayer, IContextItem, EventContextLayer, IDataResult } from "src/canvas/models/IContextItem";
 import { Rectangle } from "src/canvas/models/shapes/rectangle";
 import { DisplayValues } from "src/canvas/models/DisplayValues";
 import { Ellipse } from "src/canvas/models/shapes/ellipse";
@@ -123,7 +123,6 @@ export class YDNAModel implements IContextItem {
   Draw(contextModel) {
 
   }
-
   CopyItem(newId: string): IContextItem {
     return null;
   }
@@ -252,4 +251,15 @@ export class YDNATreeLayer extends EventContextLayer {
 
   GetTouchedShape(point: Point): IShape { return null }
   ReturnTouchedShape(shape: IShape) { }
+  
+  GetDataResult(): IDataResult {
+    return null;
+  }
+
+  GetDateResult(): IDataResult {
+    return null;
+  }
+
+  SetDataResult(data: IDataResult, changeType: any) { }
+
 }

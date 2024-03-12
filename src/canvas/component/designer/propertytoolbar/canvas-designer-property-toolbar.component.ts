@@ -3,14 +3,13 @@ import {
   OnDestroy
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable ,  Subscription } from 'rxjs';
 import { CanvasService, objectTypes } from 'src/canvas/service/canvas.service';
 import { FreedomOfMotion, AreaType } from 'src/canvas/models/shapes/IShape';
 import { ColorPickerService, Cmyk } from 'ngx-color-picker';
 import { map, startWith } from 'rxjs/operators';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
 import { MessageService } from 'src/app/messaging/message.service';
-import { Subscription } from 'rxjs';
 import { MatDialog, MatDialogRef, MatDialogConfig, MAT_DIALOG_DATA } from '@angular/material';
 import { UpdatePortDialog } from 'src/ui/components/views/form/dialogs/addport/update-port-dialog.component';
 import { CanvasGraphicStateDialogComponent } from 'src/ui/components/views/form/dialogs/canvas-graphic-state-dialog/canvas-graphic-state-dialog.component';

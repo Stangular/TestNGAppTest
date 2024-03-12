@@ -142,6 +142,7 @@ export class GeoEvent {
   get Center() {
     return this._center;
   }
+
   IsPlace(name: string, offset: number) {
     name = name.toLowerCase();
     let part = this.PlacePart(offset).toLowerCase();
@@ -195,9 +196,6 @@ export class GeoEventPath {
     e = new GeoEvent(["AL", "Pickens"], 18300000);
     this._initialPath.push(e);
 
-    e = new GeoEvent(["SC", "Pickens"], 17900000);
-    this._initialPath.push(e);
-
     e = new GeoEvent(["GA", "Wilkes"], 17800000);
     this._initialPath.push(e);
 
@@ -205,6 +203,10 @@ export class GeoEventPath {
     this._initialPath.push(e);
 
     e = new GeoEvent(["DE", "New Castle"], 17550000,1);
+    this._initialPath.push(e);
+
+
+    e = new GeoEvent(["SC", "Pickens"], 17900000);
     this._initialPath.push(e);
 
     this._initialPath = this._initialPath.sort((a, b) => b.Year - a.Year);
@@ -216,6 +218,8 @@ export class GeoEventPath {
         })
       })
     ];
+
+   
 
     this._stylesPathyLine2 = [
       new Style({
@@ -293,11 +297,11 @@ export class GeoEventPath {
        */
       new Style({
         stroke: new Stroke({
-          color: 'rgba(20, 178, 178, 0.8)',
+          color: 'rgba(20, 20, 20)',
           width: 0.5
         }),
         fill: new Fill({
-          color: 'rgba(200, 255, 200)'
+          color: 'rgba(200, 255, 200, 0.1)'
         }),
         //text: new Text({
         //  font: 'normal 18px FontAwesome',
@@ -310,6 +314,10 @@ export class GeoEventPath {
 
       })
     ];
+  }
+
+  get Name() {
+    return this._name;
   }
 
   MapEvent(state: string, county: string, feature: any): boolean {
@@ -773,7 +781,7 @@ export class USState {
 
 export class OlMapComponent implements AfterViewInit {
   bgColor: string = 'red';
-  mode: string = 'side';
+  mode: string = 'over';
   // _states: string[] = [];
   showTopo: boolean = false;
   _map: Map;
@@ -790,13 +798,15 @@ export class OlMapComponent implements AfterViewInit {
   _historylayer: VectorLayer = null;
   geolabel: string = "States"
   _events: HistoricEvent[] = [];
-  _shannonPath: GeoEventPath = new GeoEventPath("Shannon: R-CTS4528");
+  _lineagePaths: GeoEventPath[] = [];
+  _selectedLineage: GeoEventPath;
   _topoLayer: VectorLayer = null;
   constructor(
     public canvasService: CanvasService,
     private http: HttpClient,
     private httpService: DataHTTPService) {
     this._events.push(new HistoricEvent('shannonCTS4528_census_1880', 1880, '1880 Census', ["USA", "Arkansas", "Drew"]));
+    this._lineagePaths.push(new GeoEventPath("Shannon: R-CTS4528"));
     // this.canvasService.A()
   }
 
@@ -1132,7 +1142,29 @@ export class OlMapComponent implements AfterViewInit {
         vectorLayer],
       view: view
     });
-
+    let mmmm = this._map;
+    this._map.on('singleclick', function (e) {
+      var hit = false;
+      mmmm.forEachFeatureAtPixel(e.pixel, function (feature,layer) {
+        hit = true;
+      },
+        {
+          layerFilter: function (layer) {
+            let n = layer.get('name');
+            if (!n) { return false; }
+            return n.indexOf('PATH_') >= 0;
+          },
+          hitTolerance: 0
+        });
+      if (hit) {
+     //   style.getStroke().setColor('green');
+      //  statusElement.innerHTML = '&nbsp;A feature got hit!';
+      } else {
+      //  style.getStroke().setColor('black');
+      //  statusElement.innerHTML = '&nbsp;No feature got hit.';
+      }
+    //  feature.changed();
+    });
 
     this._map.on('rendercomplete', e => {
       // do something
@@ -1375,11 +1407,10 @@ export class OlMapComponent implements AfterViewInit {
     });
   }
 
-  LoadPath1() {
-
+  LineageChanged(selectedItem: any) {
     const pathlayerPromise = new Promise<string>((resolve, reject) => {
       // a resolved promise after certain hours
-      this.AddCountyLayersxxx(this._shannonPath, 2000, 1830);
+      this.AddCountyLayersxxx(selectedItem.value, 2000, 1830);
       resolve('We finished mowing the lawn'),
         reject("We couldn't mow the lawn")
     });
@@ -1395,8 +1426,13 @@ export class OlMapComponent implements AfterViewInit {
 
   }
 
+  LoadPath1() {
+
+  
+  }
+
   LoadPath2() {
-    this.AddPathLayers(this._shannonPath, 2000, 1600);
+    this.AddPathLayers(this._selectedLineage, 2000, 1600);
   }
 
   AddPathLayers(path: GeoEventPath, year1: number, year2: number) {

@@ -1,26 +1,18 @@
 import { Point, TrackingPoint } from './primitives/point';
-import { IContextItem, AreaTracker } from '../IContextItem';
+import { IContextItem } from '../IContextItem';
 import { StateIndex } from '../DisplayValues';
 
 export enum FreedomOfMotion {
-  none = 0,
-  full = 1,
-  horizontal = 2,
-  vertical = 3,
+  none = 1,
+  full = 2,
+  horizontal = 3,
+  vertical = 4,
 }
 
 export enum AreaType {
   normal = 0, // width and height change independently
   lockedRatio = 1, // Ratio between width and height remains constant as other dimension changes.
   constantArea = 2 // Total area remains the same as width of height changes
-}
-
-export interface ITracker {
-
-  TrackedArea: IShape;
-  MoveItem(dx: number, dy: number);
-  Reset(shape: IShape);
-  Draw(context: CanvasRenderingContext2D);
 }
 
 export interface IShape extends IContextItem {
@@ -50,12 +42,11 @@ export interface IShape extends IContextItem {
   SetProperties(properties: any);
   Select(criteria: any): boolean;
   IsPointInShape(point: Point);
- // Track(point: Point, tracker: AreaTracker): boolean;
-
   StateIndex: StateIndex;
   Touch(point: Point);
   HitTest(point: Point): boolean;
   ClearHit();
+  CopyShape(newID: string): IShape;
 //  Tracker(): ITracker;
 //  SetToPosition(point: TrackingPoint);
 }
@@ -83,6 +74,9 @@ export class EmptyShape implements IShape {
   }
   get FreedomOfSizing(): FreedomOfMotion {
     return FreedomOfMotion.none;
+  }
+  CopyShape(newID: string): IShape{
+    return new EmptyShape();
   }
 
   MoveBy(x: number, y: number) { };

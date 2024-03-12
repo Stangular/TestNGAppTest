@@ -7,10 +7,9 @@
 }
 
 .activeCanvas {
-  border: 1px solid blue;
   position: absolute;
   top: 1px;
-  left: 1px;
+  left: 0;
   border: 0;
   background-color: transparent;
 }

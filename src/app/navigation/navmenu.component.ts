@@ -23,6 +23,7 @@ export class NavMenuComponent implements OnInit {
     this._navMan.AddTo(new NavigationLink('Production Reports'), 'Hot Mill');
     this._navMan.AddTo(new NavigationLink('HRM Production History'), 'Production Reports');
     this._navMan.AddTo(new NavigationLink('Tools', '', '/systeminventory/detail', 'VBarChart'), 'MES');
+    this._navMan.AddTo(new NavigationLink('Family Data', '', '/family_data'), 'MES');
     this._navMan.AddTo(new NavigationLink('System Inventory', '', '/systeminventory/detail', 'VBarChart'), 'Tools');
     this._navMan.AddTo(new NavigationLink('VBar Detail', 'view_compact', '/systeminventory/detail', 'VBarChart'), 'System Inventory');
     this._navMan.AddTo(new NavigationLink('VBar Table', 'grid_on', '/systeminventory/table', 'VBarChart'), 'System Inventory');
@@ -33,7 +34,9 @@ export class NavMenuComponent implements OnInit {
     this._navMan.AddTo(new NavigationLink('All', 'grid_on', '/people/table', 'lc_people'), 'People');
     this._navMan.AddTo(new NavigationLink('State Detail', 'view_compact', '/states/detail', 'lc_states'), 'States');
     this._navMan.AddTo(new NavigationLink('State Table', 'grid_on', '/states/table', 'lc_states'), 'States');
- }
+    this._navMan.AddTo(new NavigationLink('Family Detail', 'view_compact', '/family_data/detail', 'lc_states'), 'Family Data');
+    this._navMan.AddTo(new NavigationLink('Family Table', 'grid_on', '/family_data/table', 'lc_states'), 'Family Data');
+}
 
   ngOnInit() {
    // this._navMan.SelectedItem.Go(this.router);

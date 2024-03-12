@@ -1,18 +1,15 @@
 {
   "ExpandedNodes": [
     "",
+    "\\projects",
     "\\src",
-    "\\src\\app",
-    "\\src\\apps",
     "\\src\\canvas",
-    "\\src\\canvas\\component",
-    "\\src\\canvas\\component\\layers",
-    "\\src\\canvas\\component\\layers\\Static",
-    "\\src\\NAS_App",
-    "\\src\\NAS_App\\MES",
-    "\\src\\NAS_App\\MES\\New Folder",
-    "\\src\\NAS_App\\Tools"
+    "\\src\\canvas\\service",
+    "\\src\\dataManagement",
+    "\\src\\dataManagement\\service",
+    "\\src\\dataManagement\\service\\mongodb",
+    "\\src\\dataManagement\\service\\mongodb\\routes"
   ],
-  "SelectedNode": "\\src\\NAS_App\\MES\\MES.component.html",
+  "SelectedNode": "\\src\\dataManagement\\service\\mongodb\\mongoDB.service.ts",
   "PreviewInSolutionExplorer": false
 }

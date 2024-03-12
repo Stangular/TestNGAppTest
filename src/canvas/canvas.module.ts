@@ -25,6 +25,7 @@ import { ImageUploadModule } from "angular2-image-upload";
 import { StaticCanvasComponent } from 'src/canvas/component/layers/Static/staticCanvas.component';
 import { EditCanvasComponent } from 'src/canvas/component/layers/Edit/editCanvas.component';
 import { ActionCanvasComponent } from 'src/canvas/component/layers/Action/actionCanvas.component';
+import { TimeLineService } from 'src/components/timeline/service/timeLine.service';
 
 library.add(
    faFilter
@@ -80,6 +81,7 @@ library.add(
     , UnitCellDialogComponent
     , CanvasGraphicStateDialogComponent],
   providers: [CanvasService
+    , TimeLineService
     , LineService
     , PortService
     , PathService]

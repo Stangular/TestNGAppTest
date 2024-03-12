@@ -2,33 +2,25 @@ import {
   Component,
   ElementRef,
   OnInit,
-  EventEmitter,
   Input,
-  Output,
   ViewChild,
   AfterViewInit,
   OnDestroy,
-  OnChanges,
-  DoCheck,
-  HostListener
+  HostListener,
+  OnChanges
 } from '@angular/core';
-import { ContextSystem, ContextLayer, EventContextLayer } from '../../../models/IContextItem';
+import { ContextSystem, ContextLayer, EventContextLayer, IDataResult } from '../../../models/IContextItem';
 import { Margin } from '../../../models/shapes/primitives/margin';
 import { Size } from '../../../models/shapes/primitives/size';
-import { Point } from '../../../models/shapes/primitives/point';
-import { ShapeSelectResult } from '../../../models/shapes/shapeSelected';
 import { Records } from 'src/dataManagement/model/records';
-import { MessageService } from 'src/app/messaging/message.service';
+import { MessageService, InformationExchange } from 'src/app/messaging/message.service';
 import { Subscription } from 'rxjs';
 import { EditModel } from '../../../models/designer/base.model';
 import { CanvasService } from '../../../service/canvas.service';
-import { ContextModel } from '../../context.model';
 import { DisplayValues } from 'src/canvas/models/DisplayValues';
-import { IActionItem } from '../Interfaces/IActionLayer';
-import { TimeLineSpanLayerModel } from 'src/canvas/models/concepts/timelines/timeLineSpan.model';
 import { Rectangle } from 'src/canvas/models/shapes/rectangle';
-
-
+import { AreaSizer } from 'src/canvas/models/shapes/sizing/sizer';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 export class ActionCanvasContextModel {
   size: Size = new Size();
@@ -45,6 +37,8 @@ export class ActionCanvasContextModel {
     '(window:resize)': 'onResize($event)'
   }
 })
+
+
 export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   subscription: Subscription;
@@ -56,7 +50,7 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() source: Records<string>;
   @Input() layerName: string = '';
   @Input() UIAction: string = '';
-  @ViewChild('topCanvas') topCanvas: ElementRef;
+  @ViewChild('touchCanvas') touchCanvas: ElementRef;
   @ViewChild('staticCanvas') theCanvas: ElementRef;
   @Input() canvasID: string = 'testCanvas';
   @Input() margin: Margin;
@@ -65,23 +59,93 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   _autoUpdate = false;
   _context: CanvasRenderingContext2D;
   _activeContext: CanvasRenderingContext2D;
+  //@Input() set dateChanged(change: any) {
+  //  if (this._contextLayer) {
+  //    try {
+  //      let dx = this.canvasService.DateChange;
+  //      this._contextLayer.SetDataResult(dx);
+  //    }
+  //    catch (ex) {
+  //      let sss = 0;
+  //    }
+  //    this._context.clearRect(
+  //      0,
+  //      0,
+  //      this._clientArea.Width,
+  //      this._clientArea.Height);
+  //    this.Draw();
+  //    //   this._contextLayer.Draw(this.TouchContext);
+  //  }
+  //}
+  @Input() set dataChanged(changeType: any) {
+    if( this._contextLayer ){
+  //    this._contextLayer.SetDataResult(this.canvasService.DataResultChange, changeType);
+      this._context.clearRect(
+        0,
+        0,
+        this._clientArea.Width,
+        this._clientArea.Height);
+      this.Draw();
+   //   this._contextLayer.Draw(this.TouchContext);
+    }
+ 
+  }
 
+  get dataChanged(): any {
+    return false;
+  }
+ // @output()
   constructor(private messageService: MessageService, public canvasService: CanvasService) {
 
     this.subscription = this.messageService.getMessage().subscribe(
       message => { this.AcceptMessage(message) });
+
+
   }
 
-  AcceptMessage(message: any) {
-    switch (message.text) {
-      case 11: break;
-      case 1015:
-      case 1001:
+  AcceptMessage(message: any) { //InformationExchange
+    switch (message.info.ID) {
+      case '11': break;
+      case '1015':
+      case '1001':
         this.onResize(null);
+        break;
+      case '20000' :
+        this.canvasService.setExternalDataExchange( message.info.Data );
+        this._contextLayer.SetDataResult(message.info.Data as IDataResult,2);
+        this._context.clearRect(
+        0,
+        0,
+        this._clientArea.Width,
+        this._clientArea.Height);
+        this.Draw();
+        break;
+
+      case '20001':
+        this.canvasService.setExternalDataExchange( message.info.Data );
+        this._contextLayer.SetDataResult(message.info.Data as IDataResult, 0);
+        this._context.clearRect(
+          0,
+          0,
+          this._clientArea.Width,
+          this._clientArea.Height);
+        this.Draw();
+        break;
+
     }
   }
 
-  ngOnInit() { }
+  ngOnChanges(changes: any) {
+
+    let sss = 0;
+    //this.doSomething(changes.categoryId.currentValue);
+    // You can also use categoryId.previousValue and 
+    // categoryId.firstChange for comparing old and new values
+
+  }
+
+
+  ngOnInit() {}
 
   InitCanvas(inputData: any): Promise<any> {
     return this._contextLayer.LoadCanvasData(inputData);
@@ -104,21 +168,26 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     return <HTMLCanvasElement>this.theCanvas.nativeElement;
   }
 
-  get TopCanvas() {
-    return <HTMLCanvasElement>this.topCanvas.nativeElement;
+  get TouchCanvas() {
+    return <HTMLCanvasElement>this.touchCanvas.nativeElement;
   }
 
   get TheContext() {
     return this.TheCanvas.getContext('2d');
   }
 
-  get TopContext() {
-    return this.TopCanvas.getContext('2d');
+  get TouchContext() {
+    return this.TouchCanvas.getContext('2d');
+  }
+
+  
+  set DataResultChange(data: any) {
+    let sss = 0;
   }
 
   ngAfterViewInit(): void {
     this._context = this.TheContext;
-    this._activeContext = this.TopContext;
+    this._activeContext = this.TouchContext;
     DisplayValues.SetContextItems(this._context);
     setTimeout(() =>
       this.setSize()
@@ -134,17 +203,22 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this._autoUpdate = this._contextLayer.AutoUpdate();
     if (this._autoUpdate) {
       this._context.save();
-      this.Draw();
+      this._context.clearRect(
+        0,
+        0,
+        this._clientArea.Width,
+        this._clientArea.Height);
+      this._contextLayer.DrawStatic(this._context, false);
       this._context.restore();
 
       setTimeout(() =>
         this.RunAutoUpdate()
-        , 10);
+        , 100);
     }
   }
 
   Clear() {
-    this.TopContext.clearRect(
+    this.TouchContext.clearRect(
       0,
       0,
       this._clientArea.Width,
@@ -152,43 +226,35 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   OnMouseDown(e: PointerEvent) {
-
     this.Clear();
-    this._contextLayer.selectItem(e, this.TopContext);
- //   this._contextLayer.Draw(this._context);
-    this.TopCanvas.setPointerCapture(e.pointerId);
-    this._contextLayer.Draw(this._context);
+    this._context.clearRect(
+      0,
+      0,
+      this._clientArea.Width,
+      this._clientArea.Height);
+    this._contextLayer.selectItem(e, this._context);
+    this.TouchCanvas.setPointerCapture(e.pointerId);
 
+    this._contextLayer.DrawStatic(this._context, false);
+    this._contextLayer.Draw(this.TouchContext, true);
   }
 
   OnMouseUp(e: any) {
-    this.Clear();
-    this._contextLayer.releaseSelectedItem(e,this._context);
-    this.TopCanvas.releasePointerCapture(e.pointerId);
-    this._contextLayer.Draw(this._context);
 
-  }
-
-  OnMouseOver(e: any) {
-    //if (this._mouseOut) {
-    //  e.srcElement.dispatchEvent(new Event("mouseup"));
-    //  e.srcElement.dispatchEvent(new Event("mousedown"));
-    //  e.srcElement.dispatchEvent(new Event("mouseup"));
-    //  this._mouseOut = false;
-    //}
-  }
-
-  OnMouseOut(e: any) {
-    //  e.srcElement.dispatchEvent(new Event("mouseup"));
-    // this._mouseOut = true;
+    if (this._contextLayer) {
+      this.Clear();
+      this._contextLayer.releaseSelectedItem(e, this._context);
+      this.TouchCanvas.releasePointerCapture(e.pointerId);
+      this._contextLayer.Draw(this._context);
+    }
   }
 
   OnMouseMove(e: any) {
-    this._contextLayer.mouseMove(e, this.TopContext);
-    if (!this._autoUpdate) {
-      setTimeout(() =>
-        this.RunAutoUpdate()
-        , 10);
+    if (this._contextLayer) {
+      this.Clear();
+      this._contextLayer.mouseMove(e, this.TouchContext);
+      this.canvasService.setExternalDataExchange(this._contextLayer.GetDataResult());
+      this.RunAutoUpdate();
     }
   }
 
@@ -204,8 +270,9 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.TheCanvas.width = w;
     this.TheCanvas.height = h - 5;
-    this.TopCanvas.width = this.TheCanvas.width;
-    this.TopCanvas.height = this.TheCanvas.height;
+    this.TouchCanvas.width = this.TheCanvas.width;
+    this.TouchCanvas.height = this.TheCanvas.height;
+  //  this.TouchCanvas.C = this.TheCanvas.offsetLeft;
     DisplayValues.width = this.TheCanvas.width;
     DisplayValues.height = this.TheCanvas.height;
     let area = this.TheCanvas.getBoundingClientRect();
@@ -220,7 +287,7 @@ export class ActionCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   Draw() {
-    this._contextLayer.Draw(this._context);
+    this._contextLayer.Draw(this._context,false);
   }
 
   ngOnDestroy() {

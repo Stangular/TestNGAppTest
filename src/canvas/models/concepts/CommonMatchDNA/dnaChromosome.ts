@@ -1,4 +1,4 @@
-import { EventContextLayer, IContextItem, ContextLayer } from "../../IContextItem";
+import { EventContextLayer, IContextItem, ContextLayer, IDataResult } from "../../IContextItem";
 import { Rectangle } from "../../shapes/rectangle";
 import { lineTypes } from "../../lines/line";
 import { Ellipse } from "../../shapes/ellipse";
@@ -971,6 +971,16 @@ export class DNAChromosomes extends EventContextLayer {
     //parentArea.AddPort(p2);
 
   }
+
+  GetDataResult(): IDataResult {
+    return null;
+  }
+
+  GetDateResult(): IDataResult {
+    return null;
+  }
+
+  SetDataResult(data: IDataResult, changeType: any) { }
 
   GetTouchedShape(point: Point): IShape { return null }
   ReturnTouchedShape(shape: IShape) { }
